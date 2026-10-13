@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<title>Pengumuman & Iklan · Dashboard · e-MindCare</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ═══════════════════════════════════════════════════
+   ROOT
+   ═══════════════════════════════════════════════════ */
+:root {
+  --teal: #0F766E;
+  --teal-light: #14B8A6;
+  --teal-glow: #2DD4BF;
+  --indigo: #4F46E5;
+  --indigo-light: #6366F1;
+  --cyan: #06B6D4;
+  --cyan-soft: #22D3EE;
+  --purple: #8B5CF6;
+  --pink: #EC4899;
+  --orange: #F59E0B;
+  --amber: #FBBF24;
+  --rose: #EF4444;
+  --emerald: #10B981;
+  --navy: #0F172A;
+  --pearl: #F8FAFC;
+  --white: #FFFFFF;
+  --ink: #0F172A;
+  --ink-soft: #64748B;
+  --ink-light: #94A3B8;
+  --line: rgba(15, 23, 42, 0.08);
+  --sidebar-w: 268px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--pearl);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--teal); color: #fff; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT + SIDEBAR
+   ═══════════════════════════════════════════════════ */
+.app { display: flex; min-height: 100vh; min-height: 100dvh; }
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 60;
+  transition: transform 0.4s var(--ease-out);
+  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+.sb-brand {
+  padding: 1.5rem 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+.sb-brand-logo {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1.15rem;
+  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.sb-brand-logo::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: shineSweep 4s linear infinite;
+}
+.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
+.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes shineSweep { to { transform: rotate(360deg); } }
+.sb-brand-text strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.sb-brand-text span {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.sb-profile {
+  margin: 1rem 1rem 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  color: inherit;
+}
+.sb-profile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+.sb-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sb-avatar::after {
+  content: "";
+  position: absolute;
+  bottom: -2px; right: -2px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--emerald);
+  border: 2px solid #1E293B;
+}
+.sb-profile-info { min-width: 0; flex: 1; }
+.sb-profile-info strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-profile-info span {
+  font-size: 0.68rem;
+  color: var(--teal-glow);
+  font-weight: 600;
+}
+
+.sb-menu {
+  flex: 1;
+  padding: 0.5rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.sb-section-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 1rem 0.6rem 0.4rem;
+}
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: all 0.3s var(--ease-out);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  position: relative;
+}
+.sb-item i:first-child {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+.sb-item:hover i:first-child {
+  background: rgba(20, 184, 166, 0.15);
+  color: var(--teal-glow);
+}
+.sb-item.active {
+  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
+  color: #fff;
+}
+.sb-item.active i:first-child {
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
+}
+.sb-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: var(--teal-glow);
+  border-radius: 0 4px 4px 0;
+}
+.sb-badge {
+  margin-left: auto;
+  padding: 0.1rem 0.5rem;
+  background: var(--rose);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  min-width: 22px;
+  text-align: center;
+}
+
+.sb-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+.sb-footer-btn {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #FCA5A5;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.sb-footer-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════
+   MAIN
+   ═══════════════════════════════════════════════════ */
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.tb-toggle {
+  display: none;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tb-toggle:hover { background: var(--pearl); }
+.tb-title { flex: 1; min-width: 0; }
+.tb-title h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 0.1rem;
+}
+.tb-title p {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.tb-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.tb-icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.tb-icon-btn:hover {
+  background: var(--pearl);
+  color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════
+   TAB NAVIGATION
+   ═══════════════════════════════════════════════════ */
+.tab-nav {
+  display: flex;
+  gap: 0.35rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0.4rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex: 1;
+  min-width: fit-content;
+  padding: 0.75rem 1.15rem;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s var(--ease-out);
+  white-space: nowrap;
+  position: relative;
+}
+.tab-btn i { font-size: 0.82rem; }
+.tab-btn:hover:not(.active) {
+  background: var(--pearl);
+  color: var(--ink);
+}
+.tab-btn.active {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4);
+}
+.tab-btn .tab-count {
+  padding: 0.05rem 0.4rem;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 0.68rem;
+  font-weight: 800;
+  min-width: 20px;
+  text-align: center;
+}
+.tab-btn:not(.active) .tab-count {
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--ink-soft);
+}
+
+/* ═══════════════════════════════════════════════════
+   TAB PANELS
+   ═══════════════════════════════════════════════════ */
+.tab-panel {
+  display: none;
+  animation: panelIn 0.45s var(--ease-out);
+}
+.tab-panel.active { display: block; }
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════
+   CARDS
+   ═══════════════════════════════════════════════════ */
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.6rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
+  transition: box-shadow 0.3s;
+}
+.card:hover { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06); }
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.card-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.95rem;
+}
+.card-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--card-c1, var(--teal)), var(--card-c2, var(--indigo)));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 20px -6px var(--card-c1, rgba(15, 118, 110, 0.4));
+  flex-shrink: 0;
+}
+.card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  margin-bottom: 0.15rem;
+  line-height: 1.2;
+}
+.card-subtitle {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM
+   ═══════════════════════════════════════════════════ */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.form-group.full { grid-column: 1 / -1; }
+.form-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.form-label .req { color: var(--rose); margin-left: 3px; }
+.form-label .hint {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ink-light);
+  letter-spacing: 0.3px;
+  text-transform: none;
+  margin-left: 0.5rem;
+}
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--ink-light);
+  font-size: 0.85rem;
+  transition: color 0.3s;
+  pointer-events: none;
+  z-index: 2;
+}
+.input-field {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.7rem;
+  background: var(--pearl);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink);
+  transition: all 0.3s var(--ease-out);
+  outline: none;
+}
+.input-field:hover {
+  border-color: rgba(15, 118, 110, 0.2);
+  background: #fff;
+}
+.input-field:focus {
+  border-color: var(--teal);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+}
+.input-wrap:focus-within .input-icon { color: var(--teal); }
+.input-field::placeholder { color: var(--ink-light); font-weight: 500; font-size: 0.8rem; }
+.input-field.no-icon { padding-left: 1rem; }
+textarea.input-field {
+  padding-left: 1rem;
+  min-height: 90px;
+  resize: vertical;
+  line-height: 1.6;
+  font-family: inherit;
+}
+.input-info {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin-top: 0.4rem;
+  font-weight: 500;
+}
+.input-info i { color: var(--teal); font-size: 0.68rem; }
+
+/* ═══════════════════════════════════════════════════
+   TOGGLE SWITCH
+   ═══════════════════════════════════════════════════ */
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+.toggle-switch input { display: none; }
+.toggle-track {
+  width: 46px; height: 26px;
+  border-radius: 50px;
+  background: var(--ink-light);
+  position: relative;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+.toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.3s var(--ease-elastic);
+}
+.toggle-switch input:checked + .toggle-track {
+  background: linear-gradient(90deg, var(--teal), var(--indigo));
+}
+.toggle-switch input:checked + .toggle-track::after {
+  transform: translateX(20px);
+}
+.toggle-label-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -6px rgba(15, 118, 110, 0.5);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  background: var(--pearl);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.btn-secondary:hover { background: #fff; border-color: var(--ink-light); }
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--rose);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.btn-danger:hover { background: var(--rose); color: #fff; }
+.btn-sm { padding: 0.5rem 0.9rem; font-size: 0.78rem; border-radius: 10px; }
+.btn-icon {
+  width: 34px; height: 34px;
+  padding: 0;
+  border-radius: 10px;
+}
+.btn .spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn.loading .btn-text { display: none; }
+.btn.loading .btn-loading { display: inline-flex; align-items: center; gap: 0.5rem; }
+.btn .btn-loading { display: none; }
+
+/* ═══════════════════════════════════════════════════
+   RUNNING TEXT PREVIEW
+   ═══════════════════════════════════════════════════ */
+.preview-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 0.7rem;
+}
+.preview-label i { color: var(--orange); }
+.preview-label .live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rose);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+  animation: pulse 1.5s ease-in-out infinite;
+  margin-left: auto;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.7; }
+}
+
+.preview-box {
+  background: linear-gradient(90deg, #0F172A 0%, #4C1D95 50%, #0E7490 100%);
+  color: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.3);
+  position: relative;
+}
+.preview-label-bar {
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
+  color: #0F172A;
+  padding: 0 1.2rem 0 1.4rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  padding-right: 1.7rem;
+  flex-shrink: 0;
+  z-index: 2;
+}
+.preview-label-bar i { animation: bellRing 2.5s ease-in-out infinite; }
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0); }
+  15%, 35% { transform: rotate(-14deg); }
+  25%, 45% { transform: rotate(14deg); }
+}
+.preview-track {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+}
+.preview-marquee {
+  display: flex;
+  gap: 3rem;
+  white-space: nowrap;
+  padding-left: 1.5rem;
+  animation: marquee 30s linear infinite;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.preview-marquee:hover { animation-play-state: paused; }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.preview-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+.preview-item i { color: var(--cyan-soft); font-size: 0.82rem; }
+.preview-item .badge {
+  background: rgba(34, 211, 238, 0.18);
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  color: var(--cyan-soft);
+  padding: 0.1rem 0.55rem;
+  border-radius: 50px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.preview-divider { color: var(--cyan-soft); opacity: 0.4; font-size: 0.7rem; }
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD ZONE
+   ═══════════════════════════════════════════════════ */
+.upload-zone {
+  border: 2px dashed rgba(15, 118, 110, 0.25);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: rgba(20, 184, 166, 0.02);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--teal);
+  background: rgba(20, 184, 166, 0.06);
+  transform: translateY(-2px);
+}
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.upload-icon {
+  width: 58px; height: 58px;
+  margin: 0 auto 1rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 12px 28px -6px rgba(15, 118, 110, 0.4);
+  transition: transform 0.4s var(--ease-elastic);
+}
+.upload-zone:hover .upload-icon { transform: translateY(-4px) scale(1.05); }
+.upload-zone h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 0.25rem;
+}
+.upload-zone p {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.upload-preview {
+  position: relative;
+  margin-top: 1rem;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--pearl);
+  max-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+}
+.upload-preview img,
+.upload-preview video {
+  max-width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  display: block;
+}
+.upload-preview .remove-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+}
+.upload-preview .remove-btn:hover {
+  background: var(--rose);
+  transform: scale(1.1);
+}
+.upload-preview .media-badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  padding: 0.25rem 0.65rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.upload-preview .media-size {
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.6rem;
+  padding: 0.2rem 0.6rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.upload-progress {
+  display: none;
+  margin-top: 1rem;
+  padding: 1rem 1.15rem;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.06), rgba(99, 102, 241, 0.06));
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 14px;
+}
+.upload-progress.active { display: block; }
+.upload-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+.upload-progress-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.upload-progress-label i { color: var(--teal); }
+.upload-progress-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+.upload-progress-bar {
+  height: 6px;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 50px;
+  overflow: hidden;
+}
+.upload-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal), var(--indigo));
+  border-radius: 50px;
+  transition: width 0.3s var(--ease-out);
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════
+   LIST ITEMS
+   ═══════════════════════════════════════════════════ */
+.list-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.15rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition: all 0.3s var(--ease-out);
+  position: relative;
+}
+.list-item:hover {
+  border-color: rgba(20, 184, 166, 0.3);
+  transform: translateX(4px);
+  box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.08);
+}
+.list-item.inactive {
+  opacity: 0.6;
+  background: var(--pearl);
+}
+.list-item-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px -4px rgba(20, 184, 166, 0.4);
+}
+.list-item-content {
+  flex: 1;
+  min-width: 0;
+}
+.list-item-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.list-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  align-items: center;
+}
+.list-item-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.list-item-meta i { font-size: 0.68rem; color: var(--teal); }
+.list-item-meta .badge-inline {
+  padding: 0.1rem 0.5rem;
+  background: rgba(34, 211, 238, 0.12);
+  color: var(--cyan);
+  border-radius: 50px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.list-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 50px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.status-pill.active {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--emerald);
+}
+.status-pill.inactive {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--ink-soft);
+}
+.status-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-pill.active .dot {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════
+   MEDIA GRID
+   ═══════════════════════════════════════════════════ */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.1rem;
+}
+.media-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.35s var(--ease-out);
+  display: flex;
+  flex-direction: column;
+}
+.media-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15);
+  border-color: transparent;
+}
+.media-card.inactive {
+  opacity: 0.55;
+}
+.media-card-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(135deg, #0F172A, #1E293B);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.media-card-media img,
+.media-card-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s var(--ease-out);
+}
+.media-card:hover .media-card-media img,
+.media-card:hover .media-card-media video {
+  transform: scale(1.05);
+}
+.media-card-media.logo-mode {
+  background: #fff;
+  padding: 1rem;
+}
+.media-card-media.logo-mode img {
+  object-fit: contain;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.media-badge {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.media-badge.image {
+  background: rgba(20, 184, 166, 0.9);
+  color: #fff;
+}
+.media-badge.video {
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+}
+.media-badge.logo {
+  background: rgba(99, 102, 241, 0.9);
+  color: #fff;
+}
+
+.media-card-body {
+  padding: 1rem 1.1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.media-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+.media-card-sub {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.media-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line);
+  margin-top: auto;
+}
+.media-card-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════════════ */
+.empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--ink-soft);
+  grid-column: 1 / -1;
+}
+.empty-state i {
+  font-size: 2.5rem;
+  color: var(--ink-light);
+  margin-bottom: 1rem;
+  display: block;
+  opacity: 0.5;
+}
+.empty-state strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+.empty-state p { font-size: 0.84rem; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+   ═══════════════════════════════════════════════════ */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.modal.active { display: flex; opacity: 1; }
+.modal-card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 1.75rem 1.6rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
+  animation: modalPop 0.4s var(--ease-elastic);
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-icon {
+  width: 60px; height: 60px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+}
+.modal-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
+.modal-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+.modal-desc {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+.modal-actions { display: flex; gap: 0.6rem; }
+.modal-actions .btn { flex: 1; }
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════ */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  pointer-events: none;
+  max-width: calc(100vw - 3rem);
+}
+.toast {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 20px 44px -8px rgba(15, 23, 42, 0.22);
+  border-left: 4px solid var(--emerald);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  min-width: 300px;
+  max-width: 400px;
+  font-size: 0.86rem;
+  animation: toastIn 0.45s var(--ease-elastic);
+  pointer-events: auto;
+}
+.toast.error { border-left-color: var(--rose); }
+.toast.info { border-left-color: var(--cyan); }
+.toast.warning { border-left-color: var(--orange); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(120%); } to { opacity: 1; transform: translateX(0); } }
+.toast.removing { animation: toastOut 0.3s ease forwards; }
+@keyframes toastOut { to { opacity: 0; transform: translateX(120%); } }
+.toast-icon {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+.toast.error .toast-icon { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
+.toast.info .toast-icon { background: rgba(6, 182, 212, 0.1); color: var(--cyan); }
+.toast.warning .toast-icon { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.toast-content { flex: 1; min-width: 0; }
+.toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
+.toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
+
+/* ═══════════════════════════════════════════════════
+   BACKDROP
+   ═══════════════════════════════════════════════════ */
+.sb-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 55;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.sb-backdrop.active { display: block; opacity: 1; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  :root { --sidebar-w: 240px; }
+  .content { padding: 1.25rem; }
+}
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .tb-toggle { display: flex; }
+  .topbar { padding: 0.75rem 1rem; }
+  .content { padding: 1rem; }
+  .form-grid { grid-template-columns: 1fr; }
+  .media-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+@media (max-width: 520px) {
+  .topbar { padding: 0.65rem 0.85rem; }
+  .tb-icon-btn { width: 36px; height: 36px; }
+  .tb-toggle { width: 36px; height: 36px; }
+  .tb-title h1 { font-size: 1rem; }
+  .tb-title p { display: none; }
+  .content { padding: 0.85rem; }
+  .card { padding: 1.15rem; border-radius: 16px; }
+  .media-grid { grid-template-columns: 1fr; }
+  .tab-btn { padding: 0.65rem 0.9rem; font-size: 0.78rem; }
+  .tab-btn span:not(.tab-count) { display: none; }
+  .tab-btn i { font-size: 0.9rem; }
+  .list-item { padding: 0.85rem 0.95rem; }
+  .list-item-icon { width: 36px; height: 36px; font-size: 0.9rem; }
+  .list-item-actions { flex-direction: column; }
+  .list-item-actions .btn-icon { width: 30px; height: 30px; }
+  .preview-box { height: 42px; }
+  .preview-label-bar { font-size: 0.58rem; padding-right: 1.4rem; }
+  .preview-marquee { font-size: 0.78rem; gap: 2rem; }
+  .toast-container { top: 0.85rem; right: 0.85rem; left: 0.85rem; max-width: none; }
+  .toast { min-width: auto; max-width: none; }
+  .card-header-left { gap: 0.75rem; }
+  .card-icon { width: 40px; height: 40px; font-size: 0.95rem; }
+  .card-title { font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══════════════════════════════════════════════════
+       SIDEBAR — dengan 3 menu berasingan
+       ═══════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
+      <div class="sb-brand-text">
+        <strong id="sbBrandName">e-MindCare</strong>
+        <span>Dashboard Kaunselor</span>
+      </div>
+    </div>
+
+    <a href="dashboard-profile.html" class="sb-profile">
+      <div class="sb-avatar" id="sbAvatar">K</div>
+      <div class="sb-profile-info">
+        <strong id="sbProfileName">Kaunselor</strong>
+        <span>Kaunselor UBK</span>
+      </div>
+    </a>
+
+    <nav class="sb-menu">
+      <div class="sb-section-label">Utama</div>
+      <a href="dashboard-kaunselor.html" class="sb-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Overview</span>
+      </a>
+      <a href="dashboard-profile.html" class="sb-item">
+        <i class="fas fa-user-circle"></i>
+        <span>Profil Kaunselor</span>
+      </a>
+
+      <div class="sb-section-label">Kandungan Laman</div>
+      <a href="dashboard-iklan.html?tab=announcements" class="sb-item" data-tab-link="announcements">
+        <i class="fas fa-bullhorn"></i>
+        <span>Pengumuman</span>
+      </a>
+      <a href="dashboard-iklan.html?tab=banners" class="sb-item" data-tab-link="banners">
+        <i class="fas fa-images"></i>
+        <span>Banner Iklan</span>
+      </a>
+      <a href="dashboard-iklan.html?tab=collabs" class="sb-item" data-tab-link="collabs">
+        <i class="fas fa-handshake"></i>
+        <span>Kolaborasi</span>
+      </a>
+      <a href="dashboard-sunting-laman.html" class="sb-item">
+        <i class="fas fa-paint-brush"></i>
+        <span>Sunting Laman</span>
+      </a>
+      <a href="dashboard-gallery.html" class="sb-item">
+        <i class="fas fa-photo-video"></i>
+        <span>Galeri UBK</span>
+      </a>
+      <a href="dashboard-contact.html" class="sb-item">
+        <i class="fas fa-address-book"></i>
+        <span>Hubungi & Lokasi</span>
+      </a>
+
+      <div class="sb-section-label">Pengurusan</div>
+      <a href="dashboard-inventories.html" class="sb-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Ujian Inventori</span>
+      </a>
+      <a href="dashboard-users.html" class="sb-item">
+        <i class="fas fa-users"></i>
+        <span>Urus Pengguna</span>
+      </a>
+      <a href="dashboard-appointments.html" class="sb-item">
+        <i class="fas fa-calendar-check"></i>
+        <span>Tempahan Kaunseling</span>
+        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
+      </a>
+      <a href="dashboard-diaries.html" class="sb-item">
+        <i class="fas fa-book"></i>
+        <span>Diari & Catatan</span>
+      </a>
+
+      <div class="sb-section-label">Analitik</div>
+      <a href="dashboard-analytics.html" class="sb-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Data & Laporan</span>
+      </a>
+    </nav>
+
+    <div class="sb-footer">
+      <button class="sb-footer-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Log Keluar</span>
+      </button>
+    </div>
+  </aside>
+  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       MAIN
+       ═══════════════════════════════════════════════════ -->
+  <div class="main">
+
+    <header class="topbar">
+      <button class="tb-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="tb-title">
+        <h1 id="pageTitle">Pengumuman</h1>
+        <p id="pageSubtitle">Urus mesej running text di laman utama</p>
+      </div>
+      <div class="tb-actions">
+        <a href="dashboard-kaunselor.html" class="tb-icon-btn" title="Kembali">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <a href="index.html" class="tb-icon-btn" title="Laman Utama" target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ═══════ TAB NAV ═══════ -->
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="announcements">
+          <i class="fas fa-bullhorn"></i>
+          <span>Pengumuman</span>
+          <span class="tab-count" id="tabCountAnn">0</span>
+        </button>
+        <button class="tab-btn" data-tab="banners">
+          <i class="fas fa-images"></i>
+          <span>Banner Iklan</span>
+          <span class="tab-count" id="tabCountBan">0</span>
+        </button>
+        <button class="tab-btn" data-tab="collabs">
+          <i class="fas fa-handshake"></i>
+          <span>Kolaborasi</span>
+          <span class="tab-count" id="tabCountCol">0</span>
+        </button>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           TAB 1: PENGUMUMAN
+           ═══════════════════════════════════════════════════ -->
+      <section class="tab-panel active" data-panel="announcements">
+
+        <!-- Live Preview -->
+        <div class="card">
+          <div class="preview-label">
+            <i class="fas fa-eye"></i>
+            <span>Preview Langsung</span>
+            <span class="live-dot"></span>
+          </div>
+          <div class="preview-box">
+            <div class="preview-label-bar">
+              <i class="fas fa-bullhorn"></i>
+              <span>Info</span>
+            </div>
+            <div class="preview-track">
+              <div class="preview-marquee" id="previewMarquee">
+                <span class="preview-item">
+                  <i class="fas fa-circle-info"></i>
+                  <span style="opacity:0.7;">Belum ada pengumuman aktif. Tambah di bawah.</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Borang Tambah -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#0F766E; --card-c2:#14B8A6;">
+                <i class="fas fa-plus"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Tambah Pengumuman</h2>
+                <p class="card-subtitle">Mesej yang akan berjalan di bahagian atas laman utama</p>
+              </div>
+            </div>
+          </div>
+
+          <form id="announcementForm">
+            <div class="form-grid">
+              <div class="form-group full">
+                <label class="form-label" for="annText">
+                  Teks Pengumuman <span class="req">*</span>
+                </label>
+                <div class="input-wrap">
+                  <i class="fas fa-comment input-icon"></i>
+                  <input type="text" id="annText" class="input-field" placeholder="Cth: Selamat datang ke portal e-MindCare UBK SEMSIRA" maxlength="180" required>
+                </div>
+                <div class="input-info">
+                  <i class="fas fa-info-circle"></i>
+                  <span>Maksimum 180 aksara untuk paparan optimum</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="annIcon">Ikon (Font Awesome)</label>
+                <div class="input-wrap">
+                  <i class="fas fa-icons input-icon"></i>
+                  <input type="text" id="annIcon" class="input-field" placeholder="fa-bullhorn" value="fa-bullhorn">
+                </div>
+                <div class="input-info">
+                  <i class="fas fa-lightbulb"></i>
+                  <span>Contoh: fa-heart, fa-star, fa-bell</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="annBadge">Lencana (Opsional)</label>
+                <div class="input-wrap">
+                  <i class="fas fa-tag input-icon"></i>
+                  <input type="text" id="annBadge" class="input-field" placeholder="BAHARU" maxlength="20">
+                </div>
+                <div class="input-info">
+                  <i class="fas fa-info-circle"></i>
+                  <span>Lencana kecil untuk tarik perhatian</span>
+                </div>
+              </div>
+
+              <div class="form-group full">
+                <label class="form-label">Status Paparan</label>
+                <div style="display:flex;align-items:center;gap:1rem;">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="annActive" checked>
+                    <span class="toggle-track"></span>
+                    <span class="toggle-label-text">Aktifkan pengumuman ini</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;">
+              <button type="submit" class="btn btn-primary">
+                <span class="btn-text">
+                  <i class="fas fa-save"></i>
+                  <span>Tambah Pengumuman</span>
+                </span>
+                <span class="btn-loading">
+                  <span class="spinner"></span>
+                  <span>Menyimpan...</span>
+                </span>
+              </button>
+              <button type="reset" class="btn btn-secondary">
+                <i class="fas fa-undo"></i>
+                <span>Reset</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Senarai Pengumuman -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#4F46E5; --card-c2:#6366F1;">
+                <i class="fas fa-list-ul"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Senarai Pengumuman</h2>
+                <p class="card-subtitle" id="annCountText">0 pengumuman</p>
+              </div>
+            </div>
+          </div>
+          <div class="list-stack" id="announcementList">
+            <div class="empty-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Memuatkan...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════
+           TAB 2: BANNER IKLAN
+           ═══════════════════════════════════════════════════ -->
+      <section class="tab-panel" data-panel="banners">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#F59E0B; --card-c2:#FBBF24;">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Upload Banner Iklan</h2>
+                <p class="card-subtitle">Gambar atau video untuk slideshow laman utama</p>
+              </div>
+            </div>
+          </div>
+
+          <form id="bannerForm">
+            <div class="upload-zone" id="bannerUploadZone">
+              <input type="file" id="bannerFileInput" accept="image/*,video/*">
+              <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+              <h4>Klik atau seret fail ke sini</h4>
+              <p>Format: JPG, PNG, WebP, MP4, WebM · Maks 25MB</p>
+            </div>
+
+            <div class="upload-preview" id="bannerPreview" style="display:none;"></div>
+
+            <div class="upload-progress" id="bannerProgress">
+              <div class="upload-progress-header">
+                <div class="upload-progress-label">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <span id="bannerProgressLabel">Memuat naik...</span>
+                </div>
+                <span class="upload-progress-pct" id="bannerProgressPct">0%</span>
+              </div>
+              <div class="upload-progress-bar">
+                <div class="upload-progress-fill" id="bannerProgressFill"></div>
+              </div>
+            </div>
+
+            <div class="form-grid" style="margin-top:1.2rem;">
+              <div class="form-group">
+                <label class="form-label" for="bannerTitle">Tajuk Banner</label>
+                <div class="input-wrap">
+                  <i class="fas fa-heading input-icon"></i>
+                  <input type="text" id="bannerTitle" class="input-field" placeholder="Cth: Program Minda Sihat 2026" maxlength="100">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="bannerBadge">Lencana</label>
+                <div class="input-wrap">
+                  <i class="fas fa-tag input-icon"></i>
+                  <input type="text" id="bannerBadge" class="input-field" placeholder="PROGRAM" maxlength="20">
+                </div>
+              </div>
+
+              <div class="form-group full">
+                <label class="form-label" for="bannerSubtitle">Penerangan Ringkas</label>
+                <textarea id="bannerSubtitle" class="input-field" placeholder="Huraian ringkas mengenai banner..." maxlength="200"></textarea>
+              </div>
+
+              <div class="form-group full">
+                <label class="form-label" for="bannerLink">Pautan (Opsional)</label>
+                <div class="input-wrap">
+                  <i class="fas fa-link input-icon"></i>
+                  <input type="url" id="bannerLink" class="input-field" placeholder="https://contoh.com">
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;">
+              <button type="submit" class="btn btn-primary" id="bannerSaveBtn" disabled>
+                <span class="btn-text">
+                  <i class="fas fa-save"></i>
+                  <span>Tambah Banner</span>
+                </span>
+                <span class="btn-loading">
+                  <span class="spinner"></span>
+                  <span>Menyimpan...</span>
+                </span>
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="resetBannerForm()">
+                <i class="fas fa-undo"></i>
+                <span>Reset</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#EC4899; --card-c2:#F472B6;">
+                <i class="fas fa-photo-video"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Banner Aktif</h2>
+                <p class="card-subtitle" id="bannerCountText">0 banner</p>
+              </div>
+            </div>
+          </div>
+          <div class="media-grid" id="bannerGrid">
+            <div class="empty-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Memuatkan...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════
+           TAB 3: KOLABORASI
+           ═══════════════════════════════════════════════════ -->
+      <section class="tab-panel" data-panel="collabs">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#4F46E5; --card-c2:#8B5CF6;">
+                <i class="fas fa-handshake"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Tambah Logo Kolaborasi</h2>
+                <p class="card-subtitle">Logo rakan strategik untuk dipaparkan di laman utama</p>
+              </div>
+            </div>
+          </div>
+
+          <form id="collabForm">
+            <div class="upload-zone" id="collabUploadZone">
+              <input type="file" id="collabFileInput" accept="image/*">
+              <div class="upload-icon"><i class="fas fa-image"></i></div>
+              <h4>Klik atau seret logo ke sini</h4>
+              <p>Format PNG dengan latar lutsinar digalakkan</p>
+            </div>
+
+            <div class="upload-preview" id="collabPreview" style="display:none;"></div>
+
+            <div class="upload-progress" id="collabProgress">
+              <div class="upload-progress-header">
+                <div class="upload-progress-label">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <span id="collabProgressLabel">Memuat naik...</span>
+                </div>
+                <span class="upload-progress-pct" id="collabProgressPct">0%</span>
+              </div>
+              <div class="upload-progress-bar">
+                <div class="upload-progress-fill" id="collabProgressFill"></div>
+              </div>
+            </div>
+
+            <div class="form-grid" style="margin-top:1.2rem;">
+              <div class="form-group">
+                <label class="form-label" for="collabName">
+                  Nama Rakan Kolaborasi <span class="req">*</span>
+                </label>
+                <div class="input-wrap">
+                  <i class="fas fa-building input-icon"></i>
+                  <input type="text" id="collabName" class="input-field" placeholder="Cth: Kementerian Pendidikan Malaysia" maxlength="100" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="collabLink">Pautan Laman Web</label>
+                <div class="input-wrap">
+                  <i class="fas fa-link input-icon"></i>
+                  <input type="url" id="collabLink" class="input-field" placeholder="https://moe.gov.my">
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;">
+              <button type="submit" class="btn btn-primary" id="collabSaveBtn" disabled>
+                <span class="btn-text">
+                  <i class="fas fa-save"></i>
+                  <span>Tambah Logo</span>
+                </span>
+                <span class="btn-loading">
+                  <span class="spinner"></span>
+                  <span>Menyimpan...</span>
+                </span>
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="resetCollabForm()">
+                <i class="fas fa-undo"></i>
+                <span>Reset</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#8B5CF6; --card-c2:#A78BFA;">
+                <i class="fas fa-building-columns"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Logo Aktif</h2>
+                <p class="card-subtitle" id="collabCountText">0 logo</p>
+              </div>
+            </div>
+          </div>
+          <div class="media-grid" id="collabGrid">
+            <div class="empty-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Memuatkan...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal" id="confirmModal">
+  <div class="modal-card">
+    <div class="modal-icon danger" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
+    <h3 class="modal-title" id="confirmTitle">Padam Data?</h3>
+    <p class="modal-desc" id="confirmDesc">Tindakan ini tidak boleh diundur.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeConfirmModal()">Batal</button>
+      <button class="btn btn-danger" id="confirmBtn">Ya, Padam</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="dashboard-iklan.js"></script>
+
+</body>
+</html>

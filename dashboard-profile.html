@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<title>Profil Kaunselor · Dashboard · e-MindCare</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ═══════════════════════════════════════════════════
+   ROOT
+   ═══════════════════════════════════════════════════ */
+:root {
+  --teal: #0F766E;
+  --teal-light: #14B8A6;
+  --teal-glow: #2DD4BF;
+  --indigo: #4F46E5;
+  --indigo-light: #6366F1;
+  --cyan: #06B6D4;
+  --cyan-soft: #22D3EE;
+  --purple: #8B5CF6;
+  --pink: #EC4899;
+  --orange: #F59E0B;
+  --amber: #FBBF24;
+  --rose: #EF4444;
+  --emerald: #10B981;
+  --navy: #0F172A;
+  --pearl: #F8FAFC;
+  --white: #FFFFFF;
+  --ink: #0F172A;
+  --ink-soft: #64748B;
+  --ink-light: #94A3B8;
+  --line: rgba(15, 23, 42, 0.08);
+  --sidebar-w: 268px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--pearl);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--teal); color: #fff; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.25); }
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════════════ */
+.app { display: flex; min-height: 100vh; min-height: 100dvh; }
+
+/* ═══════════════════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 60;
+  transition: transform 0.4s var(--ease-out);
+  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+.sb-brand {
+  padding: 1.5rem 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+.sb-brand-logo {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1.15rem;
+  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.sb-brand-logo::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: shineSweep 4s linear infinite;
+}
+.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
+.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes shineSweep { to { transform: rotate(360deg); } }
+.sb-brand-text strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.sb-brand-text span {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.sb-profile {
+  margin: 1rem 1rem 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  color: inherit;
+}
+.sb-profile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+.sb-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sb-avatar::after {
+  content: "";
+  position: absolute;
+  bottom: -2px; right: -2px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--emerald);
+  border: 2px solid #1E293B;
+}
+.sb-profile-info { min-width: 0; flex: 1; }
+.sb-profile-info strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-profile-info span {
+  font-size: 0.68rem;
+  color: var(--teal-glow);
+  font-weight: 600;
+}
+
+.sb-menu {
+  flex: 1;
+  padding: 0.5rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.sb-section-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 1rem 0.6rem 0.4rem;
+}
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: all 0.3s var(--ease-out);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  position: relative;
+}
+.sb-item i:first-child {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+.sb-item:hover i:first-child {
+  background: rgba(20, 184, 166, 0.15);
+  color: var(--teal-glow);
+}
+.sb-item.active {
+  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
+  color: #fff;
+}
+.sb-item.active i:first-child {
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
+}
+.sb-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: var(--teal-glow);
+  border-radius: 0 4px 4px 0;
+}
+.sb-badge {
+  margin-left: auto;
+  padding: 0.1rem 0.5rem;
+  background: var(--rose);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  min-width: 22px;
+  text-align: center;
+}
+
+.sb-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+.sb-footer-btn {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #FCA5A5;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.sb-footer-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════
+   MAIN
+   ═══════════════════════════════════════════════════ */
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.tb-toggle {
+  display: none;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tb-toggle:hover { background: var(--pearl); }
+.tb-title { flex: 1; min-width: 0; }
+.tb-title h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 0.1rem;
+}
+.tb-title p {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.tb-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.tb-icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.tb-icon-btn:hover {
+  background: var(--pearl);
+  color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════
+   HERO PROFILE CARD
+   ═══════════════════════════════════════════════════ */
+.profile-hero {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 40px -12px rgba(15, 23, 42, 0.12);
+  margin-bottom: 1.5rem;
+}
+
+.profile-cover {
+  position: relative;
+  height: 180px;
+  background: linear-gradient(135deg, #1E1B4B 0%, #4C1D95 50%, #0E7490 100%);
+  background-size: 200% 200%;
+  animation: coverGradient 15s ease infinite;
+  overflow: hidden;
+}
+@keyframes coverGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.profile-cover::before {
+  content: "";
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.35), transparent 70%);
+  border-radius: 50%;
+}
+.profile-cover::after {
+  content: "";
+  position: absolute;
+  bottom: -80px; left: 15%;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent 70%);
+  border-radius: 50%;
+}
+.cover-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.profile-body {
+  padding: 0 2rem 2rem;
+  position: relative;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  margin-top: -70px;
+  margin-bottom: 1.2rem;
+  width: fit-content;
+}
+
+.profile-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 800;
+  font-family: 'Fraunces', serif;
+  overflow: hidden;
+  border: 6px solid #fff;
+  box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.3);
+  position: relative;
+  transition: transform 0.4s var(--ease-elastic);
+}
+.profile-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.profile-avatar:hover { transform: scale(1.03); }
+
+.profile-avatar-overlay {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.profile-avatar:hover .profile-avatar-overlay { opacity: 1; }
+.profile-avatar-overlay i {
+  font-size: 1.5rem;
+  color: var(--cyan-soft);
+  margin-bottom: 0.2rem;
+}
+
+.avatar-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #fff;
+  font-size: 0.85rem;
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.35);
+  z-index: 2;
+}
+
+.profile-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.profile-info-left { flex: 1; min-width: 0; }
+.profile-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 0.4rem;
+}
+.profile-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.12), rgba(99, 102, 241, 0.12));
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--teal);
+  margin-bottom: 0.6rem;
+}
+.profile-title i { font-size: 0.7rem; }
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin-top: 0.6rem;
+}
+.profile-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.profile-meta i {
+  color: var(--teal);
+  font-size: 0.78rem;
+}
+
+.profile-info-right {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD PROGRESS
+   ═══════════════════════════════════════════════════ */
+.upload-progress {
+  display: none;
+  margin-bottom: 1rem;
+  padding: 1rem 1.15rem;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.06), rgba(99, 102, 241, 0.06));
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 14px;
+  animation: slideDown 0.3s ease;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.upload-progress.active { display: block; }
+.upload-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+.upload-progress-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.upload-progress-label i { color: var(--teal); }
+.upload-progress-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+.upload-progress-bar {
+  height: 6px;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 50px;
+  overflow: hidden;
+}
+.upload-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal), var(--indigo));
+  border-radius: 50px;
+  transition: width 0.3s var(--ease-out);
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION
+   ═══════════════════════════════════════════════════ */
+.form-section {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
+  transition: box-shadow 0.3s;
+}
+.form-section:hover { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06); }
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.section-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.section-icon {
+  width: 44px; height: 44px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--sec-c1, var(--teal)), var(--sec-c2, var(--indigo)));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  box-shadow: 0 8px 20px -6px var(--sec-c1, rgba(15, 118, 110, 0.4));
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  margin-bottom: 0.15rem;
+}
+.section-desc {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM
+   ═══════════════════════════════════════════════════ */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.1rem;
+}
+.form-group.full { grid-column: 1 / -1; }
+.form-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.form-label .req { color: var(--rose); margin-left: 3px; }
+.form-label .hint {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ink-light);
+  letter-spacing: 0.3px;
+  text-transform: none;
+  margin-left: 0.5rem;
+}
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--ink-light);
+  font-size: 0.85rem;
+  transition: color 0.3s;
+  pointer-events: none;
+  z-index: 2;
+}
+.input-field {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.7rem;
+  background: var(--pearl);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink);
+  transition: all 0.3s var(--ease-out);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.input-field:hover:not(:disabled):not([readonly]) {
+  border-color: rgba(15, 118, 110, 0.2);
+  background: #fff;
+}
+.input-field:focus:not(:disabled):not([readonly]) {
+  border-color: var(--teal);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+}
+.input-field:disabled,
+.input-field[readonly] {
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--ink-soft);
+  cursor: not-allowed;
+}
+.input-wrap:focus-within .input-icon { color: var(--teal); }
+.input-field::placeholder { color: var(--ink-light); font-weight: 500; font-size: 0.8rem; }
+.input-field.uppercase {
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+.input-field.mono {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+textarea.input-field {
+  padding-left: 1rem;
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.6;
+  font-family: inherit;
+}
+.input-info {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin-top: 0.4rem;
+  font-weight: 500;
+}
+.input-info i { color: var(--teal); font-size: 0.68rem; }
+
+/* Character counter */
+.char-counter {
+  position: absolute;
+  bottom: 0.65rem;
+  right: 1rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink-light);
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255,255,255,0.9);
+  padding: 0.15rem 0.5rem;
+  border-radius: 50px;
+  pointer-events: none;
+}
+.char-counter.warn { color: var(--orange); }
+.char-counter.limit { color: var(--rose); }
+
+/* ═══════════════════════════════════════════════════
+   TOGGLE SWITCH
+   ═══════════════════════════════════════════════════ */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  background: var(--pearl);
+  border-radius: 14px;
+  margin-bottom: 0.75rem;
+  transition: background 0.2s;
+}
+.toggle-row:hover { background: rgba(248, 250, 252, 0.6); }
+.toggle-row:last-of-type { margin-bottom: 0; }
+.toggle-info strong {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.15rem;
+}
+.toggle-info span {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.toggle-switch input { display: none; }
+.toggle-track {
+  display: block;
+  width: 50px;
+  height: 28px;
+  border-radius: 50px;
+  background: var(--ink-light);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s var(--ease-elastic);
+}
+.toggle-switch input:checked + .toggle-track {
+  background: linear-gradient(90deg, var(--teal), var(--indigo));
+}
+.toggle-switch input:checked + .toggle-track::after {
+  transform: translateX(22px);
+}
+
+/* ═══════════════════════════════════════════════════
+   ACTION BAR (STICKY)
+   ═══════════════════════════════════════════════════ */
+.action-bar {
+  position: sticky;
+  bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.2);
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  z-index: 40;
+}
+.action-bar-status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.action-bar-status .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--emerald);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+.action-bar-status .status-dot.dirty {
+  background: var(--orange);
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+  animation: dirtyPulse 2s ease-in-out infinite;
+}
+@keyframes dirtyPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -6px rgba(15, 118, 110, 0.5);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  background: var(--pearl);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #fff;
+  border-color: var(--ink-light);
+  transform: translateY(-1px);
+}
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--rose);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.btn-danger:hover { background: var(--rose); color: #fff; }
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+}
+.btn-outline:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.05);
+}
+.btn-sm { padding: 0.55rem 1rem; font-size: 0.78rem; border-radius: 10px; }
+
+.btn .spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn.loading .btn-text { display: none; }
+.btn.loading .btn-loading { display: inline-flex; align-items: center; gap: 0.5rem; }
+.btn .btn-loading { display: none; }
+
+/* ═══════════════════════════════════════════════════
+   DANGER ZONE
+   ═══════════════════════════════════════════════════ */
+.danger-zone {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.04), rgba(239, 68, 68, 0.02));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.danger-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+.danger-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--rose);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.danger-header-text strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+.danger-header-text span {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════ */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  pointer-events: none;
+  max-width: calc(100vw - 3rem);
+}
+.toast {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 20px 44px -8px rgba(15, 23, 42, 0.22);
+  border-left: 4px solid var(--emerald);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  min-width: 300px;
+  max-width: 400px;
+  font-size: 0.86rem;
+  animation: toastIn 0.45s var(--ease-elastic);
+  pointer-events: auto;
+}
+.toast.error { border-left-color: var(--rose); }
+.toast.info { border-left-color: var(--cyan); }
+.toast.warning { border-left-color: var(--orange); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(120%); } to { opacity: 1; transform: translateX(0); } }
+.toast.removing { animation: toastOut 0.3s ease forwards; }
+@keyframes toastOut { to { opacity: 0; transform: translateX(120%); } }
+.toast-icon {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+.toast.error .toast-icon { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
+.toast.info .toast-icon { background: rgba(6, 182, 212, 0.1); color: var(--cyan); }
+.toast.warning .toast-icon { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.toast-content { flex: 1; min-width: 0; }
+.toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
+.toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+   ═══════════════════════════════════════════════════ */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.modal.active { display: flex; opacity: 1; }
+.modal-card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 1.75rem 1.6rem;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
+  animation: modalPop 0.4s var(--ease-elastic);
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-icon {
+  width: 60px; height: 60px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+}
+.modal-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
+.modal-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.modal-icon.info { background: rgba(99, 102, 241, 0.1); color: var(--indigo); }
+.modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+.modal-desc {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+.modal-actions { display: flex; gap: 0.6rem; }
+.modal-actions .btn { flex: 1; }
+
+/* ═══════════════════════════════════════════════════
+   LOADING SKELETON
+   ═══════════════════════════════════════════════════ */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════
+   BACKDROP
+   ═══════════════════════════════════════════════════ */
+.sb-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 55;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.sb-backdrop.active { display: block; opacity: 1; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  :root { --sidebar-w: 240px; }
+  .content { padding: 1.25rem; }
+}
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .tb-toggle { display: flex; }
+  .topbar { padding: 0.75rem 1rem; }
+  .content { padding: 1rem; }
+  .form-grid { grid-template-columns: 1fr; }
+  .profile-cover { height: 140px; }
+  .profile-body { padding: 0 1.25rem 1.5rem; }
+  .profile-avatar { width: 110px; height: 110px; font-size: 2.4rem; }
+  .profile-avatar-wrap { margin-top: -55px; }
+  .profile-name { font-size: 1.35rem; }
+}
+@media (max-width: 520px) {
+  .topbar { padding: 0.65rem 0.85rem; }
+  .tb-icon-btn { width: 36px; height: 36px; }
+  .tb-toggle { width: 36px; height: 36px; }
+  .tb-title h1 { font-size: 1rem; }
+  .tb-title p { display: none; }
+  .content { padding: 0.85rem; }
+  .form-section { padding: 1.15rem; border-radius: 16px; }
+  .profile-cover { height: 120px; }
+  .profile-body { padding: 0 1rem 1.25rem; }
+  .profile-avatar { width: 96px; height: 96px; font-size: 2rem; border-width: 4px; }
+  .avatar-badge { width: 30px; height: 30px; font-size: 0.72rem; border-width: 3px; }
+  .profile-avatar-wrap { margin-top: -48px; }
+  .profile-name { font-size: 1.15rem; }
+  .section-header-left { gap: 0.7rem; }
+  .section-icon { width: 38px; height: 38px; font-size: 0.95rem; }
+  .action-bar { padding: 0.85rem; bottom: 0.85rem; }
+  .action-buttons { width: 100%; }
+  .action-buttons .btn { flex: 1; }
+  .action-bar-status { width: 100%; }
+  .toast-container { top: 0.85rem; right: 0.85rem; left: 0.85rem; max-width: none; }
+  .toast { min-width: auto; max-width: none; }
+  .toggle-row { padding: 0.85rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══════════════════════════════════════════════════
+       SIDEBAR
+       ═══════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
+      <div class="sb-brand-text">
+        <strong id="sbBrandName">e-MindCare</strong>
+        <span>Dashboard Kaunselor</span>
+      </div>
+    </div>
+
+    <a href="dashboard-profile.html" class="sb-profile">
+      <div class="sb-avatar" id="sbAvatar">K</div>
+      <div class="sb-profile-info">
+        <strong id="sbProfileName">Kaunselor</strong>
+        <span>Kaunselor UBK</span>
+      </div>
+    </a>
+
+    <nav class="sb-menu">
+      <div class="sb-section-label">Utama</div>
+      <a href="dashboard-kaunselor.html" class="sb-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Overview</span>
+      </a>
+      <a href="dashboard-profile.html" class="sb-item active">
+        <i class="fas fa-user-circle"></i>
+        <span>Profil Kaunselor</span>
+      </a>
+
+      <div class="sb-section-label">Kandungan Laman</div>
+      <a href="dashboard-announcements.html" class="sb-item">
+        <i class="fas fa-bullhorn"></i>
+        <span>Pengumuman</span>
+      </a>
+      <a href="dashboard-banners.html" class="sb-item">
+        <i class="fas fa-images"></i>
+        <span>Banner Iklan</span>
+      </a>
+      <a href="dashboard-collaborations.html" class="sb-item">
+        <i class="fas fa-handshake"></i>
+        <span>Kolaborasi</span>
+      </a>
+      <a href="dashboard-landing.html" class="sb-item">
+        <i class="fas fa-paint-brush"></i>
+        <span>Sunting Laman</span>
+      </a>
+      <a href="dashboard-gallery.html" class="sb-item">
+        <i class="fas fa-photo-video"></i>
+        <span>Galeri UBK</span>
+      </a>
+      <a href="dashboard-contact.html" class="sb-item">
+        <i class="fas fa-address-book"></i>
+        <span>Hubungi & Lokasi</span>
+      </a>
+
+      <div class="sb-section-label">Pengurusan</div>
+      <a href="dashboard-inventories.html" class="sb-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Ujian Inventori</span>
+      </a>
+      <a href="dashboard-users.html" class="sb-item">
+        <i class="fas fa-users"></i>
+        <span>Urus Pengguna</span>
+      </a>
+      <a href="dashboard-appointments.html" class="sb-item">
+        <i class="fas fa-calendar-check"></i>
+        <span>Tempahan Kaunseling</span>
+        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
+      </a>
+      <a href="dashboard-diaries.html" class="sb-item">
+        <i class="fas fa-book"></i>
+        <span>Diari & Catatan</span>
+      </a>
+
+      <div class="sb-section-label">Analitik</div>
+      <a href="dashboard-analytics.html" class="sb-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Data & Laporan</span>
+      </a>
+    </nav>
+
+    <div class="sb-footer">
+      <button class="sb-footer-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Log Keluar</span>
+      </button>
+    </div>
+  </aside>
+  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       MAIN
+       ═══════════════════════════════════════════════════ -->
+  <div class="main">
+
+    <header class="topbar">
+      <button class="tb-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="tb-title">
+        <h1>Profil Kaunselor</h1>
+        <p>Urus maklumat peribadi dan keselamatan akaun anda</p>
+      </div>
+      <div class="tb-actions">
+        <a href="dashboard-kaunselor.html" class="tb-icon-btn" title="Kembali ke Dashboard">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <a href="index.html" class="tb-icon-btn" title="Laman Utama" target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ═══════ HERO PROFILE CARD ═══════ -->
+      <div class="profile-hero">
+        <div class="profile-cover">
+          <div class="cover-pattern"></div>
+        </div>
+
+        <div class="profile-body">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar" id="profileAvatar">
+              <span id="avatarText">K</span>
+              <label class="profile-avatar-overlay" for="avatarInput">
+                <i class="fas fa-camera"></i>
+                <span>Tukar Gambar</span>
+              </label>
+            </div>
+            <div class="avatar-badge">
+              <i class="fas fa-check"></i>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+          </div>
+
+          <!-- Upload Progress -->
+          <div class="upload-progress" id="uploadProgress">
+            <div class="upload-progress-header">
+              <div class="upload-progress-label">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span id="uploadLabel">Memuat naik gambar...</span>
+              </div>
+              <span class="upload-progress-pct" id="uploadPct">0%</span>
+            </div>
+            <div class="upload-progress-bar">
+              <div class="upload-progress-fill" id="uploadFill"></div>
+            </div>
+          </div>
+
+          <div class="profile-info">
+            <div class="profile-info-left">
+              <h1 class="profile-name" id="profileName">Memuatkan...</h1>
+              <div class="profile-title" id="profileTitle">
+                <i class="fas fa-user-shield"></i>
+                <span>Kaunselor UBK SEMSIRA</span>
+              </div>
+              <div class="profile-meta">
+                <span><i class="fas fa-id-card"></i> <span id="metaIC">—</span></span>
+                <span><i class="fas fa-envelope"></i> <span id="metaEmail">—</span></span>
+                <span><i class="fas fa-phone"></i> <span id="metaPhone">—</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ MAKLUMAT PERIBADI ═══════ -->
+      <form id="profileForm" autocomplete="off">
+
+        <div class="form-section" style="--sec-c1:#0F766E; --sec-c2:#14B8A6;">
+          <div class="section-header">
+            <div class="section-header-left">
+              <div class="section-icon"><i class="fas fa-user-circle"></i></div>
+              <div>
+                <h2 class="section-title">Maklumat Peribadi</h2>
+                <p class="section-desc">Maklumat asas yang dipaparkan pada profil anda</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label" for="fullName">
+                Nama Penuh <span class="req">*</span>
+              </label>
+              <div class="input-wrap">
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" id="fullName" class="input-field uppercase" placeholder="SEPERTI DALAM KAD PENGENALAN" maxlength="80" required>
+              </div>
+              <div class="input-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Auto format HURUF BESAR mengikut Kad Pengenalan</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Nombor Kad Pengenalan
+                <span class="hint">(Tetap — untuk keselamatan)</span>
+              </label>
+              <div class="input-wrap">
+                <i class="fas fa-id-card input-icon"></i>
+                <input type="text" id="icNumber" class="input-field mono" placeholder="—" readonly>
+              </div>
+              <div class="input-info">
+                <i class="fas fa-lock"></i>
+                <span>Tidak boleh diubah. Hubungi admin jika perlu kemaskini</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="title">Gelaran / Jawatan UBK</label>
+              <div class="input-wrap">
+                <i class="fas fa-user-tie input-icon"></i>
+                <input type="text" id="title" class="input-field" placeholder="Cth: Ketua Guru Bimbingan & Kaunseling" maxlength="100">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">Nombor Telefon / WhatsApp</label>
+              <div class="input-wrap">
+                <i class="fas fa-phone input-icon"></i>
+                <input type="tel" id="phone" class="input-field" placeholder="0123456789" maxlength="20" inputmode="tel">
+              </div>
+              <div class="input-info">
+                <i class="fas fa-bell"></i>
+                <span>Untuk notifikasi temujanji murid</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">E-mel Rasmi / EduID</label>
+              <div class="input-wrap">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" id="email" class="input-field" placeholder="nama@moe-dl.edu.my" maxlength="100">
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label" for="education">Kelulusan Akademik / Opsyen</label>
+              <div class="input-wrap">
+                <i class="fas fa-graduation-cap input-icon"></i>
+                <input type="text" id="education" class="input-field" placeholder="Cth: Ijazah Sarjana Muda Bimbingan & Kaunseling (UPM)" maxlength="150">
+              </div>
+            </div>
+
+            <div class="form-group full" style="position:relative;">
+              <label class="form-label" for="bio">
+                Biodata / Perutusan Kaunselor
+                <span class="hint">(dipaparkan di laman utama)</span>
+              </label>
+              <textarea id="bio" class="input-field" placeholder="Sepatah kata / hasrat kaunselor untuk murid dan ibu bapa..." maxlength="600" rows="5"></textarea>
+              <div class="char-counter" id="bioCounter">0 / 600</div>
+              <div class="input-info">
+                <i class="fas fa-comment-dots"></i>
+                <span>Akan dipaparkan di bahagian perutusan kaunselor pada laman utama</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ KESELAMATAN & NOTIFIKASI ═══════ -->
+        <div class="form-section" style="--sec-c1:#4F46E5; --sec-c2:#6366F1;">
+          <div class="section-header">
+            <div class="section-header-left">
+              <div class="section-icon"><i class="fas fa-shield-halved"></i></div>
+              <div>
+                <h2 class="section-title">Keselamatan & Notifikasi</h2>
+                <p class="section-desc">Kawal privasi akaun dan pilihan notifikasi anda</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong><i class="fas fa-envelope" style="color:var(--teal);margin-right:0.4rem;"></i> Notifikasi E-mel</strong>
+              <span>Terima notifikasi temujanji baharu melalui e-mel</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="notifEmail" checked>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong><i class="fab fa-whatsapp" style="color:var(--emerald);margin-right:0.4rem;"></i> Notifikasi WhatsApp</strong>
+              <span>Terima peringatan temujanji melalui WhatsApp</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="notifWhatsapp">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong><i class="fas fa-user-shield" style="color:var(--indigo);margin-right:0.4rem;"></i> Papar Nombor Telefon</strong>
+              <span>Benarkan murid melihat nombor telefon anda</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="showPhone">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong><i class="fas fa-eye" style="color:var(--purple);margin-right:0.4rem;"></i> Papar Biodata di Laman Utama</strong>
+              <span>Tunjuk biodata anda di bahagian perutusan</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="showBio" checked>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ═══════ ACTION BAR (Sticky) ═══════ -->
+        <div class="action-bar">
+          <div class="action-bar-status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Semua perubahan disimpan</span>
+          </div>
+          <div class="action-buttons">
+            <button type="button" class="btn btn-secondary" id="resetBtn">
+              <i class="fas fa-undo"></i>
+              <span>Reset</span>
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveBtn" disabled>
+              <span class="btn-text">
+                <i class="fas fa-save"></i>
+                <span>Simpan Perubahan</span>
+              </span>
+              <span class="btn-loading">
+                <span class="spinner"></span>
+                <span>Menyimpan...</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+    </main>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal" id="confirmModal">
+  <div class="modal-card">
+    <div class="modal-icon danger" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
+    <h3 class="modal-title" id="confirmTitle">Anda Pasti?</h3>
+    <p class="modal-desc" id="confirmDesc">Tindakan ini tidak boleh diundur.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeConfirmModal()">Batal</button>
+      <button class="btn btn-danger" id="confirmBtn">Ya, Teruskan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="dashboard-profile.js"></script>
+
+</body>
+</html>

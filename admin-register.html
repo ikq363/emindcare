@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0F172A;
+  color: #E2E8F0;
+  min-height: 100vh;
+  padding: 1.5rem;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ============ LOCK SCREEN ============ */
+.lock-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+.lock-box {
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+.lock-icon {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, #EF4444, #B91C1C);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: #fff;
+  margin: 0 auto 1.2rem;
+}
+.lock-box h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+.lock-box p {
+  font-size: 0.85rem;
+  color: #94A3B8;
+  margin-bottom: 1.5rem;
+}
+.lock-box input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: #0F172A;
+  border: 1.5px solid #334155;
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 0.8rem;
+  outline: none;
+  transition: all 0.2s;
+}
+.lock-box input:focus {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+}
+.lock-box button {
+  width: 100%;
+  padding: 0.85rem;
+  background: linear-gradient(120deg, #EF4444, #B91C1C);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.lock-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.4);
+}
+.lock-error {
+  color: #FCA5A5;
+  font-size: 0.8rem;
+  margin-top: 0.8rem;
+  display: none;
+}
+.lock-error.show { display: block; }
+
+/* ============ MAIN APP ============ */
+#mainApp { display: none; }
+#mainApp.active { display: block; }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  background: #1E293B;
+  border-radius: 14px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.header h1 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.header h1 i { color: #EF4444; }
+.header .badge {
+  padding: 0.35rem 0.8rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.header button {
+  padding: 0.55rem 1rem;
+  background: rgba(239, 68, 68, 0.15);
+  color: #FCA5A5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.header button:hover {
+  background: #EF4444;
+  color: #fff;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.card-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #334155;
+}
+.card-title i { color: #14B8A6; font-size: 0.9rem; }
+
+/* ============ FORM ============ */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.form-group { margin-bottom: 0.9rem; }
+.form-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.4rem;
+}
+.form-label .req { color: #EF4444; margin-left: 2px; }
+.form-input {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  background: #0F172A;
+  border: 1.5px solid #334155;
+  border-radius: 10px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s;
+}
+.form-input:focus {
+  border-color: #14B8A6;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+}
+.form-input::placeholder { color: #64748B; font-size: 0.82rem; }
+.form-input.uppercase {
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+.form-input.mono {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 2px;
+}
+select.form-input { cursor: pointer; }
+
+.btn {
+  padding: 0.75rem 1.3rem;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: linear-gradient(120deg, #14B8A6, #0F766E);
+  color: #fff;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.35);
+}
+.btn-secondary {
+  background: #334155;
+  color: #E2E8F0;
+}
+.btn-secondary:hover { background: #475569; }
+.btn-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #FCA5A5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.btn-danger:hover {
+  background: #EF4444;
+  color: #fff;
+}
+.btn-sm {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.75rem;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ============ TABLE ============ */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #334155;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+thead {
+  background: #0F172A;
+}
+thead th {
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #334155;
+}
+tbody tr {
+  border-bottom: 1px solid #334155;
+  transition: background 0.2s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(20, 184, 166, 0.04); }
+tbody td {
+  padding: 0.75rem 0.9rem;
+  color: #E2E8F0;
+  vertical-align: middle;
+}
+.role-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.role-badge.kaunselor { background: rgba(99, 102, 241, 0.2); color: #A5B4FC; }
+.role-badge.guru { background: rgba(20, 184, 166, 0.2); color: #5EEAD4; }
+.role-badge.murid { background: rgba(6, 182, 212, 0.2); color: #67E8F9; }
+
+.td-actions {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: flex-end;
+}
+.td-actions button {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+.btn-edit {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FCD34D;
+}
+.btn-edit:hover { background: #F59E0B; color: #fff; }
+.btn-del {
+  background: rgba(239, 68, 68, 0.15);
+  color: #FCA5A5;
+}
+.btn-del:hover { background: #EF4444; color: #fff; }
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #64748B;
+  font-size: 0.85rem;
+}
+.empty-state i { font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.5; }
+
+/* ============ TOAST ============ */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.toast {
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-left: 4px solid #10B981;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  color: #fff;
+  font-size: 0.85rem;
+  min-width: 260px;
+  max-width: 380px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  animation: toastIn 0.3s ease;
+}
+.toast.error { border-left-color: #EF4444; }
+.toast.info { border-left-color: #06B6D4; }
+.toast.warning { border-left-color: #F59E0B; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(80px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.toast i { font-size: 0.9rem; margin-top: 2px; }
+.toast.success i { color: #10B981; }
+.toast.error i { color: #EF4444; }
+.toast.info i { color: #06B6D4; }
+.toast.warning i { color: #F59E0B; }
+.toast-content { flex: 1; }
+.toast-content strong { display: block; font-size: 0.85rem; margin-bottom: 0.15rem; }
+.toast-content span { font-size: 0.78rem; color: #94A3B8; }
+
+/* ============ MODAL ============ */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.modal.active { display: flex; }
+.modal-box {
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 1.8rem;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+.modal-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+}
+.modal-icon.danger { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
+.modal-icon.warning { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
+.modal h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+.modal p {
+  font-size: 0.85rem;
+  color: #94A3B8;
+  margin-bottom: 1.5rem;
+}
+.modal-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+.modal-actions .btn { flex: 1; justify-content: center; }
+
+/* ============ MOBILE ============ */
+@media (max-width: 600px) {
+  body { padding: 0.9rem; }
+  .header { padding: 1rem; }
+  .header h1 { font-size: 1rem; }
+  .card { padding: 1.1rem; }
+  .form-grid { grid-template-columns: 1fr; }
+  .toast-container { top: 0.9rem; right: 0.9rem; left: 0.9rem; }
+  .toast { min-width: auto; max-width: none; }
+  thead th, tbody td { padding: 0.6rem 0.7rem; font-size: 0.76rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOCK SCREEN ═══════════════ -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon"><i class="fas fa-lock"></i></div>
+    <h1>Akses Terhad</h1>
+    <p>Halaman ini hanya untuk admin sahaja.</p>
+    <input type="password" id="accessKey" placeholder="Masukkan kunci akses..." autocomplete="off">
+    <button onclick="checkAccess()">
+      <i class="fas fa-unlock"></i> Buka Akses
+    </button>
+    <div class="lock-error" id="lockError">
+      <i class="fas fa-times-circle"></i> Kunci akses salah!
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN APP ═══════════════ -->
+<div id="mainApp">
+  <div class="container">
+
+    <div class="header">
+      <h1><i class="fas fa-shield-halved"></i> Admin Register Panel</h1>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <span class="badge">ADMIN MODE</span>
+        <button onclick="lockApp()">
+          <i class="fas fa-lock"></i> Lock
+        </button>
+      </div>
+    </div>
+
+    <!-- FORM DAFTAR -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-user-plus"></i> Daftar Pengguna Baru</div>
+      <form id="registerForm" autocomplete="off">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nama Penuh <span class="req">*</span></label>
+            <input type="text" id="regName" class="form-input uppercase" placeholder="SEPERTI DALAM KAD PENGENALAN" maxlength="80" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nombor Kad Pengenalan <span class="req">*</span></label>
+            <input type="text" id="regIC" class="form-input mono" placeholder="12 DIGIT" maxlength="12" inputmode="numeric" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Peranan <span class="req">*</span></label>
+            <select id="regRole" class="form-input" required>
+              <option value="murid">Murid</option>
+              <option value="guru">Guru</option>
+              <option value="kaunselor">Kaunselor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kelas / Jawatan</label>
+            <input type="text" id="regClass" class="form-input" placeholder="Cth: 5 CEMERLANG / Guru Matematik" maxlength="60">
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mel (Opsional)</label>
+            <input type="email" id="regEmail" class="form-input" placeholder="nama@sekolah.edu.my" maxlength="80">
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Daftar Pengguna
+          </button>
+          <button type="reset" class="btn btn-secondary">
+            <i class="fas fa-undo"></i> Reset
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- SENARAI PENGGUNA -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-list"></i> Senarai Pengguna <span id="userCount" style="color:#94A3B8;font-weight:500;font-size:0.8rem;margin-left:auto;"></span></div>
+
+      <div style="margin-bottom:1rem;">
+        <input type="text" id="searchInput" class="form-input" placeholder="🔍 Cari nama, IC, atau kelas...">
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>IC</th>
+              <th>Peranan</th>
+              <th>Kelas / Jawatan</th>
+              <th style="text-align:right;">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="userTable">
+            <tr><td colspan="5"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i>Memuatkan...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ CONFIRM MODAL ═══════════════ -->
+<div class="modal" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+    <h3 id="confirmTitle">Padam Pengguna?</h3>
+    <p id="confirmDesc">Tindakan ini tidak boleh diundur.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Batal</button>
+      <button class="btn btn-danger" id="confirmBtn">Ya, Padam</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════ SCRIPT ═══════════════ -->
+<script type="module">
+  import './config.js';
+
+  /* ═══════════════════════════════════════════════════════════
+     🔑 KUNCI AKSES RAHSIA — TUKAR IKUT SUKA HATI
+     ═══════════════════════════════════════════════════════════ */
+  const ACCESS_KEY = 'SEMSIRA-UBK-2026-admin';
+
+  /* ═══════════════════════════════════════════════════════════
+     STATE
+     ═══════════════════════════════════════════════════════════ */
+  let allUsers = [];
+  let pendingDeleteId = null;
+
+  /* ═══════════════════════════════════════════════════════════
+     LOCK / UNLOCK
+     ═══════════════════════════════════════════════════════════ */
+  window.checkAccess = function() {
+    const key = document.getElementById('accessKey').value.trim();
+    if (key === ACCESS_KEY) {
+      sessionStorage.setItem('admin_unlocked', '1');
+      unlockApp();
+    } else {
+      document.getElementById('lockError').classList.add('show');
+      document.getElementById('accessKey').value = '';
+      document.getElementById('accessKey').focus();
+      setTimeout(() => document.getElementById('lockError').classList.remove('show'), 2500);
+    }
+  };
+
+  // Enter key untuk buka
+  document.getElementById('accessKey').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAccess();
+  });
+
+  function unlockApp() {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainApp').classList.add('active');
+    loadUsers();
+  }
+
+  window.lockApp = function() {
+    sessionStorage.removeItem('admin_unlocked');
+    location.reload();
+  };
+
+  // Auto-check on load
+  if (sessionStorage.getItem('admin_unlocked') === '1') {
+    unlockApp();
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOAST
+     ═══════════════════════════════════════════════════════════ */
+  function showToast(title, msg, type = 'success') {
+    const c = document.getElementById('toastContainer');
+    const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML = `
+      <i class="fas ${icons[type]}"></i>
+      <div class="toast-content">
+        <strong>${title}</strong>
+        <span>${msg}</span>
+      </div>
+    `;
+    c.appendChild(t);
+    setTimeout(() => {
+      t.style.animation = 'toastIn 0.3s reverse';
+      setTimeout(() => t.remove(), 300);
+    }, 3500);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     WAIT FOR SDK
+     ═══════════════════════════════════════════════════════════ */
+  function waitForEMindCare() {
+    return new Promise((resolve, reject) => {
+      if (window.EMindCare) return resolve();
+      let tries = 0;
+      const timer = setInterval(() => {
+        tries++;
+        if (window.EMindCare) { clearInterval(timer); resolve(); }
+        else if (tries > 100) { clearInterval(timer); reject(new Error('SDK timeout')); }
+      }, 50);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LOAD USERS
+     ═══════════════════════════════════════════════════════════ */
+  async function loadUsers() {
+    try {
+      await waitForEMindCare();
+      const { db, fs } = window.EMindCare;
+      const snap = await fs.getDocs(fs.collection(db, 'users'));
+      allUsers = [];
+      snap.forEach(d => allUsers.push({ id: d.id, ...d.data() }));
+
+      // Sort by name
+      allUsers.sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
+      renderUsers();
+    } catch (err) {
+      console.error(err);
+      showToast('Ralat', 'Gagal memuatkan pengguna: ' + err.message, 'error');
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     RENDER USERS
+     ═══════════════════════════════════════════════════════════ */
+  function renderUsers() {
+    const tbody = document.getElementById('userTable');
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+
+    let filtered = allUsers;
+    if (search) {
+      filtered = allUsers.filter(u =>
+        (u.fullName || '').toLowerCase().includes(search) ||
+        (u.icNumber || '').includes(search) ||
+        (u.class || '').toLowerCase().includes(search)
+      );
+    }
+
+    document.getElementById('userCount').textContent = `${filtered.length} / ${allUsers.length} pengguna`;
+
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users-slash"></i>${allUsers.length ? 'Tiada padanan.' : 'Belum ada pengguna.'}</div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(u => `
+      <tr>
+        <td style="font-weight:600;color:#fff;">${escapeHtml(u.fullName || '-')}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:#94A3B8;">${u.icNumber || '-'}</td>
+        <td><span class="role-badge ${u.role || 'murid'}">${u.role || 'murid'}</span></td>
+        <td style="color:#94A3B8;font-size:0.8rem;">${escapeHtml(u.class || '-')}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn-del" onclick="confirmDelete('${u.id}', '${escapeHtml(u.fullName || '').replace(/'/g, "\\'")}')" title="Padam">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  document.getElementById('searchInput')?.addEventListener('input', renderUsers);
+
+  /* ═══════════════════════════════════════════════════════════
+     REGISTER FORM
+     ═══════════════════════════════════════════════════════════ */
+  // Auto uppercase name
+  document.getElementById('regName').addEventListener('input', e => {
+    e.target.value = e.target.value.replace(/[^A-Za-z\s'\.]/g, '').toUpperCase();
+  });
+
+  // Auto strip IC
+  document.getElementById('regIC').addEventListener('input', e => {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const name = document.getElementById('regName').value.trim().toUpperCase();
+    const ic = document.getElementById('regIC').value.trim();
+    const role = document.getElementById('regRole').value;
+    const cls = document.getElementById('regClass').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+
+    // Validation
+    if (!name || name.length < 3) {
+      return showToast('Ralat', 'Nama tidak sah.', 'error');
+    }
+    if (!/^\d{12}$/.test(ic)) {
+      return showToast('Ralat', 'IC perlu 12 digit.', 'error');
+    }
+
+    // Check duplicate IC
+    if (allUsers.find(u => u.icNumber === ic)) {
+      return showToast('IC Berulang', `IC ${ic} sudah wujud dalam sistem.`, 'error');
+    }
+
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendaftar...';
+
+    try {
+      const { db, fs } = window.EMindCare;
+      const newUser = {
+        fullName: name,
+        icNumber: ic,
+        role: role,
+        class: cls || null,
+        email: email || null,
+        createdAt: fs.serverTimestamp(),
+        createdBy: 'admin-panel'
+      };
+
+      const ref = await fs.addDoc(fs.collection(db, 'users'), newUser);
+      allUsers.push({ id: ref.id, ...newUser });
+      allUsers.sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
+
+      document.getElementById('registerForm').reset();
+      renderUsers();
+      showToast('Berjaya', `"${name}" berjaya didaftarkan sebagai ${role}.`, 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Gagal', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-save"></i> Daftar Pengguna';
+    }
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     DELETE USER
+     ═══════════════════════════════════════════════════════════ */
+  window.confirmDelete = function(id, name) {
+    pendingDeleteId = id;
+    document.getElementById('confirmTitle').textContent = 'Padam Pengguna?';
+    document.getElementById('confirmDesc').textContent = `Padam akaun "${name}"? Tindakan ini tidak boleh diundur.`;
+    document.getElementById('confirmModal').classList.add('active');
+  };
+
+  window.closeConfirm = function() {
+    document.getElementById('confirmModal').classList.remove('active');
+    pendingDeleteId = null;
+  };
+
+  document.getElementById('confirmBtn').addEventListener('click', async () => {
+    if (!pendingDeleteId) return;
+    const id = pendingDeleteId;
+    closeConfirm();
+
+    try {
+      const { db, fs } = window.EMindCare;
+      await fs.deleteDoc(fs.doc(db, 'users', id));
+      allUsers = allUsers.filter(u => u.id !== id);
+      renderUsers();
+      showToast('Berjaya', 'Pengguna dipadam.', 'success');
+    } catch (err) {
+      showToast('Gagal', err.message, 'error');
+    }
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     UTILS
+     ═══════════════════════════════════════════════════════════ */
+  function escapeHtml(str) {
+    if (!str) return '';
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  console.log('%c 🔐 Admin Register ', 'background:#EF4444;color:#fff;font-weight:900;padding:6px 12px;border-radius:6px;font-size:12px;');
+</script>
+
+</body>
+</html>

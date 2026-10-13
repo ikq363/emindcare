@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F766E">
+<title>Kenali UBK SEMSIRA · e-MindCare</title>
+<meta name="description" content="Kenali Unit Bimbingan & Kaunseling SMK Syed Sirajuddin (SEMSIRA) — visi, misi, perutusan kaunselor, dan perkhidmatan kami.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ═══════════════════════════════════════════════════
+   ROOT
+   ═══════════════════════════════════════════════════ */
+:root {
+  --teal: #0F766E;
+  --teal-dark: #134E4A;
+  --teal-light: #14B8A6;
+  --emerald: #10B981;
+  --indigo: #4F46E5;
+  --indigo-dark: #3730A3;
+  --indigo-light: #6366F1;
+  --cyan: #06B6D4;
+  --cyan-soft: #22D3EE;
+  --purple: #8B5CF6;
+  --pink: #EC4899;
+  --bg: #F8FAFC;
+  --bg-alt: #F1F5F9;
+  --white: #FFFFFF;
+  --ink: #0F172A;
+  --ink-soft: #64748B;
+  --ink-light: #94A3B8;
+  --line: rgba(15, 23, 42, 0.08);
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--teal); color: #fff; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
+
+/* ═══════ PRELOADER ═══════ */
+#preloader {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, #0F172A 0%, #134E4A 50%, #312E81 100%);
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 1.5rem;
+  transition: opacity 0.7s, visibility 0.7s;
+}
+#preloader.hidden { opacity: 0; visibility: hidden; }
+.preloader-mark {
+  font-family: 'Fraunces', serif;
+  font-size: 2.4rem; font-weight: 900;
+  color: #fff; letter-spacing: -0.03em;
+  opacity: 0; animation: fadeUp 0.8s ease forwards;
+}
+.preloader-mark span {
+  background: linear-gradient(120deg, var(--teal-light), var(--cyan-soft));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+}
+.preloader-line {
+  width: 200px; height: 2px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden; position: relative;
+  border-radius: 2px;
+}
+.preloader-line::after {
+  content: ""; position: absolute;
+  top: 0; left: 0; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--teal-light), var(--cyan-soft));
+  border-radius: 2px;
+  animation: lineLoad 1.6s ease forwards;
+}
+@keyframes lineLoad { to { width: 100%; } }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════ AMBIENT BG ═══════ */
+.ambient {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+  overflow: hidden;
+}
+.ambient-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.28;
+  animation: orbDrift 26s ease-in-out infinite;
+}
+.ambient-orb.o1 {
+  width: 520px; height: 520px;
+  background: radial-gradient(circle, var(--teal-light), transparent 70%);
+  top: -220px; right: -180px;
+}
+.ambient-orb.o2 {
+  width: 460px; height: 460px;
+  background: radial-gradient(circle, var(--indigo-light), transparent 70%);
+  bottom: -200px; left: -160px;
+  animation-delay: 8s; opacity: 0.22;
+}
+.ambient-orb.o3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, var(--cyan-soft), transparent 70%);
+  top: 45%; left: 45%;
+  animation-delay: 16s; opacity: 0.14;
+}
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -60px) scale(1.15); }
+}
+
+/* ═══════ ANNOUNCEMENT BAR ═══════ */
+.top-announcement {
+  position: relative; z-index: 100;
+  background: linear-gradient(90deg, #0F172A 0%, var(--teal-dark) 40%, var(--indigo-dark) 100%);
+  color: #fff;
+  height: 42px;
+  display: none;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.2);
+}
+.top-announcement.active { display: flex; }
+.announce-label {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0 1.1rem 0 1.4rem;
+  height: 100%;
+  background: linear-gradient(135deg, var(--teal-light), var(--cyan-soft));
+  color: #0F172A;
+  font-size: 0.62rem; font-weight: 800;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  padding-right: 1.6rem;
+  position: relative; z-index: 3;
+}
+.announce-label i { font-size: 0.75rem; animation: bellRing 2.5s ease-in-out infinite; }
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0); }
+  15%, 35% { transform: rotate(-14deg); }
+  25%, 45% { transform: rotate(14deg); }
+}
+.announce-track {
+  flex: 1; height: 100%;
+  display: flex; align-items: center;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+}
+.announce-marquee {
+  display: flex; gap: 3.5rem;
+  animation: marquee 42s linear infinite;
+  white-space: nowrap; padding-left: 2rem;
+  will-change: transform;
+}
+.announce-marquee:hover { animation-play-state: paused; }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.announce-item {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  font-size: 0.8rem; font-weight: 500;
+  flex-shrink: 0;
+}
+.announce-item i { color: var(--cyan-soft); font-size: 0.75rem; }
+.announce-item .badge {
+  background: rgba(34, 211, 238, 0.18);
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  color: var(--cyan-soft);
+  padding: 0.1rem 0.5rem; border-radius: 50px;
+  font-size: 0.6rem; font-weight: 800;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.announce-divider { color: var(--cyan-soft); opacity: 0.4; font-size: 0.65rem; }
+
+/* ═══════ NAVBAR ═══════ */
+.navbar {
+  position: sticky; top: 0;
+  z-index: 90;
+  padding: 0.9rem 1.4rem 0;
+  transition: padding 0.3s;
+}
+.navbar-inner {
+  max-width: 1280px; margin: 0 auto;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 60px;
+  padding: 0.55rem 0.55rem 0.55rem 1.1rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 8px 40px rgba(15, 23, 42, 0.06);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.navbar.scrolled { padding: 0.5rem 1.4rem 0; }
+.navbar.scrolled .navbar-inner {
+  box-shadow: 0 12px 44px rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.nav-brand {
+  display: flex; align-items: center; gap: 0.75rem;
+  text-decoration: none; color: inherit;
+  flex-shrink: 0;
+}
+.nav-logo {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1.15rem;
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.35);
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-logo img { width: 100%; height: 100%; object-fit: cover; }
+.nav-brand:hover .nav-logo { transform: rotate(-10deg) scale(1.06); }
+.nav-brand-text {
+  display: flex; flex-direction: column; line-height: 1.1;
+}
+.nav-brand-text strong {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem; font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.nav-brand-text span {
+  font-size: 0.6rem; color: var(--ink-soft);
+  font-weight: 600; letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.nav-kolab {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0 0.8rem;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  height: 32px;
+  flex-shrink: 0;
+}
+.nav-kolab-label {
+  font-size: 0.58rem; font-weight: 800;
+  color: var(--ink-light);
+  letter-spacing: 1.2px; text-transform: uppercase;
+  margin-right: 0.3rem;
+}
+.nav-kolab-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--bg-alt);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+.nav-kolab-icon img {
+  max-width: 85%; max-height: 85%;
+  object-fit: contain;
+  filter: grayscale(100%) opacity(0.7);
+  transition: all 0.3s;
+}
+.nav-kolab-icon:hover {
+  background: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+.nav-kolab-icon:hover img { filter: grayscale(0%) opacity(1); }
+
+.nav-links {
+  display: flex; gap: 0.15rem; align-items: center;
+  flex: 1; justify-content: center;
+}
+.nav-link {
+  padding: 0.55rem 0.9rem;
+  border-radius: 50px;
+  font-size: 0.8rem; font-weight: 600;
+  color: var(--ink-soft); text-decoration: none;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.nav-link:hover {
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.07);
+}
+.nav-link.active {
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.1);
+}
+
+.nav-cta { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
+
+/* ═══════ BUTTONS ═══════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.84rem; font-weight: 600;
+  text-decoration: none;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none; cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+  position: relative; overflow: hidden;
+}
+.btn-teal {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  background-size: 200% auto;
+  box-shadow: 0 8px 22px rgba(15, 118, 110, 0.28);
+}
+.btn-teal:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(15, 118, 110, 0.4);
+}
+.btn-dark {
+  background: var(--ink);
+  color: #fff;
+}
+.btn-dark:hover {
+  background: var(--teal-dark);
+  transform: translateY(-2px);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+}
+.btn-outline:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.28);
+  backdrop-filter: blur(10px);
+}
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.5);
+  transform: translateY(-2px);
+}
+.btn-sm { padding: 0.55rem 1.05rem; font-size: 0.76rem; }
+.btn-lg { padding: 1rem 2rem; font-size: 0.95rem; }
+
+/* ═══════ MOBILE MENU ═══════ */
+.mobile-toggle {
+  display: none;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: none;
+  color: var(--ink);
+  font-size: 1.05rem;
+  cursor: pointer;
+  align-items: center; justify-content: center;
+}
+.mobile-menu {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 95;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.mobile-menu.active { display: flex; opacity: 1; }
+.mobile-menu-content {
+  margin: auto;
+  width: calc(100% - 2rem);
+  max-width: 380px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 1.8rem;
+  transform: translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.3);
+}
+.mobile-menu.active .mobile-menu-content { transform: translateY(0); }
+.mobile-menu-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.mobile-menu-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 900;
+  color: var(--ink);
+}
+.mobile-menu-close {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.mobile-menu-links {
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+.mobile-menu-link {
+  padding: 0.9rem 1.1rem;
+  border-radius: 14px;
+  font-size: 0.9rem; font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  display: flex; align-items: center; gap: 0.8rem;
+  transition: all 0.3s;
+}
+.mobile-menu-link i {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: var(--bg-alt);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--teal);
+  font-size: 0.85rem;
+}
+.mobile-menu-link:hover { background: var(--bg-alt); }
+
+/* ═══════ HERO ═══════ */
+.hero {
+  position: relative;
+  background: linear-gradient(135deg, #1E1B4B 0%, #4C1D95 40%, #0E7490 100%);
+  background-size: 200% 200%;
+  animation: heroGradient 15s ease infinite;
+  color: #fff;
+  padding: 5rem 1.4rem 7rem;
+  overflow: hidden;
+  isolation: isolate;
+  margin-top: -1rem;
+}
+@keyframes heroGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.3), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: -100px; left: 10%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.35), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--cyan-soft);
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.7s ease both;
+}
+.hero-badge i { font-size: 0.75rem; }
+.hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+  animation: fadeUp 0.7s ease 0.1s both;
+}
+.hero-title .accent {
+  font-style: italic;
+  background: linear-gradient(120deg, var(--cyan-soft), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  color: rgba(255,255,255,0.85);
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.65;
+  animation: fadeUp 0.7s ease 0.2s both;
+}
+.hero-sub strong { color: #fff; font-weight: 700; }
+.hero-wave {
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 60px;
+  z-index: 1;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════ MAIN ═══════ */
+.main {
+  position: relative;
+  z-index: 2;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 1.4rem 5rem;
+}
+
+/* ═══════ SECTION ═══════ */
+.section { margin-top: 5rem; }
+.section:first-child { margin-top: 0; }
+
+.section-head {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.7rem; font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.section-eyebrow::before,
+.section-eyebrow::after {
+  content: "";
+  width: 24px; height: 1px;
+  background: var(--teal);
+  opacity: 0.4;
+}
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.8rem, 3.4vw, 2.7rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 0.9rem;
+}
+.section-title .accent {
+  font-style: italic;
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section-desc {
+  color: var(--ink-soft);
+  max-width: 540px;
+  margin: 0 auto;
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
+
+/* ═══════ SECTION 1: PERUTUSAN KETUA KAUNSELOR ═══════ */
+.message-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px -16px rgba(15, 23, 42, 0.12);
+}
+.message-photo {
+  position: relative;
+  background: linear-gradient(135deg, #0F172A, #134E4A);
+  overflow: hidden;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+}
+.message-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.25), transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.25), transparent 50%);
+  pointer-events: none;
+}
+.message-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.message-photo-placeholder {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 6rem;
+  min-height: 420px;
+}
+.message-photo-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.9) 100%);
+  z-index: 2;
+}
+.message-photo-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: linear-gradient(135deg, var(--teal-light), var(--cyan-soft));
+  color: #0F172A;
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 6px 16px rgba(34, 211, 238, 0.3);
+}
+.message-content {
+  padding: 3rem 3.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.message-quote {
+  font-family: 'Fraunces', serif;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--teal);
+  line-height: 0.6;
+  opacity: 0.15;
+  margin-bottom: 0.5rem;
+}
+.message-text {
+  font-size: 1.02rem;
+  color: var(--ink);
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+  white-space: pre-line;
+  font-style: italic;
+}
+.message-signature {
+  border-top: 1px solid var(--line);
+  padding-top: 1.25rem;
+  margin-top: 0.5rem;
+}
+.message-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.15rem;
+}
+.message-title {
+  font-size: 0.82rem;
+  color: var(--teal);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════ SECTION 2: VISI MISI FALSAFAH ═══════ */
+.vmf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.3rem;
+}
+.vmf-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 2.2rem 1.9rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.vmf-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--vm-c1, var(--teal)), var(--vm-c2, var(--indigo)));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s;
+}
+.vmf-card:hover::before { transform: scaleX(1); }
+.vmf-card::after {
+  content: "";
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, var(--vm-c1, var(--teal)), transparent 70%);
+  border-radius: 50%;
+  opacity: 0.06;
+  pointer-events: none;
+}
+.vmf-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 52px rgba(15, 23, 42, 0.12);
+}
+.vmf-icon {
+  width: 64px; height: 64px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--vm-c1, var(--teal)), var(--vm-c2, var(--indigo)));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 1.4rem;
+  box-shadow: 0 14px 32px -8px var(--vm-c1, rgba(15, 118, 110, 0.5));
+  position: relative;
+  z-index: 1;
+}
+.vmf-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.7rem;
+  position: relative;
+  z-index: 1;
+}
+.vmf-text {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.75;
+  white-space: pre-line;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══════ SECTION 3: BARISAN KAUNSELOR ═══════ */
+.counselor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.counselor-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+.counselor-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 60px -12px rgba(15, 23, 42, 0.18);
+  border-color: transparent;
+}
+.counselor-photo {
+  position: relative;
+  height: 280px;
+  background: linear-gradient(135deg, #0F172A, #134E4A);
+  overflow: hidden;
+}
+.counselor-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.2), transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.25), transparent 50%);
+  pointer-events: none;
+}
+.counselor-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.counselor-card:hover .counselor-photo img {
+  transform: scale(1.06);
+}
+.counselor-initial {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 6rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.85);
+  z-index: 1;
+}
+.counselor-badge {
+  position: absolute;
+  top: 1rem; left: 1rem;
+  z-index: 3;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  color: var(--ink);
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.counselor-badge.utama {
+  background: linear-gradient(135deg, var(--teal-light), var(--cyan-soft));
+  color: #0F172A;
+}
+.counselor-body {
+  padding: 1.5rem 1.6rem 1.7rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.counselor-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-bottom: 0.3rem;
+}
+.counselor-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.3px;
+  margin-bottom: 0.9rem;
+}
+.counselor-specialty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  background: rgba(15, 118, 110, 0.08);
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin-bottom: 1rem;
+  align-self: flex-start;
+}
+.counselor-specialty i { font-size: 0.65rem; }
+.counselor-bio {
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.counselor-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.1rem;
+  background: var(--bg-alt);
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+  transition: all 0.3s;
+  align-self: flex-start;
+}
+.counselor-card:hover .counselor-cta {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  transform: translateX(3px);
+}
+
+/* ═══════ SKELETON ═══════ */
+.skeleton-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  overflow: hidden;
+}
+.skeleton-photo {
+  height: 280px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+}
+.skeleton-body {
+  padding: 1.5rem 1.6rem 1.7rem;
+}
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  margin-bottom: 0.6rem;
+}
+.skeleton-line.short { width: 40%; }
+.skeleton-line.medium { width: 65%; }
+.skeleton-line.tall { height: 18px; }
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════ EMPTY STATE ═══════ */
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: #fff;
+  border: 2px dashed var(--line);
+  border-radius: 24px;
+}
+.empty-icon {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.1), rgba(79, 70, 229, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  font-size: 2.2rem;
+  color: var(--teal);
+}
+.empty-state strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  color: var(--ink);
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  font-size: 1.15rem;
+}
+.empty-state p {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* ═══════ SECTION 4: 4 TERAS ═══════ */
+.teras-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.3rem;
+}
+.teras-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 2.2rem 1.7rem 1.9rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.teras-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--tr-c1, var(--teal)), var(--tr-c2, var(--indigo)));
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 0;
+}
+.teras-card:hover {
+  transform: translateY(-8px);
+  border-color: transparent;
+  box-shadow: 0 28px 60px -12px var(--tr-c1, rgba(15, 118, 110, 0.4));
+}
+.teras-card:hover::before { opacity: 1; }
+.teras-card > * { position: relative; z-index: 1; transition: color 0.4s; }
+.teras-num {
+  font-family: 'Fraunces', serif;
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--tr-c1, var(--teal)), var(--tr-c2, var(--indigo)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  transition: all 0.4s;
+}
+.teras-card:hover .teras-num {
+  background: rgba(255,255,255,0.3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.teras-icon {
+  width: 52px; height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--tr-c1, var(--teal)), var(--tr-c2, var(--indigo)));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 12px 28px -6px var(--tr-c1, rgba(15, 118, 110, 0.4));
+  transition: all 0.4s;
+}
+.teras-card:hover .teras-icon {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  transform: scale(1.05);
+}
+.teras-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+.teras-card:hover .teras-title { color: #fff; }
+.teras-desc {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+.teras-card:hover .teras-desc { color: rgba(255,255,255,0.85); }
+
+/* ═══════ CTA ═══════ */
+.cta {
+  margin-top: 5rem;
+  position: relative;
+  border-radius: 32px;
+  padding: 4.5rem 2.5rem;
+  text-align: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0F172A 0%, var(--teal-dark) 50%, var(--indigo-dark) 100%);
+  background-size: 200% 200%;
+  animation: heroGradient 14s ease infinite;
+  color: #fff;
+  box-shadow: 0 32px 80px -20px rgba(15, 23, 42, 0.4);
+}
+.cta::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(20, 184, 166, 0.3), transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(99, 102, 241, 0.3), transparent 50%);
+  pointer-events: none;
+}
+.cta-content { position: relative; z-index: 2; }
+.cta-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.cta-title .italic {
+  font-style: italic;
+  background: linear-gradient(120deg, var(--cyan-soft), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cta-desc {
+  color: rgba(255,255,255,0.82);
+  max-width: 520px;
+  margin: 0 auto 2rem;
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+.cta-actions {
+  display: flex; gap: 0.75rem; justify-content: center;
+  flex-wrap: wrap;
+}
+.cta-actions .btn-dark {
+  background: #fff; color: #0F172A;
+}
+.cta-actions .btn-dark:hover {
+  background: var(--cyan-soft);
+  box-shadow: 0 12px 32px rgba(34, 211, 238, 0.4);
+}
+
+/* ═══════ FOOTER ═══════ */
+.footer {
+  background: linear-gradient(135deg, #1E1B4B 0%, #4C1D95 50%, #0E7490 100%);
+  background-size: 200% 200%;
+  animation: heroGradient 20s ease infinite;
+  color: #cbd5e1;
+  padding: 4rem 1.4rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cyan-soft), var(--purple), var(--pink), var(--cyan-soft));
+  background-size: 200% auto;
+  animation: shimmer 5s linear infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+}
+.footer-brand {
+  display: flex; align-items: flex-start; gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+.footer-logo {
+  width: 52px; height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
+  overflow: hidden;
+}
+.footer-logo img { width: 100%; height: 100%; object-fit: cover; }
+.footer-brand-text strong {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fff;
+  display: block;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.15rem;
+}
+.footer-brand-text span {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: 600;
+}
+.footer-desc {
+  font-size: 0.86rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.7;
+  max-width: 400px;
+}
+.footer h4 {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 1.1rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.footer h4 i { color: var(--cyan-soft); font-size: 0.75rem; }
+.footer ul { list-style: none; padding: 0; }
+.footer ul li { margin-bottom: 0.65rem; }
+.footer ul a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 500;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.footer ul a i {
+  font-size: 0.75rem;
+  color: var(--teal-glow, #2DD4BF);
+  transition: transform 0.3s;
+}
+.footer ul a:hover { color: #fff; }
+.footer ul a:hover i { transform: translateX(3px); }
+.footer-social {
+  display: flex; gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+.footer-social a {
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.footer-social a:hover {
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
+}
+.footer-bottom {
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.55);
+}
+.footer-bottom strong { color: #fff; font-weight: 700; }
+.footer-bottom .heart {
+  color: #EC4899;
+  animation: beat 1.5s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* ═══════ REVEAL ═══════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1), transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══════ RESPONSIVE ═══════ */
+@media (max-width: 1024px) {
+  .nav-kolab { display: none; }
+  .nav-links { gap: 0; }
+  .nav-link { padding: 0.5rem 0.7rem; font-size: 0.76rem; }
+  .message-card { grid-template-columns: 1fr; }
+  .message-photo { min-height: 300px; }
+  .message-photo-placeholder { min-height: 300px; font-size: 4rem; }
+  .message-content { padding: 2.5rem 2rem; }
+}
+@media (max-width: 900px) {
+  .navbar { padding: 0.6rem 0.9rem 0; }
+  .navbar-inner { padding: 0.5rem 0.5rem 0.5rem 0.9rem; border-radius: 24px; }
+  .nav-links { display: none; }
+  .mobile-toggle { display: flex; }
+  .hero { padding: 3.5rem 1rem 5rem; }
+  .main { padding: 2rem 1rem 4rem; }
+  .section { margin-top: 4rem; }
+  .counselor-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .footer { padding: 3rem 1rem 1.5rem; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .footer-grid > div:first-child { grid-column: 1 / -1; }
+  .cta { padding: 3.5rem 1.5rem; border-radius: 26px; }
+}
+@media (max-width: 520px) {
+  .nav-brand-text span { display: none; }
+  .nav-brand-text strong { font-size: 1.05rem; }
+  .btn-sm { padding: 0.5rem 0.85rem; font-size: 0.72rem; }
+  .hero { padding: 3rem 1rem 4rem; }
+  .hero-badge { font-size: 0.65rem; padding: 0.4rem 0.9rem; }
+  .hero-title { font-size: 1.65rem; }
+  .hero-sub { font-size: 0.85rem; }
+  .main { padding: 1.5rem 0.9rem 3rem; }
+  .message-content { padding: 2rem 1.5rem; }
+  .message-quote { font-size: 2.5rem; }
+  .message-text { font-size: 0.92rem; }
+  .counselor-grid { grid-template-columns: 1fr; }
+  .counselor-photo { height: 240px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .footer-bottom { flex-direction: column; text-align: center; }
+  .cta-actions .btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="preloader-mark">e-<span>MindCare</span></div>
+  <div class="preloader-line"></div>
+</div>
+
+<!-- AMBIENT BG -->
+<div class="ambient">
+  <div class="ambient-orb o1"></div>
+  <div class="ambient-orb o2"></div>
+  <div class="ambient-orb o3"></div>
+</div>
+
+<!-- ═══════ ANNOUNCEMENT BAR ═══════ -->
+<div class="top-announcement" id="announcementBar">
+  <div class="announce-label">
+    <i class="fas fa-bullhorn"></i>
+    <span>Info</span>
+  </div>
+  <div class="announce-track">
+    <div class="announce-marquee" id="announcementMarquee">
+      <span class="announce-item">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Memuatkan pengumuman...</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ NAVBAR ═══════ -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo" id="navLogo"><i class="fas fa-brain"></i></div>
+      <div class="nav-brand-text">
+        <strong id="brandName">e-MindCare</strong>
+        <span id="brandTagline">Unit Bimbingan & Kaunseling</span>
+      </div>
+    </a>
+
+    <div class="nav-kolab" id="navKolab" style="display:none;">
+      <span class="nav-kolab-label">Kolaborasi</span>
+      <div id="navKolabIcons" style="display:flex;gap:0.35rem;"></div>
+    </div>
+
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="kenali.html" class="nav-link active">Kenali UBK</a>
+      <a href="galeri.html" class="nav-link">Galeri</a>
+      <a href="perkhidmatan.html" class="nav-link">Perkhidmatan</a>
+      <a href="hubungi.html" class="nav-link">Hubungi</a>
+    </div>
+
+    <div class="nav-cta">
+      <a href="login.html" class="btn btn-teal btn-sm" id="navCtaBtn">
+        <i class="fas fa-sign-in-alt"></i> Log Masuk
+      </a>
+      <button class="mobile-toggle" onclick="openMobileMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu" onclick="closeMobileMenu(event)">
+  <div class="mobile-menu-content" onclick="event.stopPropagation()">
+    <div class="mobile-menu-header">
+      <div class="mobile-menu-title">Menu</div>
+      <button class="mobile-menu-close" onclick="closeMobileMenu()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="mobile-menu-links">
+      <a href="index.html" class="mobile-menu-link"><i class="fas fa-home"></i> Home</a>
+      <a href="kenali.html" class="mobile-menu-link"><i class="fas fa-users"></i> Kenali UBK</a>
+      <a href="galeri.html" class="mobile-menu-link"><i class="fas fa-images"></i> Galeri</a>
+      <a href="perkhidmatan.html" class="mobile-menu-link"><i class="fas fa-hand-holding-heart"></i> Perkhidmatan</a>
+      <a href="hubungi.html" class="mobile-menu-link"><i class="fas fa-envelope"></i> Hubungi</a>
+      <a href="login.html" class="mobile-menu-link"><i class="fas fa-sign-in-alt"></i> Log Masuk</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <i class="fas fa-users"></i>
+      <span>Unit Bimbingan & Kaunseling</span>
+    </div>
+    <h1 class="hero-title">
+      Kenali <span class="accent">UBK SEMSIRA</span>
+    </h1>
+    <p class="hero-sub">
+      <strong>Membimbing Potensi</strong>, <strong>Memperkasa Minda</strong>, <strong>Membina Resiliensi</strong> Generasi Cemerlang SMK Syed Sirajuddin.
+    </p>
+  </div>
+  <svg class="hero-wave" viewBox="0 0 1200 70" preserveAspectRatio="none">
+    <path d="M0,35 C300,70 600,0 900,35 C1050,52 1150,40 1200,35 L1200,70 L0,70 Z" fill="#F8FAFC"/>
+  </svg>
+</section>
+
+<!-- ═══════ MAIN ═══════ -->
+<main class="main">
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 1: PERUTUSAN KETUA KAUNSELOR
+       ═══════════════════════════════════════════════ -->
+  <section class="section" id="perutusan">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Kata Aluan</div>
+      <h2 class="section-title">Perutusan <span class="accent">Ketua Kaunselor</span></h2>
+      <p class="section-desc">Mesej mesra daripada ketua Unit Bimbingan & Kaunseling SEMSIRA.</p>
+    </div>
+
+    <div class="message-card reveal" id="messageCard">
+      <div class="message-photo" id="messagePhoto">
+        <div class="message-photo-placeholder">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="message-photo-overlay">
+          <div class="message-photo-badge" id="messageBadge">
+            <i class="fas fa-star"></i>
+            <span>Ketua Kaunselor</span>
+          </div>
+        </div>
+      </div>
+      <div class="message-content">
+        <div class="message-quote">"</div>
+        <div class="message-text" id="messageText">
+          Selamat datang ke portal Unit Bimbingan & Kaunseling SMK Syed Sirajuddin.
+
+          Kami di sini untuk mendengar, membantu dan membimbing setiap pelajar menuju kecemerlangan akademik dan kesejahteraan minda. Jangan pernah rasa bersendirian — kami sentiasa bersedia membantu anda.
+        </div>
+        <div class="message-signature">
+          <div class="message-name" id="messageName">—</div>
+          <div class="message-title" id="messageTitle">Ketua Kaunselor UBK SEMSIRA</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 2: VISI, MISI & FALSAFAH
+       ═══════════════════════════════════════════════ -->
+  <section class="section" id="visimisi">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Hala Tuju Kami</div>
+      <h2 class="section-title">Visi, Misi & <span class="accent">Falsafah</span></h2>
+      <p class="section-desc">Prinsip dan komitmen Unit Bimbingan & Kaunseling SEMSIRA.</p>
+    </div>
+
+    <div class="vmf-grid">
+      <div class="vmf-card reveal" style="--vm-c1:#0F766E; --vm-c2:#14B8A6;">
+        <div class="vmf-icon"><i class="fas fa-eye"></i></div>
+        <h3 class="vmf-title">Visi UBK</h3>
+        <p class="vmf-text" id="visiText">
+          Menjadi Unit Bimbingan & Kaunseling yang unggul dalam membentuk pelajar holistik — cemerlang akademik, kukuh sahsiah, dan sejahtera minda menjelang 2030.
+        </p>
+      </div>
+
+      <div class="vmf-card reveal" style="--vm-c1:#4F46E5; --vm-c2:#6366F1;">
+        <div class="vmf-icon"><i class="fas fa-bullseye"></i></div>
+        <h3 class="vmf-title">Misi UBK</h3>
+        <p class="vmf-text" id="misiText">
+          Menyediakan perkhidmatan bimbingan dan kaunseling yang profesional, mesra dan menyeluruh — menyokong perkembangan sahsiah, akademik dan kerjaya setiap pelajar SMK Syed Sirajuddin.
+        </p>
+      </div>
+
+      <div class="vmf-card reveal" style="--vm-c1:#8B5CF6; --vm-c2:#EC4899;">
+        <div class="vmf-icon"><i class="fas fa-heart"></i></div>
+        <h3 class="vmf-title">Falsafah & Etika</h3>
+        <p class="vmf-text">
+          <strong>Kerahsiaan</strong> — setiap perkongsian adalah sulit.<br>
+          <strong>Penerimaan Tanpa Syarat</strong> — setiap individu dihargai.<br>
+          <strong>Empati & Keprihatinan</strong> — kami mendengar dengan hati.<br>
+          <strong>Nondirektif</strong> — anda penentu kepada jalan penyelesaian.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 3: BARISAN KAUNSELOR
+       ═══════════════════════════════════════════════ -->
+  <section class="section" id="barisan">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Carta Organisasi</div>
+      <h2 class="section-title">Barisan <span class="accent">Kaunselor UBK</span></h2>
+      <p class="section-desc">Kenali kaunselor kami yang sentiasa bersedia membantu anda.</p>
+    </div>
+
+    <div class="counselor-grid" id="counselorGrid">
+      <div class="skeleton-card"><div class="skeleton-photo"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line tall"></div><div class="skeleton-line medium"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-photo"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line tall"></div><div class="skeleton-line medium"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-photo"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line tall"></div><div class="skeleton-line medium"></div></div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 4: 4 TERAS UTAMA
+       ═══════════════════════════════════════════════ -->
+  <section class="section" id="teras">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Fokus Kami</div>
+      <h2 class="section-title">4 Teras <span class="accent">Perkhidmatan UBK</span></h2>
+      <p class="section-desc">Fokus utama Unit Bimbingan & Kaunseling SMK Syed Sirajuddin.</p>
+    </div>
+
+    <div class="teras-grid">
+      <div class="teras-card reveal" style="--tr-c1:#0F766E; --tr-c2:#14B8A6;">
+        <div class="teras-num">01</div>
+        <div class="teras-icon"><i class="fas fa-brain"></i></div>
+        <h3 class="teras-title">Pembangunan & Perkembangan Sahsiah Diri</h3>
+        <p class="teras-desc">Membantu pelajar mengenali diri, mengembangkan bakat, dan memperkasa sahsiah menuju kecemerlangan holistik.</p>
+      </div>
+
+      <div class="teras-card reveal" style="--tr-c1:#4F46E5; --tr-c2:#6366F1;">
+        <div class="teras-num">02</div>
+        <div class="teras-icon"><i class="fas fa-book"></i></div>
+        <h3 class="teras-title">Peningkatan Disiplin & Sahsiah Murid</h3>
+        <p class="teras-desc">Menerapkan nilai murni, disiplin diri dan tanggungjawab sosial sebagai asas kejayaan masa depan.</p>
+      </div>
+
+      <div class="teras-card reveal" style="--tr-c1:#8B5CF6; --tr-c2:#A78BFA;">
+        <div class="teras-num">03</div>
+        <div class="teras-icon"><i class="fas fa-graduation-cap"></i></div>
+        <h3 class="teras-title">Pendidikan Kerjaya & Hala Tuju Akademik</h3>
+        <p class="teras-desc">Bimbingan memilih laluan akademik dan kerjaya yang sesuai dengan minat, bakat dan potensi pelajar.</p>
+      </div>
+
+      <div class="teras-card reveal" style="--tr-c1:#EC4899; --tr-c2:#F472B6;">
+        <div class="teras-num">04</div>
+        <div class="teras-icon"><i class="fas fa-heart"></i></div>
+        <h3 class="teras-title">Kesejahteraan Mental & Emosi (Psikososial)</h3>
+        <p class="teras-desc">Menyokong kesihatan mental, mengurus emosi, dan membina resiliensi dalam menghadapi cabaran.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       CTA
+       ═══════════════════════════════════════════════ -->
+  <section class="cta reveal">
+    <div class="cta-content">
+      <h2 class="cta-title">
+        Perlukan Seseorang<br><span class="italic">Untuk Bercakap?</span>
+      </h2>
+      <p class="cta-desc">
+        Kaunselor kami sedia mendengar anda. Buat temujanji atau hubungi kami hari ini.
+      </p>
+      <div class="cta-actions">
+        <a href="perkhidmatan.html" class="btn btn-dark btn-lg">
+          <i class="fas fa-calendar-check"></i> Buat Temujanji
+        </a>
+        <a href="hubungi.html" class="btn btn-ghost btn-lg">
+          <i class="fas fa-comments"></i> Hubungi Kami
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <div class="footer-logo" id="footerLogo"><i class="fas fa-brain"></i></div>
+          <div class="footer-brand-text">
+            <strong id="footerBrandName">e-MindCare</strong>
+            <span id="footerBrandTagline">Unit Bimbingan & Kaunseling SMK Syed Sirajuddin</span>
+          </div>
+        </div>
+        <p class="footer-desc" id="footerDesc">
+          Platform digital Unit Bimbingan & Kaunseling SMK Syed Sirajuddin (SEMSIRA). Empowering Minds Through Interactive Navigation, Digital Counseling, and Resilience Excellence.
+        </p>
+        <div class="footer-social" id="footerSocial">
+          <a href="#" aria-label="Facebook" data-social="facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram" data-social="instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube" data-social="youtube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="TikTok" data-social="tiktok"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+
+      <div>
+        <h4><i class="fas fa-compass"></i> Navigasi</h4>
+        <ul>
+          <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+          <li><a href="kenali.html"><i class="fas fa-chevron-right"></i> Kenali UBK</a></li>
+          <li><a href="galeri.html"><i class="fas fa-chevron-right"></i> Galeri</a></li>
+          <li><a href="perkhidmatan.html"><i class="fas fa-chevron-right"></i> Perkhidmatan</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4><i class="fas fa-envelope"></i> Hubungi</h4>
+        <ul id="footerContact">
+          <li><a href="mailto:ubk@smksyed.edu.my"><i class="fas fa-envelope"></i> ubk@smksyed.edu.my</a></li>
+          <li><a href="#"><i class="fas fa-phone"></i> +60 4-XXX XXXX</a></li>
+          <li><a href="#"><i class="fas fa-map-marker-alt"></i> SMK Syed Sirajuddin, Perlis</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 <strong>Unit Bimbingan & Kaunseling SMK Syed Sirajuddin</strong> · e-MindCare v2</span>
+      <span>Made with <span class="heart">❤</span> untuk pelajar</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="kenali.js"></script>
+
+</body>
+</html>
