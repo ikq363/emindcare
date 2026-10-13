@@ -644,14 +644,18 @@ select.input-field {
   transform: scale(1.05);
 }
 
-/* Multi-row grid: Nama | IC | Tingkatan | Kelas | Tahun */
-.multi-row-grid {
+/* Multi-row grid layouts */
+/* Murid: Nama | IC | Tingkatan | Kelas | Tahun */
+.multi-row-grid.murid-grid {
   display: grid;
   grid-template-columns: 1.8fr 1fr 0.9fr 1fr 0.7fr;
   gap: 0.7rem;
 }
-.multi-row-grid.thirds {
-  grid-template-columns: 1.8fr 1fr 1.3fr 0.7fr;
+/* Guru: Nama | IC | Tingkatan | Kelas | Jawatan Tambahan | Tahun */
+.multi-row-grid.guru-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 0.9fr 0.7fr 0.9fr 1.3fr 0.7fr;
+  gap: 0.6rem;
 }
 
 .multi-row-field {
@@ -1280,18 +1284,24 @@ tbody td {
 .sb-backdrop.active { display: block; opacity: 1; }
 
 /* Responsive */
-@media (max-width: 1100px) {
-  .multi-row-grid {
-    grid-template-columns: 1.5fr 1fr 1fr;
+@media (max-width: 1200px) {
+  .multi-row-grid.guru-grid {
+    grid-template-columns: 1.5fr 1fr 0.8fr 1fr 1.2fr;
   }
-  .multi-row-grid .multi-row-field:nth-child(4),
-  .multi-row-grid .multi-row-field:nth-child(5) {
+  .multi-row-grid.guru-grid .multi-row-field:nth-child(6) {
     grid-column: span 1;
   }
 }
 @media (max-width: 1024px) {
   :root { --sidebar-w: 240px; }
   .content { padding: 1.25rem; }
+  .multi-row-grid.guru-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .multi-row-grid.guru-grid .multi-row-field:nth-child(4),
+  .multi-row-grid.guru-grid .multi-row-field:nth-child(5) {
+    grid-column: span 1;
+  }
 }
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
@@ -1300,8 +1310,9 @@ tbody td {
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
   .content { padding: 1rem; }
-  .multi-row-grid { grid-template-columns: 1fr 1fr; }
-  .multi-row-grid.thirds { grid-template-columns: 1fr 1fr; }
+  .multi-row-grid.murid-grid { grid-template-columns: 1fr 1fr; }
+  .multi-row-grid.guru-grid { grid-template-columns: 1fr 1fr; }
+  .single-grid { grid-template-columns: 1fr 1fr !important; }
 }
 @media (max-width: 520px) {
   .topbar { padding: 0.65rem 0.85rem; }
@@ -1316,8 +1327,9 @@ tbody td {
   .tab-btn i { font-size: 0.9rem; }
   .mode-btn { padding: 0.6rem 0.8rem; font-size: 0.72rem; }
   .mode-btn span { display: none; }
-  .multi-row-grid { grid-template-columns: 1fr; }
-  .multi-row-grid.thirds { grid-template-columns: 1fr; }
+  .multi-row-grid.murid-grid { grid-template-columns: 1fr; }
+  .multi-row-grid.guru-grid { grid-template-columns: 1fr; }
+  .single-grid { grid-template-columns: 1fr !important; }
   .card-header-left { gap: 0.75rem; }
   .card-icon { width: 40px; height: 40px; font-size: 0.95rem; }
   .card-title { font-size: 1rem; }
@@ -1732,6 +1744,7 @@ tbody td {
             </button>
           </div>
 
+          <!-- Mode 1: Multi-Row -->
           <div class="mode-panel active" data-panel-guru="multi">
             <div class="multi-row-list" id="multiRowListGuru"></div>
             <div class="row-actions">
@@ -1769,12 +1782,13 @@ tbody td {
             </div>
           </div>
 
+          <!-- Mode 2: CSV -->
           <div class="mode-panel" data-panel-guru="csv">
             <div class="csv-drop" id="csvDropGuru">
               <input type="file" id="csvInputGuru" accept=".csv,.xlsx,.xls">
               <div class="csv-icon"><i class="fas fa-file-csv"></i></div>
               <h4>Klik atau seret fail CSV ke sini</h4>
-              <p>Format: Nama, NomborIC, Jawatan, Tahun</p>
+              <p>Format: Nama, NomborIC, Tingkatan, Kelas, Jawatan, Tahun</p>
               <button type="button" class="csv-template" onclick="downloadTemplate('guru')">
                 <i class="fas fa-download"></i>
                 <span>Muat Turun Template CSV</span>
@@ -1811,7 +1825,7 @@ tbody td {
                       <th>#</th>
                       <th>Nama Penuh</th>
                       <th>Nombor IC</th>
-                      <th>Jawatan</th>
+                      <th>Guru Kelas</th>
                       <th>Umur</th>
                     </tr>
                   </thead>
@@ -1834,9 +1848,10 @@ tbody td {
             </div>
           </div>
 
+          <!-- Mode 3: Single -->
           <div class="mode-panel" data-panel-guru="single">
             <form id="singleFormGuru">
-              <div style="display:grid;grid-template-columns:2fr 1.2fr 1.5fr 0.8fr;gap:0.9rem;" class="single-grid">
+              <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1.5fr 0.8fr;gap:0.9rem;" class="single-grid">
                 <div class="form-group">
                   <label class="form-label">Nama Penuh <span class="req">*</span></label>
                   <div class="input-wrap">
@@ -1852,10 +1867,32 @@ tbody td {
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Jawatan / Subjek</label>
+                  <label class="form-label">Tingkatan (Guru Kelas)</label>
+                  <div class="input-wrap">
+                    <i class="fas fa-layer-group input-icon"></i>
+                    <select class="input-field" name="formLevel">
+                      <option value="">— Pilih —</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nama Kelas</label>
+                  <div class="input-wrap">
+                    <i class="fas fa-graduation-cap input-icon"></i>
+                    <input type="text" class="input-field upper" name="className" placeholder="MAWAR" maxlength="40">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Jawatan Tambahan</label>
                   <div class="input-wrap">
                     <i class="fas fa-briefcase input-icon"></i>
-                    <input type="text" class="input-field upper" name="className" placeholder="GURU MATEMATIK" maxlength="80">
+                    <input type="text" class="input-field upper" name="title" placeholder="GURU MATEMATIK" maxlength="80">
                   </div>
                 </div>
                 <div class="form-group">
@@ -1880,6 +1917,7 @@ tbody td {
           </div>
         </div>
 
+        <!-- Senarai Guru -->
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1899,7 +1937,7 @@ tbody td {
               <input type="text" id="guruSearch" placeholder="Cari nama atau IC...">
             </div>
             <select id="guruFilterJawatan" class="filter-select">
-              <option value="">Semua Jawatan</option>
+              <option value="">Semua Kelas</option>
             </select>
             <select id="guruFilterTahun" class="filter-select">
               <option value="">Semua Tahun</option>
@@ -1911,7 +1949,8 @@ tbody td {
               <thead>
                 <tr>
                   <th>Pengguna</th>
-                  <th>Jawatan / Subjek</th>
+                  <th>Guru Kelas</th>
+                  <th>Jawatan</th>
                   <th>Umur</th>
                   <th style="text-align:right;">Tindakan</th>
                 </tr>
@@ -1987,18 +2026,25 @@ tbody td {
         <input type="text" id="editFullName" class="input-field upper" maxlength="100">
       </div>
     </div>
-    <div class="form-group" id="editFormLevelGroup">
-      <label class="form-label">Tingkatan / Jawatan</label>
+    <div class="form-group">
+      <label class="form-label">Tingkatan</label>
       <div class="input-wrap">
         <i class="fas fa-layer-group input-icon"></i>
-        <input type="text" id="editFormLevel" class="input-field upper" maxlength="80">
+        <input type="text" id="editFormLevel" class="input-field upper" maxlength="10">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Nama Kelas / Subjek</label>
+      <label class="form-label">Nama Kelas</label>
+      <div class="input-wrap">
+        <i class="fas fa-graduation-cap input-icon"></i>
+        <input type="text" id="editClassName" class="input-field upper" maxlength="80">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Jawatan Tambahan</label>
       <div class="input-wrap">
         <i class="fas fa-briefcase input-icon"></i>
-        <input type="text" id="editClassName" class="input-field upper" maxlength="80">
+        <input type="text" id="editTitle" class="input-field upper" maxlength="80">
       </div>
     </div>
     <div class="form-group">
