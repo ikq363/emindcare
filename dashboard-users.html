@@ -652,8 +652,8 @@ select.input-field {
 }
 .multi-row-grid.guru-grid {
   display: grid;
-  grid-template-columns: 1.5fr 0.9fr 0.7fr 0.9fr 1.3fr 0.7fr;
-  gap: 0.6rem;
+  grid-template-columns: 1.8fr 1fr 0.9fr 1fr 0.7fr;
+  gap: 0.7rem;
 }
 
 .multi-row-field {
@@ -1282,20 +1282,9 @@ tbody td {
 .sb-backdrop.active { display: block; opacity: 1; }
 
 /* Responsive */
-@media (max-width: 1200px) {
-  .multi-row-grid.guru-grid {
-    grid-template-columns: 1.5fr 1fr 0.8fr 1fr 1.2fr;
-  }
-  .multi-row-grid.guru-grid .multi-row-field:nth-child(6) {
-    grid-column: span 1;
-  }
-}
 @media (max-width: 1024px) {
   :root { --sidebar-w: 240px; }
   .content { padding: 1.25rem; }
-  .multi-row-grid.guru-grid {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
 }
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
@@ -1304,7 +1293,7 @@ tbody td {
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
   .content { padding: 1rem; }
-  .multi-row-grid.murid-grid { grid-template-columns: 1fr 1fr; }
+  .multi-row-grid.murid-grid,
   .multi-row-grid.guru-grid { grid-template-columns: 1fr 1fr; }
   .single-grid { grid-template-columns: 1fr 1fr !important; }
 }
@@ -1321,7 +1310,7 @@ tbody td {
   .tab-btn i { font-size: 0.9rem; }
   .mode-btn { padding: 0.6rem 0.8rem; font-size: 0.72rem; }
   .mode-btn span { display: none; }
-  .multi-row-grid.murid-grid { grid-template-columns: 1fr; }
+  .multi-row-grid.murid-grid,
   .multi-row-grid.guru-grid { grid-template-columns: 1fr; }
   .single-grid { grid-template-columns: 1fr !important; }
   .card-header-left { gap: 0.75rem; }
@@ -1491,7 +1480,6 @@ tbody td {
             </button>
           </div>
 
-          <!-- Mode 1: Multi-Row -->
           <div class="mode-panel active" data-panel-murid="multi">
             <div class="multi-row-list" id="multiRowListMurid"></div>
             <div class="row-actions">
@@ -1529,7 +1517,6 @@ tbody td {
             </div>
           </div>
 
-          <!-- Mode 2: CSV -->
           <div class="mode-panel" data-panel-murid="csv">
             <div class="csv-drop" id="csvDropMurid">
               <input type="file" id="csvInputMurid" accept=".csv,.xlsx,.xls">
@@ -1595,7 +1582,6 @@ tbody td {
             </div>
           </div>
 
-          <!-- Mode 3: Single -->
           <div class="mode-panel" data-panel-murid="single">
             <form id="singleFormMurid">
               <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 0.8fr;gap:0.9rem;" class="single-grid">
@@ -1657,7 +1643,6 @@ tbody td {
           </div>
         </div>
 
-        <!-- Senarai Murid -->
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1772,7 +1757,7 @@ tbody td {
               <input type="file" id="csvInputGuru" accept=".csv,.xlsx,.xls">
               <div class="csv-icon"><i class="fas fa-file-csv"></i></div>
               <h4>Klik atau seret fail CSV ke sini</h4>
-              <p>Format: Nama, NomborIC, Tingkatan, Kelas, Jawatan, Tahun</p>
+              <p>Format: Nama, NomborIC, Tingkatan, Kelas, Tahun</p>
               <button type="button" class="csv-template" onclick="downloadTemplate('guru')">
                 <i class="fas fa-download"></i>
                 <span>Muat Turun Template CSV</span>
@@ -1834,7 +1819,7 @@ tbody td {
 
           <div class="mode-panel" data-panel-guru="single">
             <form id="singleFormGuru">
-              <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1.5fr 0.8fr;gap:0.9rem;" class="single-grid">
+              <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 0.8fr;gap:0.9rem;" class="single-grid">
                 <div class="form-group">
                   <label class="form-label">Nama Penuh <span class="req">*</span></label>
                   <div class="input-wrap">
@@ -1869,13 +1854,6 @@ tbody td {
                   <div class="input-wrap">
                     <i class="fas fa-graduation-cap input-icon"></i>
                     <input type="text" class="input-field upper" name="className" placeholder="MAWAR" maxlength="40">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Jawatan Tambahan</label>
-                  <div class="input-wrap">
-                    <i class="fas fa-briefcase input-icon"></i>
-                    <input type="text" class="input-field upper" name="title" placeholder="GURU MATEMATIK" maxlength="80">
                   </div>
                 </div>
                 <div class="form-group">
@@ -1918,7 +1896,7 @@ tbody td {
               <i class="fas fa-search"></i>
               <input type="text" id="guruSearch" placeholder="Cari nama atau IC...">
             </div>
-            <select id="guruFilterJawatan" class="filter-select">
+            <select id="guruFilterKelas" class="filter-select">
               <option value="">Semua Kelas</option>
             </select>
             <select id="guruFilterTahun" class="filter-select">
@@ -1932,7 +1910,6 @@ tbody td {
                 <tr>
                   <th>Pengguna</th>
                   <th>Guru Kelas</th>
-                  <th>Jawatan</th>
                   <th>Umur</th>
                   <th style="text-align:right;">Tindakan</th>
                 </tr>
@@ -2020,13 +1997,6 @@ tbody td {
       <div class="input-wrap">
         <i class="fas fa-graduation-cap input-icon"></i>
         <input type="text" id="editClassName" class="input-field upper" maxlength="80">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Jawatan Tambahan</label>
-      <div class="input-wrap">
-        <i class="fas fa-briefcase input-icon"></i>
-        <input type="text" id="editTitle" class="input-field upper" maxlength="80">
       </div>
     </div>
     <div class="form-group">
