@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   e-MindCare · Dashboard User Script (v5 — FULLY FIXED)
-   Auth + Profile + Bulk + CSV + Guru Kelas + Auto Year
+   e-MindCare · Dashboard User Script (v5 — Clean)
+   Bulk + CSV + Guru Kelas (TANPA Jawatan Tambahan)
    ═══════════════════════════════════════════════════════════════ */
 
 import './config.js';
@@ -30,7 +30,6 @@ function normalizeRole(rawRole) {
   if (!rawRole) return null;
   const cleaned = String(rawRole).toLowerCase().trim().replace(/\s+/g, ' ');
 
-  // Terima variasi
   const aliasMap = {
     'kaunselor': 'kaunselor',
     'kaunselor ubk': 'kaunselor',
@@ -46,7 +45,6 @@ function normalizeRole(rawRole) {
 
   if (aliasMap[cleaned]) return aliasMap[cleaned];
 
-  // Fallback: cek substring
   for (const key in aliasMap) {
     if (cleaned.includes(key)) return aliasMap[key];
   }
@@ -95,7 +93,6 @@ window.addEventListener('load', async () => {
     await loadUsers();
     console.log('✅ Users loaded:', allUsers.length);
 
-    // Start rows
     for (let i = 0; i < 3; i++) addRow('murid', true);
     for (let i = 0; i < 2; i++) addRow('guru', true);
     console.log('✅ Rows added');
@@ -120,7 +117,7 @@ function waitForEMindCare() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   🔒 AUTH GUARD (Case-Insensitive + Robust)
+   🔒 AUTH GUARD
    ═══════════════════════════════════════════════════════════════ */
 function authGuard() {
   const raw = localStorage.getItem(SESSION_KEY);
@@ -138,7 +135,6 @@ function authGuard() {
       role: session.role
     });
 
-    // ⚡ Normalize role (case-insensitive)
     const role = normalizeRole(session.role);
     console.log('📋 Normalized role:', role);
 
@@ -150,7 +146,6 @@ function authGuard() {
       return false;
     }
 
-    // ⚡ Bukan kaunselor — redirect ke dashboard yang betul
     if (role !== 'kaunselor') {
       const redirects = {
         guru: 'dashboard-guru.html',
@@ -174,29 +169,19 @@ function authGuard() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   👤 LOAD PROFILE (Sidebar)
+   👤 LOAD PROFILE
    ═══════════════════════════════════════════════════════════════ */
 function loadProfile() {
-  if (!currentUser) {
-    console.warn('⚠️ No currentUser to load profile');
-    return;
-  }
+  if (!currentUser) return;
 
   const name = currentUser.fullName || 'Kaunselor';
   const initial = name.charAt(0).toUpperCase();
 
   console.log('👤 Loading profile:', name);
 
-  // Update sidebar name
   const nameEl = document.getElementById('sbProfileName');
-  if (nameEl) {
-    nameEl.textContent = name;
-    console.log('✅ sbProfileName updated');
-  } else {
-    console.warn('⚠️ sbProfileName not found');
-  }
+  if (nameEl) nameEl.textContent = name;
 
-  // Update avatar
   const avatarEl = document.getElementById('sbAvatar');
   if (avatarEl) {
     const avatarUrl = currentUser.avatarUrl || currentUser.profileImage;
@@ -205,9 +190,6 @@ function loadProfile() {
     } else {
       avatarEl.textContent = initial;
     }
-    console.log('✅ sbAvatar updated');
-  } else {
-    console.warn('⚠️ sbAvatar not found');
   }
 }
 
@@ -242,12 +224,10 @@ async function applyBranding() {
    🎯 INIT UI
    ═══════════════════════════════════════════════════════════════ */
 function initUI() {
-  // Tab navigation
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  // Mode switcher
   document.querySelectorAll('.mode-switcher').forEach(switcher => {
     const group = switcher.dataset.group;
     switcher.querySelectorAll('.mode-btn').forEach(btn => {
@@ -259,18 +239,15 @@ function initUI() {
     });
   });
 
-  // CSV drop zones
   ['murid', 'guru'].forEach(group => initCsvDrop(group));
 
-  // Search & filters
   document.getElementById('muridSearch')?.addEventListener('input', renderMuridTable);
   document.getElementById('muridFilterKelas')?.addEventListener('change', renderMuridTable);
   document.getElementById('muridFilterTahun')?.addEventListener('change', renderMuridTable);
   document.getElementById('guruSearch')?.addEventListener('input', renderGuruTable);
-  document.getElementById('guruFilterJawatan')?.addEventListener('change', renderGuruTable);
+  document.getElementById('guruFilterKelas')?.addEventListener('change', renderGuruTable);
   document.getElementById('guruFilterTahun')?.addEventListener('change', renderGuruTable);
 
-  // Confirm modal
   document.getElementById('confirmBtn')?.addEventListener('click', async () => {
     if (typeof pendingConfirmAction === 'function') {
       const action = pendingConfirmAction;
@@ -279,7 +256,6 @@ function initUI() {
     }
   });
 
-  // Single forms
   document.getElementById('singleFormMurid')?.addEventListener('submit', (e) => {
     e.preventDefault();
     submitSingle(e, 'murid');
@@ -289,7 +265,6 @@ function initUI() {
     submitSingle(e, 'guru');
   });
 
-  // Auto-format single form inputs
   document.querySelectorAll('.input-field.upper').forEach(el => {
     if (el.dataset.fmtAttached) return;
     el.dataset.fmtAttached = '1';
@@ -315,9 +290,6 @@ function initUI() {
   });
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   📑 TAB & MODE SWITCHER
-   ═══════════════════════════════════════════════════════════════ */
 window.switchTab = function(tabName) {
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tabName);
@@ -339,14 +311,11 @@ function capitalize(s) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   📝 MULTI-ROW MANAGEMENT
+   📝 MULTI-ROW
    ═══════════════════════════════════════════════════════════════ */
 window.addRow = function(group, silent = false) {
   const container = document.getElementById(`multiRowList${capitalize(group)}`);
-  if (!container) {
-    console.warn(`⚠️ multiRowList${capitalize(group)} not found`);
-    return;
-  }
+  if (!container) return;
 
   const rowNum = container.children.length + 1;
   const isGuru = group === 'guru';
@@ -356,108 +325,56 @@ window.addRow = function(group, silent = false) {
   row.className = 'multi-row';
   row.dataset.rowId = rowId;
 
-  if (isGuru) {
-    // GURU: Nama | IC | Tingkatan | Kelas | Jawatan | Tahun
-    row.innerHTML = `
-      <div class="multi-row-header">
-        <div class="multi-row-title">
-          <span class="multi-row-num">${rowNum}</span>
-          <span class="multi-row-label">Guru #${rowNum}</span>
-        </div>
-        <button type="button" class="multi-row-delete" onclick="removeRow(this, '${group}')" title="Hapus baris">
-          <i class="fas fa-times"></i>
-        </button>
+  // Sama untuk murid & guru: Nama | IC | Tingkatan | Kelas | Tahun
+  row.innerHTML = `
+    <div class="multi-row-header">
+      <div class="multi-row-title">
+        <span class="multi-row-num">${rowNum}</span>
+        <span class="multi-row-label">${isGuru ? 'Guru' : 'Murid'} #${rowNum}</span>
       </div>
-      <div class="multi-row-grid guru-grid">
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nama Penuh</label>
-          <input type="text" class="multi-row-input upper" placeholder="SEPERTI DALAM IC" data-field="fullName" maxlength="100">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nombor IC</label>
-          <input type="text" class="multi-row-input mono" placeholder="12 DIGIT" data-field="icNumber" maxlength="12" inputmode="numeric">
-          <span class="auto-hint" data-hint-for="${rowId}"></span>
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Tingkatan</label>
-          <select class="multi-row-select" data-field="formLevel">
-            <option value="">—</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Guru Kelas</label>
-          <input type="text" class="multi-row-input upper" placeholder="MAWAR" data-field="className" maxlength="40">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Jawatan Tambahan</label>
-          <input type="text" class="multi-row-input upper" placeholder="GURU MATEMATIK" data-field="title" maxlength="80">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Tahun</label>
-          <input type="text" class="multi-row-input" placeholder="${CURRENT_YEAR}" data-field="sessionYear" maxlength="4" inputmode="numeric">
-        </div>
+      <button type="button" class="multi-row-delete" onclick="removeRow(this, '${group}')" title="Hapus baris">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="multi-row-grid ${isGuru ? 'guru-grid' : 'murid-grid'}">
+      <div class="multi-row-field">
+        <label class="multi-row-field-label">Nama Penuh</label>
+        <input type="text" class="multi-row-input upper" placeholder="SEPERTI DALAM IC" data-field="fullName" maxlength="100">
       </div>
-    `;
-  } else {
-    // MURID: Nama | IC | Tingkatan | Kelas | Tahun
-    row.innerHTML = `
-      <div class="multi-row-header">
-        <div class="multi-row-title">
-          <span class="multi-row-num">${rowNum}</span>
-          <span class="multi-row-label">Murid #${rowNum}</span>
-        </div>
-        <button type="button" class="multi-row-delete" onclick="removeRow(this, '${group}')" title="Hapus baris">
-          <i class="fas fa-times"></i>
-        </button>
+      <div class="multi-row-field">
+        <label class="multi-row-field-label">Nombor IC</label>
+        <input type="text" class="multi-row-input mono" placeholder="12 DIGIT" data-field="icNumber" maxlength="12" inputmode="numeric">
+        <span class="auto-hint" data-hint-for="${rowId}"></span>
       </div>
-      <div class="multi-row-grid murid-grid">
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nama Penuh</label>
-          <input type="text" class="multi-row-input upper" placeholder="SEPERTI DALAM IC" data-field="fullName" maxlength="100">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nombor IC</label>
-          <input type="text" class="multi-row-input mono" placeholder="12 DIGIT" data-field="icNumber" maxlength="12" inputmode="numeric">
-          <span class="auto-hint" data-hint-for="${rowId}"></span>
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Tingkatan</label>
-          <select class="multi-row-select" data-field="formLevel">
-            <option value="">—</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nama Kelas</label>
-          <input type="text" class="multi-row-input upper" placeholder="MAWAR" data-field="className" maxlength="40">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Tahun</label>
-          <input type="text" class="multi-row-input" placeholder="${CURRENT_YEAR}" data-field="sessionYear" maxlength="4" inputmode="numeric">
-        </div>
+      <div class="multi-row-field">
+        <label class="multi-row-field-label">Tingkatan</label>
+        <select class="multi-row-select" data-field="formLevel">
+          <option value="">—</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
       </div>
-    `;
-  }
+      <div class="multi-row-field">
+        <label class="multi-row-field-label">${isGuru ? 'Guru Kelas' : 'Nama Kelas'}</label>
+        <input type="text" class="multi-row-input upper" placeholder="MAWAR" data-field="className" maxlength="40">
+      </div>
+      <div class="multi-row-field">
+        <label class="multi-row-field-label">Tahun</label>
+        <input type="text" class="multi-row-input" placeholder="${CURRENT_YEAR}" data-field="sessionYear" maxlength="4" inputmode="numeric">
+      </div>
+    </div>
+  `;
 
-  // Auto-format listeners
   const nameInput = row.querySelector('[data-field="fullName"]');
   const icInput = row.querySelector('[data-field="icNumber"]');
   const classInput = row.querySelector('[data-field="className"]');
-  const titleInput = row.querySelector('[data-field="title"]');
   const yearInput = row.querySelector('[data-field="sessionYear"]');
 
-  nameInput?.addEventListener('input', (e) => {
+  nameInput.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/[^A-Za-z\s'\.]/g, '').toUpperCase();
@@ -465,7 +382,7 @@ window.addRow = function(group, silent = false) {
     if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
   });
 
-  icInput?.addEventListener('input', (e) => {
+  icInput.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
@@ -474,7 +391,7 @@ window.addRow = function(group, silent = false) {
     updateAutoHint(row, e.target.value);
   });
 
-  classInput?.addEventListener('input', (e) => {
+  classInput.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
@@ -482,19 +399,10 @@ window.addRow = function(group, silent = false) {
     if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
   });
 
-  titleInput?.addEventListener('input', (e) => {
-    const start = e.target.selectionStart;
-    const oldLen = e.target.value.length;
-    e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
-    const diff = oldLen - e.target.value.length;
-    if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
-  });
-
-  yearInput?.addEventListener('input', (e) => {
+  yearInput.addEventListener('input', (e) => {
     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
   });
 
-  // Enter key → tambah baris
   row.querySelectorAll('input, select').forEach(input => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && input.tagName !== 'SELECT') {
@@ -508,7 +416,7 @@ window.addRow = function(group, silent = false) {
 
   if (!silent) {
     row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    nameInput?.focus();
+    nameInput.focus();
   }
 };
 
@@ -571,7 +479,6 @@ function getMultiRowData(group) {
     const fullName = row.querySelector('[data-field="fullName"]')?.value.trim() || '';
     const icNumber = row.querySelector('[data-field="icNumber"]')?.value.trim() || '';
     const className = row.querySelector('[data-field="className"]')?.value.trim() || '';
-    const title = row.querySelector('[data-field="title"]')?.value.trim() || '';
     const sessionYear = row.querySelector('[data-field="sessionYear"]')?.value.trim() || CURRENT_YEAR;
     const formLevel = row.querySelector('[data-field="formLevel"]')?.value || '';
 
@@ -589,7 +496,6 @@ function getMultiRowData(group) {
       icNumber,
       formLevel,
       className: finalClass,
-      title: title || null,
       sessionYear: sessionYear || CURRENT_YEAR
     });
   });
@@ -615,7 +521,7 @@ window.submitBulk = async function(group) {
 
   const invalid = data.filter(d => !d.fullName || d.fullName.length < 3 || !/^\d{12}$/.test(d.icNumber));
   if (invalid.length) {
-    return showToast('Ralat Validasi', `${invalid.length} pengguna tidak lengkap.`, 'error', 6000);
+    return showToast('Ralat Validasi', `${invalid.length} pengguna tidak lengkap (nama atau IC tidak sah).`, 'error', 6000);
   }
 
   const icSet = new Set();
@@ -631,7 +537,7 @@ window.submitBulk = async function(group) {
   const existing = new Set(allUsers.map(u => u.icNumber));
   const dupInDb = data.filter(d => existing.has(d.icNumber));
   if (dupInDb.length) {
-    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar.`, 'error', 6000);
+    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar dalam sistem.`, 'error', 6000);
   }
 
   showConfirmModal({
@@ -681,7 +587,6 @@ async function processBulkInsert(group, data) {
           role: group,
           formLevel: item.formLevel || null,
           class: item.className || null,
-          title: item.title || null,
           sessionYear: item.sessionYear || CURRENT_YEAR,
           birthYear: birthYear || null,
           age: age || null,
@@ -761,13 +666,10 @@ function handleCsvFile(group, file) {
     header: true,
     skipEmptyLines: true,
     complete: (results) => {
-      const isGuru = group === 'guru';
-
       const data = results.data.map(row => {
         const fullName = (row.fullName || row.nama || row.name || row['Nama Penuh'] || row['NAMA PENUH'] || '').trim().toUpperCase();
         const icNumber = (row.icNumber || row.ic || row['Nombor IC'] || row['NOMBOR IC'] || row['no_ic'] || '').toString().replace(/\D/g, '').slice(0, 12);
         const sessionYear = (row.sessionYear || row.tahun || row.year || row['Tahun'] || row['TAHUN'] || CURRENT_YEAR).toString().trim();
-        const title = (row.title || row.jawatan || row.subjek || row['Jawatan'] || row['JAWATAN'] || '').trim().toUpperCase();
 
         let formLevel = (row.formLevel || row.tingkatan || row.level || row['Tingkatan'] || row['TINGKATAN'] || '').toString().trim();
         let className = (row.className || row.kelas || row.class || row['Kelas'] || row['KELAS'] || '').trim().toUpperCase();
@@ -799,7 +701,6 @@ function handleCsvFile(group, file) {
           icNumber,
           formLevel,
           className: finalClass,
-          title: title || null,
           sessionYear: sessionYear || CURRENT_YEAR,
           birthYear,
           age
@@ -852,9 +753,9 @@ window.downloadTemplate = function(group) {
 
   let csv;
   if (isGuru) {
-    csv = 'fullName,icNumber,formLevel,className,title,sessionYear\n' +
-      'AHMAD BIN ALI,850101015678,3,MAWAR,GURU MATEMATIK,2026\n' +
-      'SITI BINTI HASSAN,860202016789,5,DEDIKASI,GURU BAHASA MELAYU,2026';
+    csv = 'fullName,icNumber,formLevel,className,sessionYear\n' +
+      'AHMAD BIN ALI,850101015678,3,MAWAR,2026\n' +
+      'SITI BINTI HASSAN,860202016789,5,DEDIKASI,2026';
   } else {
     csv = 'fullName,icNumber,formLevel,className,sessionYear\n' +
       'AHMAD BIN ALI,080101015678,1,MAWAR,2026\n' +
@@ -937,7 +838,6 @@ async function processCsvImport(group, data) {
           role: group,
           formLevel: item.formLevel || null,
           class: item.className || null,
-          title: item.title || null,
           sessionYear: item.sessionYear || CURRENT_YEAR,
           birthYear: birthYear || null,
           age: age || null,
@@ -984,7 +884,6 @@ window.submitSingle = async function(e, group) {
   const fullName = form.querySelector('[name="fullName"]').value.trim().toUpperCase();
   const icNumber = form.querySelector('[name="icNumber"]').value.trim();
   const className = form.querySelector('[name="className"]')?.value.trim().toUpperCase() || '';
-  const title = form.querySelector('[name="title"]')?.value.trim().toUpperCase() || '';
   const sessionYear = form.querySelector('[name="sessionYear"]')?.value.trim() || CURRENT_YEAR;
   const formLevel = form.querySelector('[name="formLevel"]')?.value || '';
 
@@ -1017,7 +916,6 @@ window.submitSingle = async function(e, group) {
       role: group,
       formLevel: formLevel || null,
       class: finalClass || null,
-      title: title || null,
       sessionYear,
       birthYear: birthYear || null,
       age: age || null,
@@ -1093,9 +991,9 @@ function populateFilters() {
   }
 
   const guruKelasSet = [...new Set(guru.map(u => u.class).filter(Boolean))].sort();
-  const jawatanSel = document.getElementById('guruFilterJawatan');
-  if (jawatanSel) {
-    jawatanSel.innerHTML = '<option value="">Semua Kelas</option>' +
+  const guruKelasSel = document.getElementById('guruFilterKelas');
+  if (guruKelasSel) {
+    guruKelasSel.innerHTML = '<option value="">Semua Kelas</option>' +
       guruKelasSet.map(j => `<option value="${escapeHtml(j)}">${escapeHtml(j)}</option>`).join('');
   }
 
@@ -1141,7 +1039,7 @@ function renderGuruTable() {
   if (!tbody) return;
 
   const search = document.getElementById('guruSearch')?.value.toLowerCase().trim() || '';
-  const kelas = document.getElementById('guruFilterJawatan')?.value || '';
+  const kelas = document.getElementById('guruFilterKelas')?.value || '';
   const tahun = document.getElementById('guruFilterTahun')?.value || '';
 
   let list = allUsers.filter(u => u.role === 'guru');
@@ -1153,11 +1051,11 @@ function renderGuruTable() {
   if (countEl) countEl.textContent = `${list.length} daripada ${allUsers.filter(u => u.role === 'guru').length} guru`;
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-chalkboard-teacher"></i><strong>Tiada guru</strong><p>Belum ada guru berdaftar.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-chalkboard-teacher"></i><strong>Tiada guru</strong><p>Belum ada guru berdaftar.</p></div></td></tr>`;
     return;
   }
 
-  tbody.innerHTML = list.map(u => renderGuruRow(u)).join('');
+  tbody.innerHTML = list.map(u => renderUserRow(u)).join('');
 }
 
 function renderUserRow(u) {
@@ -1178,43 +1076,6 @@ function renderUserRow(u) {
         </div>
       </td>
       <td>${escapeHtml(u.class || '—')}</td>
-      <td>${age ? `${age} thn` : '—'}</td>
-      <td>
-        <div class="td-actions">
-          <button class="btn btn-secondary btn-icon btn-sm" onclick="viewUser('${u.id}')" title="Lihat">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button class="btn btn-secondary btn-icon btn-sm" onclick="editUser('${u.id}')" title="Edit">
-            <i class="fas fa-pen"></i>
-          </button>
-          <button class="btn btn-danger btn-icon btn-sm" onclick="deleteUser('${u.id}')" title="Padam">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      </td>
-    </tr>
-  `;
-}
-
-function renderGuruRow(u) {
-  const initial = (u.fullName || 'U').charAt(0).toUpperCase();
-  const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
-  let age = u.age;
-  if (!age && u.icNumber) age = getBirthInfoFromIC(u.icNumber).age;
-
-  return `
-    <tr>
-      <td>
-        <div class="user-cell">
-          <div class="user-avatar">${avatarHTML}</div>
-          <div class="user-info">
-            <strong>${escapeHtml(u.fullName || 'Tanpa Nama')}</strong>
-            <span>${escapeHtml(u.icNumber || '—')}</span>
-          </div>
-        </div>
-      </td>
-      <td>${escapeHtml(u.class || '—')}</td>
-      <td>${escapeHtml(u.title || '—')}</td>
       <td>${age ? `${age} thn` : '—'}</td>
       <td>
         <div class="td-actions">
@@ -1319,15 +1180,6 @@ window.viewUser = function(id) {
         <span>${escapeHtml(u.class || '—')}</span>
       </div>
     </div>
-    ${isGuru && u.title ? `
-      <div class="view-row">
-        <i class="fas fa-briefcase"></i>
-        <div class="view-row-content">
-          <strong>Jawatan Tambahan</strong>
-          <span>${escapeHtml(u.title)}</span>
-        </div>
-      </div>
-    ` : ''}
     <div class="view-row">
       <i class="fas fa-calendar"></i>
       <div class="view-row-content">
@@ -1361,7 +1213,6 @@ window.editUser = function(id) {
   document.getElementById('editFullName').value = u.fullName || '';
   document.getElementById('editFormLevel').value = u.formLevel || '';
   document.getElementById('editClassName').value = u.class || '';
-  document.getElementById('editTitle').value = u.title || '';
   document.getElementById('editSessionYear').value = u.sessionYear || CURRENT_YEAR;
 
   document.getElementById('editModal')?.classList.add('active');
@@ -1378,7 +1229,6 @@ window.saveEdit = async function() {
   const fullName = document.getElementById('editFullName').value.trim().toUpperCase();
   const formLevel = document.getElementById('editFormLevel').value.trim().toUpperCase();
   const className = document.getElementById('editClassName').value.trim().toUpperCase();
-  const title = document.getElementById('editTitle').value.trim().toUpperCase();
   const sessionYear = document.getElementById('editSessionYear').value.trim() || CURRENT_YEAR;
 
   if (!fullName || fullName.length < 3) return showToast('Ralat', 'Nama tidak sah.', 'error');
@@ -1393,7 +1243,6 @@ window.saveEdit = async function() {
       fullName,
       formLevel: formLevel || null,
       class: className || null,
-      title: title || null,
       sessionYear,
       updatedAt: fs.serverTimestamp()
     });
@@ -1403,7 +1252,6 @@ window.saveEdit = async function() {
       u.fullName = fullName;
       u.formLevel = formLevel || null;
       u.class = className || null;
-      u.title = title || null;
       u.sessionYear = sessionYear;
     }
 
@@ -1521,4 +1369,4 @@ console.log(
   "%c 👥 Dashboard User v5 ",
   "background:linear-gradient(135deg,#0F766E,#4F46E5,#06B6D4);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
 );
-console.log("FULLY FIXED · Auth + Profile + Form · Ready");
+console.log("Guru Kelas (NO Jawatan Tambahan) · Ready");
