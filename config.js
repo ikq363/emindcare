@@ -25,7 +25,8 @@ import {
   addDoc,
   deleteDoc,
   serverTimestamp,
-  onSnapshot
+  onSnapshot,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -48,7 +49,6 @@ const CLOUDINARY_CONFIG = {
   cloudName: "tt0ofn22",
   uploadPreset: "emindcarev2",
   folder: "emindcare",
-  // URL builder untuk pelbagai jenis media
   imageUrl: (publicId, opts = "") =>
     `https://res.cloudinary.com/tt0ofn22/image/upload/${opts}${publicId}`,
   videoUrl: (publicId, opts = "") =>
@@ -68,13 +68,12 @@ const db = getFirestore(app);
    ═══════════════════════════════════════════════════════════════ */
 async function uploadToCloudinary(file, options = {}) {
   const {
-    resourceType = "auto",       // "image" | "video" | "auto"
+    resourceType = "auto",
     folder = CLOUDINARY_CONFIG.folder,
     tags = [],
     publicId = null
   } = options;
 
-  // Tentukan resourceType jika auto
   let type = resourceType;
   if (type === "auto") {
     if (file.type.startsWith("video/")) type = "video";
@@ -114,7 +113,6 @@ async function uploadToCloudinary(file, options = {}) {
    FIRESTORE HELPERS
    ═══════════════════════════════════════════════════════════════ */
 
-// Ambil siteConfig utama
 async function getSiteConfig() {
   try {
     const snap = await getDoc(doc(db, "siteConfig", "main"));
@@ -125,7 +123,6 @@ async function getSiteConfig() {
   }
 }
 
-// Ambil sebarang collection dengan sorting client-side
 async function getCollection(name, orderField = "order") {
   try {
     const snap = await getDocs(collection(db, name));
@@ -139,7 +136,6 @@ async function getCollection(name, orderField = "order") {
   }
 }
 
-// Ambil collection dengan query where
 async function getCollectionWhere(name, field, value, orderField = "order") {
   try {
     const q = query(collection(db, name), where(field, "==", value));
@@ -154,7 +150,6 @@ async function getCollectionWhere(name, field, value, orderField = "order") {
   }
 }
 
-// Ambil pengumuman aktif
 async function getActiveAnnouncements() {
   try {
     const q = query(collection(db, "announcements"), where("active", "==", true));
@@ -173,7 +168,6 @@ async function getActiveAnnouncements() {
   }
 }
 
-// Real-time listener untuk siteConfig
 function watchSiteConfig(callback) {
   return onSnapshot(doc(db, "siteConfig", "main"), snap => {
     callback(snap.exists() ? snap.data() : null);
@@ -181,36 +175,36 @@ function watchSiteConfig(callback) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   EXPORT TO WINDOW — supaya boleh akses dari index.html
+   EXPORT TO WINDOW
    ═══════════════════════════════════════════════════════════════ */
 window.EMindCare = {
-  // Core
   app, auth, db, analytics,
 
-  // Cloudinary
   CLOUDINARY_CONFIG,
   uploadToCloudinary,
 
-  // Firestore Helpers
   getSiteConfig,
   getCollection,
   getCollectionWhere,
   getActiveAnnouncements,
   watchSiteConfig,
 
-  // Firestore raw functions (untuk dashboard kaunselor)
   fs: {
     doc, getDoc, setDoc, updateDoc,
     collection, getDocs, query, where, orderBy, limit,
-    addDoc, deleteDoc, serverTimestamp, onSnapshot
+    addDoc, deleteDoc, serverTimestamp, onSnapshot,
+    writeBatch
   },
 
-  // Auth functions
   auth_fns: { onAuthStateChanged, signOut }
 };
+
+// ⚡ Fallback global
+window.writeBatch = writeBatch;
 
 console.log(
   "%c e-MindCare ",
   "background:linear-gradient(135deg,#0F766E,#4F46E5);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
 );
 console.log("🧠 Firebase SDK + Cloudinary ready (eMindCare v2)");
+console.log("✅ writeBatch available");
