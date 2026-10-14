@@ -1285,6 +1285,9 @@ tbody td {
 @media (max-width: 1024px) {
   :root { --sidebar-w: 240px; }
   .content { padding: 1.25rem; }
+  .multi-row-grid.guru-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
@@ -1293,7 +1296,7 @@ tbody td {
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
   .content { padding: 1rem; }
-  .multi-row-grid.murid-grid,
+  .multi-row-grid.murid-grid { grid-template-columns: 1fr 1fr; }
   .multi-row-grid.guru-grid { grid-template-columns: 1fr 1fr; }
   .single-grid { grid-template-columns: 1fr 1fr !important; }
 }
@@ -1310,7 +1313,7 @@ tbody td {
   .tab-btn i { font-size: 0.9rem; }
   .mode-btn { padding: 0.6rem 0.8rem; font-size: 0.72rem; }
   .mode-btn span { display: none; }
-  .multi-row-grid.murid-grid,
+  .multi-row-grid.murid-grid { grid-template-columns: 1fr; }
   .multi-row-grid.guru-grid { grid-template-columns: 1fr; }
   .single-grid { grid-template-columns: 1fr !important; }
   .card-header-left { gap: 0.75rem; }
@@ -1480,6 +1483,7 @@ tbody td {
             </button>
           </div>
 
+          <!-- Mode 1: Multi-Row -->
           <div class="mode-panel active" data-panel-murid="multi">
             <div class="multi-row-list" id="multiRowListMurid"></div>
             <div class="row-actions">
@@ -1517,6 +1521,7 @@ tbody td {
             </div>
           </div>
 
+          <!-- Mode 2: CSV -->
           <div class="mode-panel" data-panel-murid="csv">
             <div class="csv-drop" id="csvDropMurid">
               <input type="file" id="csvInputMurid" accept=".csv,.xlsx,.xls">
@@ -1582,6 +1587,7 @@ tbody td {
             </div>
           </div>
 
+          <!-- Mode 3: Single -->
           <div class="mode-panel" data-panel-murid="single">
             <form id="singleFormMurid">
               <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 0.8fr;gap:0.9rem;" class="single-grid">
@@ -1643,6 +1649,7 @@ tbody td {
           </div>
         </div>
 
+        <!-- Senarai Murid -->
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1896,7 +1903,7 @@ tbody td {
               <i class="fas fa-search"></i>
               <input type="text" id="guruSearch" placeholder="Cari nama atau IC...">
             </div>
-            <select id="guruFilterKelas" class="filter-select">
+            <select id="guruFilterJawatan" class="filter-select">
               <option value="">Semua Kelas</option>
             </select>
             <select id="guruFilterTahun" class="filter-select">
