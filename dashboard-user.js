@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   e-MindCare · Dashboard User Script (v5 — Clean)
-   Bulk + CSV + Guru Kelas (TANPA Jawatan Tambahan)
+   e-MindCare · Dashboard User Script (v6 — Clean Guru Edition)
+   Auth + Profile + Bulk + CSV + Guru Kelas + Auto Year
    ═══════════════════════════════════════════════════════════════ */
 
 import './config.js';
@@ -169,7 +169,7 @@ function authGuard() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   👤 LOAD PROFILE
+   👤 LOAD PROFILE (Sidebar)
    ═══════════════════════════════════════════════════════════════ */
 function loadProfile() {
   if (!currentUser) return;
@@ -180,7 +180,10 @@ function loadProfile() {
   console.log('👤 Loading profile:', name);
 
   const nameEl = document.getElementById('sbProfileName');
-  if (nameEl) nameEl.textContent = name;
+  if (nameEl) {
+    nameEl.textContent = name;
+    console.log('✅ sbProfileName updated');
+  }
 
   const avatarEl = document.getElementById('sbAvatar');
   if (avatarEl) {
@@ -190,6 +193,7 @@ function loadProfile() {
     } else {
       avatarEl.textContent = initial;
     }
+    console.log('✅ sbAvatar updated');
   }
 }
 
@@ -245,7 +249,7 @@ function initUI() {
   document.getElementById('muridFilterKelas')?.addEventListener('change', renderMuridTable);
   document.getElementById('muridFilterTahun')?.addEventListener('change', renderMuridTable);
   document.getElementById('guruSearch')?.addEventListener('input', renderGuruTable);
-  document.getElementById('guruFilterKelas')?.addEventListener('change', renderGuruTable);
+  document.getElementById('guruFilterJawatan')?.addEventListener('change', renderGuruTable);
   document.getElementById('guruFilterTahun')?.addEventListener('change', renderGuruTable);
 
   document.getElementById('confirmBtn')?.addEventListener('click', async () => {
@@ -290,6 +294,9 @@ function initUI() {
   });
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   📑 TAB & MODE SWITCHER
+   ═══════════════════════════════════════════════════════════════ */
 window.switchTab = function(tabName) {
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tabName);
@@ -311,11 +318,14 @@ function capitalize(s) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   📝 MULTI-ROW
+   📝 MULTI-ROW MANAGEMENT
    ═══════════════════════════════════════════════════════════════ */
 window.addRow = function(group, silent = false) {
   const container = document.getElementById(`multiRowList${capitalize(group)}`);
-  if (!container) return;
+  if (!container) {
+    console.warn(`⚠️ multiRowList${capitalize(group)} not found`);
+    return;
+  }
 
   const rowNum = container.children.length + 1;
   const isGuru = group === 'guru';
@@ -325,56 +335,102 @@ window.addRow = function(group, silent = false) {
   row.className = 'multi-row';
   row.dataset.rowId = rowId;
 
-  // Sama untuk murid & guru: Nama | IC | Tingkatan | Kelas | Tahun
-  row.innerHTML = `
-    <div class="multi-row-header">
-      <div class="multi-row-title">
-        <span class="multi-row-num">${rowNum}</span>
-        <span class="multi-row-label">${isGuru ? 'Guru' : 'Murid'} #${rowNum}</span>
+  if (isGuru) {
+    // GURU: Nama | IC | Tingkatan | Kelas | Tahun
+    row.innerHTML = `
+      <div class="multi-row-header">
+        <div class="multi-row-title">
+          <span class="multi-row-num">${rowNum}</span>
+          <span class="multi-row-label">Guru #${rowNum}</span>
+        </div>
+        <button type="button" class="multi-row-delete" onclick="removeRow(this, '${group}')" title="Hapus baris">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
-      <button type="button" class="multi-row-delete" onclick="removeRow(this, '${group}')" title="Hapus baris">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="multi-row-grid ${isGuru ? 'guru-grid' : 'murid-grid'}">
-      <div class="multi-row-field">
-        <label class="multi-row-field-label">Nama Penuh</label>
-        <input type="text" class="multi-row-input upper" placeholder="SEPERTI DALAM IC" data-field="fullName" maxlength="100">
+      <div class="multi-row-grid guru-grid">
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Nama Penuh</label>
+          <input type="text" class="multi-row-input upper" placeholder="SEPERTI DALAM IC" data-field="fullName" maxlength="100">
+        </div>
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Nombor IC</label>
+          <input type="text" class="multi-row-input mono" placeholder="12 DIGIT" data-field="icNumber" maxlength="12" inputmode="numeric">
+          <span class="auto-hint" data-hint-for="${rowId}"></span>
+        </div>
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Tingkatan</label>
+          <select class="multi-row-select" data-field="formLevel">
+            <option value="">—</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Guru Kelas</label>
+          <input type="text" class="multi-row-input upper" placeholder="MAWAR" data-field="className" maxlength="40">
+        </div>
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Tahun</label>
+          <input type="text" class="multi-row-input" placeholder="${CURRENT_YEAR}" data-field="sessionYear" maxlength="4" inputmode="numeric">
+        </div>
       </div>
-      <div class="multi-row-field">
-        <label class="multi-row-field-label">Nombor IC</label>
-        <input type="text" class="multi-row-input mono" placeholder="12 DIGIT" data-field="icNumber" maxlength="12" inputmode="numeric">
-        <span class="auto-hint" data-hint-for="${rowId}"></span>
+    `;
+  } else {
+    // MURID: Nama | IC | Tingkatan | Kelas | Tahun
+    row.innerHTML = `
+      <div class="multi-row-header">
+        <div class="multi-row-title">
+          <span class="multi-row-num">${rowNum}</span>
+          <span class="multi-row-label">Murid #${rowNum}</span>
+        </div>
+        <button type="button" class="multi-row-delete" onclick="removeRow(this, '${group}')" title="Hapus baris">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
-      <div class="multi-row-field">
-        <label class="multi-row-field-label">Tingkatan</label>
-        <select class="multi-row-select" data-field="formLevel">
-          <option value="">—</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-        </select>
+      <div class="multi-row-grid murid-grid">
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Nama Penuh</label>
+          <input type="text" class="multi-row-input upper" placeholder="SEPERTI DALAM IC" data-field="fullName" maxlength="100">
+        </div>
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Nombor IC</label>
+          <input type="text" class="multi-row-input mono" placeholder="12 DIGIT" data-field="icNumber" maxlength="12" inputmode="numeric">
+          <span class="auto-hint" data-hint-for="${rowId}"></span>
+        </div>
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Tingkatan</label>
+          <select class="multi-row-select" data-field="formLevel">
+            <option value="">—</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Nama Kelas</label>
+          <input type="text" class="multi-row-input upper" placeholder="MAWAR" data-field="className" maxlength="40">
+        </div>
+        <div class="multi-row-field">
+          <label class="multi-row-field-label">Tahun</label>
+          <input type="text" class="multi-row-input" placeholder="${CURRENT_YEAR}" data-field="sessionYear" maxlength="4" inputmode="numeric">
+        </div>
       </div>
-      <div class="multi-row-field">
-        <label class="multi-row-field-label">${isGuru ? 'Guru Kelas' : 'Nama Kelas'}</label>
-        <input type="text" class="multi-row-input upper" placeholder="MAWAR" data-field="className" maxlength="40">
-      </div>
-      <div class="multi-row-field">
-        <label class="multi-row-field-label">Tahun</label>
-        <input type="text" class="multi-row-input" placeholder="${CURRENT_YEAR}" data-field="sessionYear" maxlength="4" inputmode="numeric">
-      </div>
-    </div>
-  `;
+    `;
+  }
 
   const nameInput = row.querySelector('[data-field="fullName"]');
   const icInput = row.querySelector('[data-field="icNumber"]');
   const classInput = row.querySelector('[data-field="className"]');
   const yearInput = row.querySelector('[data-field="sessionYear"]');
 
-  nameInput.addEventListener('input', (e) => {
+  nameInput?.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/[^A-Za-z\s'\.]/g, '').toUpperCase();
@@ -382,7 +438,7 @@ window.addRow = function(group, silent = false) {
     if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
   });
 
-  icInput.addEventListener('input', (e) => {
+  icInput?.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
@@ -391,7 +447,7 @@ window.addRow = function(group, silent = false) {
     updateAutoHint(row, e.target.value);
   });
 
-  classInput.addEventListener('input', (e) => {
+  classInput?.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
@@ -399,7 +455,7 @@ window.addRow = function(group, silent = false) {
     if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
   });
 
-  yearInput.addEventListener('input', (e) => {
+  yearInput?.addEventListener('input', (e) => {
     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
   });
 
@@ -416,7 +472,7 @@ window.addRow = function(group, silent = false) {
 
   if (!silent) {
     row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    nameInput.focus();
+    nameInput?.focus();
   }
 };
 
@@ -521,7 +577,7 @@ window.submitBulk = async function(group) {
 
   const invalid = data.filter(d => !d.fullName || d.fullName.length < 3 || !/^\d{12}$/.test(d.icNumber));
   if (invalid.length) {
-    return showToast('Ralat Validasi', `${invalid.length} pengguna tidak lengkap (nama atau IC tidak sah).`, 'error', 6000);
+    return showToast('Ralat Validasi', `${invalid.length} pengguna tidak lengkap.`, 'error', 6000);
   }
 
   const icSet = new Set();
@@ -537,7 +593,7 @@ window.submitBulk = async function(group) {
   const existing = new Set(allUsers.map(u => u.icNumber));
   const dupInDb = data.filter(d => existing.has(d.icNumber));
   if (dupInDb.length) {
-    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar dalam sistem.`, 'error', 6000);
+    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar.`, 'error', 6000);
   }
 
   showConfirmModal({
@@ -991,9 +1047,9 @@ function populateFilters() {
   }
 
   const guruKelasSet = [...new Set(guru.map(u => u.class).filter(Boolean))].sort();
-  const guruKelasSel = document.getElementById('guruFilterKelas');
-  if (guruKelasSel) {
-    guruKelasSel.innerHTML = '<option value="">Semua Kelas</option>' +
+  const jawatanSel = document.getElementById('guruFilterJawatan');
+  if (jawatanSel) {
+    jawatanSel.innerHTML = '<option value="">Semua Kelas</option>' +
       guruKelasSet.map(j => `<option value="${escapeHtml(j)}">${escapeHtml(j)}</option>`).join('');
   }
 
@@ -1039,7 +1095,7 @@ function renderGuruTable() {
   if (!tbody) return;
 
   const search = document.getElementById('guruSearch')?.value.toLowerCase().trim() || '';
-  const kelas = document.getElementById('guruFilterKelas')?.value || '';
+  const kelas = document.getElementById('guruFilterJawatan')?.value || '';
   const tahun = document.getElementById('guruFilterTahun')?.value || '';
 
   let list = allUsers.filter(u => u.role === 'guru');
@@ -1055,10 +1111,46 @@ function renderGuruTable() {
     return;
   }
 
-  tbody.innerHTML = list.map(u => renderUserRow(u)).join('');
+  tbody.innerHTML = list.map(u => renderGuruRow(u)).join('');
 }
 
 function renderUserRow(u) {
+  const initial = (u.fullName || 'U').charAt(0).toUpperCase();
+  const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
+  let age = u.age;
+  if (!age && u.icNumber) age = getBirthInfoFromIC(u.icNumber).age;
+
+  return `
+    <tr>
+      <td>
+        <div class="user-cell">
+          <div class="user-avatar">${avatarHTML}</div>
+          <div class="user-info">
+            <strong>${escapeHtml(u.fullName || 'Tanpa Nama')}</strong>
+            <span>${escapeHtml(u.icNumber || '—')}</span>
+          </div>
+        </div>
+      </td>
+      <td>${escapeHtml(u.class || '—')}</td>
+      <td>${age ? `${age} thn` : '—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-secondary btn-icon btn-sm" onclick="viewUser('${u.id}')" title="Lihat">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="btn btn-secondary btn-icon btn-sm" onclick="editUser('${u.id}')" title="Edit">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="btn btn-danger btn-icon btn-sm" onclick="deleteUser('${u.id}')" title="Padam">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
+function renderGuruRow(u) {
   const initial = (u.fullName || 'U').charAt(0).toUpperCase();
   const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
   let age = u.age;
@@ -1366,7 +1458,7 @@ function escapeHtml(str) {
 }
 
 console.log(
-  "%c 👥 Dashboard User v5 ",
+  "%c 👥 Dashboard User v6 ",
   "background:linear-gradient(135deg,#0F766E,#4F46E5,#06B6D4);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
 );
-console.log("Guru Kelas (NO Jawatan Tambahan) · Ready");
+console.log("Clean Guru Edition · Tanpa Jawatan Tambahan · Ready");
