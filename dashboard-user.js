@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   e-MindCare · Dashboard User Script (v4)
-   Bulk Registration + CSV + Guru Kelas (bukan Subjek)
+   e-MindCare · Dashboard User Script (v5 — FULLY FIXED)
+   Auth + Profile + Bulk + CSV + Guru Kelas + Auto Year
    ═══════════════════════════════════════════════════════════════ */
 
 import './config.js';
@@ -20,12 +20,42 @@ let allUsers = [];
 let csvData = { murid: [], guru: [] };
 let pendingConfirmAction = null;
 let editingUserId = null;
-let editingUserRole = null;
 let isSubmittingSingle = { murid: false, guru: false };
 let isSubmittingBulk = { murid: false, guru: false };
 
 /* ═══════════════════════════════════════════════════════════════
-   HELPER: Extract Birth Year & Age from IC
+   🔧 HELPER: Normalize Role (case-insensitive)
+   ═══════════════════════════════════════════════════════════════ */
+function normalizeRole(rawRole) {
+  if (!rawRole) return null;
+  const cleaned = String(rawRole).toLowerCase().trim().replace(/\s+/g, ' ');
+
+  // Terima variasi
+  const aliasMap = {
+    'kaunselor': 'kaunselor',
+    'kaunselor ubk': 'kaunselor',
+    'kaunselor semsira': 'kaunselor',
+    'counselor': 'kaunselor',
+    'counsellor': 'kaunselor',
+    'guru': 'guru',
+    'teacher': 'guru',
+    'murid': 'murid',
+    'pelajar': 'murid',
+    'student': 'murid'
+  };
+
+  if (aliasMap[cleaned]) return aliasMap[cleaned];
+
+  // Fallback: cek substring
+  for (const key in aliasMap) {
+    if (cleaned.includes(key)) return aliasMap[key];
+  }
+
+  return null;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🔧 HELPER: Get Birth Year & Age from IC
    ═══════════════════════════════════════════════════════════════ */
 function getBirthInfoFromIC(icNumber) {
   if (!icNumber || icNumber.length < 2) return { birthYear: null, age: null };
@@ -34,24 +64,47 @@ function getBirthInfoFromIC(icNumber) {
 
   const currentYear = new Date().getFullYear();
   const currentYY = currentYear % 100;
-  let birthYear = yy <= currentYY ? 2000 + yy : 1900 + yy;
+  const birthYear = yy <= currentYY ? 2000 + yy : 1900 + yy;
   const age = currentYear - birthYear;
   return { birthYear, age };
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INIT
+   🚀 INIT
    ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('load', async () => {
-  await waitForEMindCare();
-  if (!authGuard()) return;
-  initUI();
-  applyBranding();
-  await loadUsers();
+  console.log('🚀 Dashboard User loading...');
 
-  // Start rows
-  for (let i = 0; i < 3; i++) addRow('murid', true);
-  for (let i = 0; i < 2; i++) addRow('guru', true);
+  try {
+    await waitForEMindCare();
+    console.log('✅ EMindCare SDK ready');
+
+    if (!authGuard()) {
+      console.warn('❌ Auth guard failed');
+      return;
+    }
+
+    console.log('✅ Auth guard passed');
+
+    initUI();
+    console.log('✅ UI initialized');
+
+    applyBranding();
+    console.log('✅ Branding applied');
+
+    await loadUsers();
+    console.log('✅ Users loaded:', allUsers.length);
+
+    // Start rows
+    for (let i = 0; i < 3; i++) addRow('murid', true);
+    for (let i = 0; i < 2; i++) addRow('guru', true);
+    console.log('✅ Rows added');
+
+    console.log('🎉 Dashboard User READY');
+  } catch (err) {
+    console.error('💥 INIT ERROR:', err);
+    showToast('Ralat Sistem', 'Gagal memuatkan dashboard: ' + err.message, 'error', 8000);
+  }
 });
 
 function waitForEMindCare() {
@@ -67,46 +120,134 @@ function waitForEMindCare() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   AUTH GUARD
+   🔒 AUTH GUARD (Case-Insensitive + Robust)
    ═══════════════════════════════════════════════════════════════ */
 function authGuard() {
   const raw = localStorage.getItem(SESSION_KEY);
-  if (!raw) { window.location.href = 'login.html'; return false; }
+  if (!raw) {
+    console.warn('⚠️ No session found — redirect to login');
+    window.location.href = 'login.html';
+    return false;
+  }
+
   try {
     const session = JSON.parse(raw);
-    if (session.role !== 'kaunselor') {
-      const redirects = { guru: 'dashboard-guru.html', murid: 'dashboard-murid.html' };
-      window.location.href = redirects[session.role] || 'login.html';
+    console.log('📋 Session loaded:', {
+      uid: session.uid,
+      fullName: session.fullName,
+      role: session.role
+    });
+
+    // ⚡ Normalize role (case-insensitive)
+    const role = normalizeRole(session.role);
+    console.log('📋 Normalized role:', role);
+
+    if (!role) {
+      console.warn('⚠️ Invalid role:', session.role);
+      showToast('Ralat Peranan', 'Peranan anda tidak sah. Sila login semula.', 'error', 5000);
+      localStorage.removeItem(SESSION_KEY);
+      setTimeout(() => { window.location.href = 'login.html'; }, 2000);
       return false;
     }
+
+    // ⚡ Bukan kaunselor — redirect ke dashboard yang betul
+    if (role !== 'kaunselor') {
+      const redirects = {
+        guru: 'dashboard-guru.html',
+        murid: 'dashboard-murid.html'
+      };
+      console.warn(`⚠️ Role = ${role}, redirecting to ${redirects[role]}`);
+      window.location.href = redirects[role] || 'login.html';
+      return false;
+    }
+
     currentUser = session;
     loadProfile();
     return true;
+
   } catch (e) {
+    console.error('❌ Session parse error:', e);
     localStorage.removeItem(SESSION_KEY);
     window.location.href = 'login.html';
     return false;
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   👤 LOAD PROFILE (Sidebar)
+   ═══════════════════════════════════════════════════════════════ */
 function loadProfile() {
-  document.getElementById('sbProfileName').textContent = currentUser.fullName || 'Kaunselor';
-  const avatar = document.getElementById('sbAvatar');
-  if (currentUser.avatarUrl) {
-    avatar.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
+  if (!currentUser) {
+    console.warn('⚠️ No currentUser to load profile');
+    return;
+  }
+
+  const name = currentUser.fullName || 'Kaunselor';
+  const initial = name.charAt(0).toUpperCase();
+
+  console.log('👤 Loading profile:', name);
+
+  // Update sidebar name
+  const nameEl = document.getElementById('sbProfileName');
+  if (nameEl) {
+    nameEl.textContent = name;
+    console.log('✅ sbProfileName updated');
   } else {
-    avatar.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
+    console.warn('⚠️ sbProfileName not found');
+  }
+
+  // Update avatar
+  const avatarEl = document.getElementById('sbAvatar');
+  if (avatarEl) {
+    const avatarUrl = currentUser.avatarUrl || currentUser.profileImage;
+    if (avatarUrl) {
+      avatarEl.innerHTML = `<img src="${avatarUrl}" alt="${name}">`;
+    } else {
+      avatarEl.textContent = initial;
+    }
+    console.log('✅ sbAvatar updated');
+  } else {
+    console.warn('⚠️ sbAvatar not found');
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INIT UI
+   🎨 APPLY BRANDING
+   ═══════════════════════════════════════════════════════════════ */
+async function applyBranding() {
+  try {
+    const cfg = await window.EMindCare.getSiteConfig();
+    if (!cfg?.branding) return;
+    const b = cfg.branding;
+
+    if (b.name) {
+      const el = document.getElementById('sbBrandName');
+      if (el) el.textContent = b.name;
+    }
+    if (b.logoUrl) {
+      const el = document.getElementById('sbLogo');
+      if (el) el.innerHTML = `<img src="${b.logoUrl}" alt="">`;
+    } else if (b.logoIcon) {
+      const el = document.getElementById('sbLogo');
+      if (el) el.innerHTML = `<i class="${b.logoIcon}"></i>`;
+    }
+    if (b.primaryColor) document.documentElement.style.setProperty('--teal', b.primaryColor);
+    if (b.accentColor) document.documentElement.style.setProperty('--indigo', b.accentColor);
+  } catch (e) {
+    console.warn('⚠️ Branding error:', e.message);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🎯 INIT UI
    ═══════════════════════════════════════════════════════════════ */
 function initUI() {
+  // Tab navigation
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
+  // Mode switcher
   document.querySelectorAll('.mode-switcher').forEach(switcher => {
     const group = switcher.dataset.group;
     switcher.querySelectorAll('.mode-btn').forEach(btn => {
@@ -118,8 +259,10 @@ function initUI() {
     });
   });
 
+  // CSV drop zones
   ['murid', 'guru'].forEach(group => initCsvDrop(group));
 
+  // Search & filters
   document.getElementById('muridSearch')?.addEventListener('input', renderMuridTable);
   document.getElementById('muridFilterKelas')?.addEventListener('change', renderMuridTable);
   document.getElementById('muridFilterTahun')?.addEventListener('change', renderMuridTable);
@@ -127,6 +270,7 @@ function initUI() {
   document.getElementById('guruFilterJawatan')?.addEventListener('change', renderGuruTable);
   document.getElementById('guruFilterTahun')?.addEventListener('change', renderGuruTable);
 
+  // Confirm modal
   document.getElementById('confirmBtn')?.addEventListener('click', async () => {
     if (typeof pendingConfirmAction === 'function') {
       const action = pendingConfirmAction;
@@ -135,6 +279,7 @@ function initUI() {
     }
   });
 
+  // Single forms
   document.getElementById('singleFormMurid')?.addEventListener('submit', (e) => {
     e.preventDefault();
     submitSingle(e, 'murid');
@@ -144,6 +289,7 @@ function initUI() {
     submitSingle(e, 'guru');
   });
 
+  // Auto-format single form inputs
   document.querySelectorAll('.input-field.upper').forEach(el => {
     if (el.dataset.fmtAttached) return;
     el.dataset.fmtAttached = '1';
@@ -169,6 +315,9 @@ function initUI() {
   });
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   📑 TAB & MODE SWITCHER
+   ═══════════════════════════════════════════════════════════════ */
 window.switchTab = function(tabName) {
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tabName);
@@ -190,30 +339,14 @@ function capitalize(s) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BRANDING
-   ═══════════════════════════════════════════════════════════════ */
-async function applyBranding() {
-  try {
-    const cfg = await window.EMindCare.getSiteConfig();
-    if (!cfg?.branding) return;
-    const b = cfg.branding;
-    if (b.name) document.getElementById('sbBrandName').textContent = b.name;
-    if (b.logoUrl) {
-      document.getElementById('sbLogo').innerHTML = `<img src="${b.logoUrl}" alt="">`;
-    } else if (b.logoIcon) {
-      document.getElementById('sbLogo').innerHTML = `<i class="${b.logoIcon}"></i>`;
-    }
-    if (b.primaryColor) document.documentElement.style.setProperty('--teal', b.primaryColor);
-    if (b.accentColor) document.documentElement.style.setProperty('--indigo', b.accentColor);
-  } catch (e) { /* ignore */ }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   ⚡ MULTI-ROW (Fixed + Tingkatan + Guru Kelas)
+   📝 MULTI-ROW MANAGEMENT
    ═══════════════════════════════════════════════════════════════ */
 window.addRow = function(group, silent = false) {
   const container = document.getElementById(`multiRowList${capitalize(group)}`);
-  if (!container) return;
+  if (!container) {
+    console.warn(`⚠️ multiRowList${capitalize(group)} not found`);
+    return;
+  }
 
   const rowNum = container.children.length + 1;
   const isGuru = group === 'guru';
@@ -224,7 +357,7 @@ window.addRow = function(group, silent = false) {
   row.dataset.rowId = rowId;
 
   if (isGuru) {
-    // GURU: Nama | IC | Tingkatan | Kelas | Jawatan Tambahan | Tahun
+    // GURU: Nama | IC | Tingkatan | Kelas | Jawatan | Tahun
     row.innerHTML = `
       <div class="multi-row-header">
         <div class="multi-row-title">
@@ -317,14 +450,14 @@ window.addRow = function(group, silent = false) {
     `;
   }
 
-  // Auto-format
+  // Auto-format listeners
   const nameInput = row.querySelector('[data-field="fullName"]');
   const icInput = row.querySelector('[data-field="icNumber"]');
   const classInput = row.querySelector('[data-field="className"]');
   const titleInput = row.querySelector('[data-field="title"]');
   const yearInput = row.querySelector('[data-field="sessionYear"]');
 
-  nameInput.addEventListener('input', (e) => {
+  nameInput?.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/[^A-Za-z\s'\.]/g, '').toUpperCase();
@@ -332,7 +465,7 @@ window.addRow = function(group, silent = false) {
     if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
   });
 
-  icInput.addEventListener('input', (e) => {
+  icInput?.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
@@ -341,7 +474,7 @@ window.addRow = function(group, silent = false) {
     updateAutoHint(row, e.target.value);
   });
 
-  classInput.addEventListener('input', (e) => {
+  classInput?.addEventListener('input', (e) => {
     const start = e.target.selectionStart;
     const oldLen = e.target.value.length;
     e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
@@ -349,17 +482,15 @@ window.addRow = function(group, silent = false) {
     if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
   });
 
-  if (titleInput) {
-    titleInput.addEventListener('input', (e) => {
-      const start = e.target.selectionStart;
-      const oldLen = e.target.value.length;
-      e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
-      const diff = oldLen - e.target.value.length;
-      if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
-    });
-  }
+  titleInput?.addEventListener('input', (e) => {
+    const start = e.target.selectionStart;
+    const oldLen = e.target.value.length;
+    e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
+    const diff = oldLen - e.target.value.length;
+    if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
+  });
 
-  yearInput.addEventListener('input', (e) => {
+  yearInput?.addEventListener('input', (e) => {
     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
   });
 
@@ -377,7 +508,7 @@ window.addRow = function(group, silent = false) {
 
   if (!silent) {
     row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    nameInput.focus();
+    nameInput?.focus();
   }
 };
 
@@ -435,12 +566,10 @@ function getMultiRowData(group) {
   const container = document.getElementById(`multiRowList${capitalize(group)}`);
   if (!container) return [];
 
-  const isGuru = group === 'guru';
   const data = [];
-
   [...container.children].forEach(row => {
-    const fullName = row.querySelector('[data-field="fullName"]').value.trim();
-    const icNumber = row.querySelector('[data-field="icNumber"]').value.trim();
+    const fullName = row.querySelector('[data-field="fullName"]')?.value.trim() || '';
+    const icNumber = row.querySelector('[data-field="icNumber"]')?.value.trim() || '';
     const className = row.querySelector('[data-field="className"]')?.value.trim() || '';
     const title = row.querySelector('[data-field="title"]')?.value.trim() || '';
     const sessionYear = row.querySelector('[data-field="sessionYear"]')?.value.trim() || CURRENT_YEAR;
@@ -448,7 +577,6 @@ function getMultiRowData(group) {
 
     if (!fullName && !icNumber) return;
 
-    // Gabungkan tingkatan + nama kelas
     let finalClass = className;
     if (formLevel && className) {
       finalClass = `${formLevel} ${className}`.trim();
@@ -474,7 +602,7 @@ function clearAllRows(group) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BULK SUBMIT
+   📤 BULK SUBMIT
    ═══════════════════════════════════════════════════════════════ */
 window.submitBulk = async function(group) {
   if (isSubmittingBulk[group]) return;
@@ -487,7 +615,7 @@ window.submitBulk = async function(group) {
 
   const invalid = data.filter(d => !d.fullName || d.fullName.length < 3 || !/^\d{12}$/.test(d.icNumber));
   if (invalid.length) {
-    return showToast('Ralat Validasi', `${invalid.length} pengguna tidak lengkap (nama atau IC tidak sah).`, 'error', 6000);
+    return showToast('Ralat Validasi', `${invalid.length} pengguna tidak lengkap.`, 'error', 6000);
   }
 
   const icSet = new Set();
@@ -497,18 +625,18 @@ window.submitBulk = async function(group) {
     icSet.add(d.icNumber);
   });
   if (dupInList.length) {
-    return showToast('IC Berulang', `${dupInList.length} IC berulang dalam senarai: ${dupInList[0]}`, 'error', 6000);
+    return showToast('IC Berulang', `${dupInList.length} IC berulang dalam senarai.`, 'error', 6000);
   }
 
   const existing = new Set(allUsers.map(u => u.icNumber));
   const dupInDb = data.filter(d => existing.has(d.icNumber));
   if (dupInDb.length) {
-    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar dalam sistem.`, 'error', 6000);
+    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar.`, 'error', 6000);
   }
 
   showConfirmModal({
     title: `Daftar ${data.length} Pengguna?`,
-    desc: `Anda akan mendaftarkan ${data.length} akaun ${group} baharu ke dalam sistem.`,
+    desc: `Anda akan mendaftarkan ${data.length} akaun ${group} baharu.`,
     confirmText: `Ya, Daftar ${data.length}`,
     onConfirm: async () => {
       await processBulkInsert(group, data);
@@ -558,8 +686,7 @@ async function processBulkInsert(group, data) {
           birthYear: birthYear || null,
           age: age || null,
           createdAt: serverTimestamp(),
-          createdBy: currentUser.uid,
-          bulkImport: true
+          createdBy: currentUser.uid
         });
       });
 
@@ -569,10 +696,10 @@ async function processBulkInsert(group, data) {
       const pct = Math.round((processed / total) * 100);
       if (fillEl) fillEl.style.width = pct + '%';
       if (pctEl) pctEl.textContent = pct + '%';
-      if (labelEl) labelEl.textContent = `Menyimpan ${processed}/${total} akaun ${group}...`;
+      if (labelEl) labelEl.textContent = `Menyimpan ${processed}/${total}...`;
     }
 
-    if (labelEl) labelEl.textContent = `✓ Selesai — ${total} akaun ${group} didaftarkan`;
+    if (labelEl) labelEl.textContent = `✓ Selesai — ${total} akaun didaftarkan`;
     showToast('Berjaya!', `${total} akaun ${group} berjaya didaftarkan.`, 'success', 6000);
 
     clearAllRows(group);
@@ -585,7 +712,7 @@ async function processBulkInsert(group, data) {
 
   } catch (err) {
     console.error('Bulk insert error:', err);
-    showToast('Gagal', 'Ralat semasa menyimpan: ' + err.message, 'error', 6000);
+    showToast('Gagal', 'Ralat: ' + err.message, 'error', 6000);
     progressEl?.classList.remove('active');
   } finally {
     btn?.classList.remove('loading');
@@ -595,7 +722,7 @@ async function processBulkInsert(group, data) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CSV HANDLING
+   📁 CSV HANDLING
    ═══════════════════════════════════════════════════════════════ */
 function initCsvDrop(group) {
   const zone = document.getElementById(`csvDrop${capitalize(group)}`);
@@ -645,13 +772,11 @@ function handleCsvFile(group, file) {
         let formLevel = (row.formLevel || row.tingkatan || row.level || row['Tingkatan'] || row['TINGKATAN'] || '').toString().trim();
         let className = (row.className || row.kelas || row.class || row['Kelas'] || row['KELAS'] || '').trim().toUpperCase();
 
-        // Kalau formLevel dalam format "Tingkatan 1", ambil digit
         if (formLevel) {
           const match = formLevel.match(/\d+/);
           formLevel = match ? match[0] : formLevel;
         }
 
-        // Kalau className ada nombor depan (contoh "1 MAWAR"), pisahkan
         if (!formLevel && className) {
           const match = className.match(/^(\d+)\s+(.+)$/);
           if (match) {
@@ -660,7 +785,6 @@ function handleCsvFile(group, file) {
           }
         }
 
-        // Gabungkan
         let finalClass = className;
         if (formLevel && className) {
           finalClass = `${formLevel} ${className}`.trim();
@@ -683,7 +807,7 @@ function handleCsvFile(group, file) {
       }).filter(d => d.fullName && d.icNumber);
 
       if (!data.length) {
-        return showToast('Fail Kosong', 'Tiada data sah dijumpai dalam fail CSV.', 'warning');
+        return showToast('Fail Kosong', 'Tiada data sah dijumpai.', 'warning');
       }
 
       csvData[group] = data;
@@ -730,8 +854,7 @@ window.downloadTemplate = function(group) {
   if (isGuru) {
     csv = 'fullName,icNumber,formLevel,className,title,sessionYear\n' +
       'AHMAD BIN ALI,850101015678,3,MAWAR,GURU MATEMATIK,2026\n' +
-      'SITI BINTI HASSAN,860202016789,5,DEDIKASI,GURU BAHASA MELAYU,2026\n' +
-      'MUHAMMAD IKQRAM,900303017890,,,PENOLONG KANAN,2026';
+      'SITI BINTI HASSAN,860202016789,5,DEDIKASI,GURU BAHASA MELAYU,2026';
   } else {
     csv = 'fullName,icNumber,formLevel,className,sessionYear\n' +
       'AHMAD BIN ALI,080101015678,1,MAWAR,2026\n' +
@@ -765,13 +888,13 @@ window.importCsv = async function(group) {
     icSet.add(d.icNumber);
   });
   if (dupInList.length) {
-    return showToast('IC Berulang', `${dupInList.length} IC berulang dalam fail CSV.`, 'error', 6000);
+    return showToast('IC Berulang', `${dupInList.length} IC berulang.`, 'error', 6000);
   }
 
   const existing = new Set(allUsers.map(u => u.icNumber));
   const dupInDb = data.filter(d => existing.has(d.icNumber));
   if (dupInDb.length) {
-    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar dalam sistem.`, 'error', 6000);
+    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar.`, 'error', 6000);
   }
 
   showConfirmModal({
@@ -819,8 +942,7 @@ async function processCsvImport(group, data) {
           birthYear: birthYear || null,
           age: age || null,
           createdAt: serverTimestamp(),
-          createdBy: currentUser.uid,
-          csvImport: true
+          createdBy: currentUser.uid
         });
       });
 
@@ -843,13 +965,13 @@ async function processCsvImport(group, data) {
 
   } catch (err) {
     console.error('CSV import error:', err);
-    showToast('Gagal', 'Ralat semasa import: ' + err.message, 'error', 6000);
+    showToast('Gagal', 'Ralat: ' + err.message, 'error', 6000);
     progressEl?.classList.remove('active');
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SINGLE REGISTRATION
+   📝 SINGLE REGISTRATION
    ═══════════════════════════════════════════════════════════════ */
 window.submitSingle = async function(e, group) {
   if (e) e.preventDefault();
@@ -874,10 +996,10 @@ window.submitSingle = async function(e, group) {
   }
 
   if (!fullName || fullName.length < 3) return showToast('Ralat', 'Nama tidak sah.', 'error');
-  if (!/^\d{12}$/.test(icNumber)) return showToast('Ralat', 'Nombor IC perlu 12 digit.', 'error');
+  if (!/^\d{12}$/.test(icNumber)) return showToast('Ralat', 'IC perlu 12 digit.', 'error');
 
   if (allUsers.find(u => u.icNumber === icNumber)) {
-    return showToast('IC Berulang', `IC ${icNumber} sudah wujud dalam sistem.`, 'error', 6000);
+    return showToast('IC Berulang', `IC ${icNumber} sudah wujud.`, 'error', 6000);
   }
 
   isSubmittingSingle[group] = true;
@@ -918,16 +1040,20 @@ window.submitSingle = async function(e, group) {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   LOAD USERS
+   📊 LOAD USERS
    ═══════════════════════════════════════════════════════════════ */
 async function loadUsers() {
   try {
     const { db, fs } = window.EMindCare;
+    console.log('📥 Loading users from Firestore...');
+
     const snap = await fs.getDocs(fs.collection(db, 'users'));
     allUsers = [];
     snap.forEach(d => allUsers.push({ id: d.id, ...d.data() }));
 
     allUsers.sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
+
+    console.log(`📥 Loaded ${allUsers.length} users`);
 
     updateCounts();
     populateFilters();
@@ -936,8 +1062,8 @@ async function loadUsers() {
     renderKaunselorTable();
 
   } catch (err) {
-    console.error('Load users error:', err);
-    showToast('Ralat', 'Gagal memuatkan data pengguna.', 'error');
+    console.error('❌ Load users error:', err);
+    showToast('Ralat', 'Gagal memuatkan data pengguna: ' + err.message, 'error', 8000);
   }
 }
 
@@ -946,9 +1072,13 @@ function updateCounts() {
   const guru = allUsers.filter(u => u.role === 'guru').length;
   const kaunselor = allUsers.filter(u => u.role === 'kaunselor').length;
 
-  document.getElementById('muridCount').textContent = murid;
-  document.getElementById('guruCount').textContent = guru;
-  document.getElementById('kaunselorCount').textContent = kaunselor;
+  const mcEl = document.getElementById('muridCount');
+  const gcEl = document.getElementById('guruCount');
+  const kcEl = document.getElementById('kaunselorCount');
+
+  if (mcEl) mcEl.textContent = murid;
+  if (gcEl) gcEl.textContent = guru;
+  if (kcEl) kcEl.textContent = kaunselor;
 }
 
 function populateFilters() {
@@ -957,103 +1087,80 @@ function populateFilters() {
 
   const kelasSet = [...new Set(murid.map(u => u.class).filter(Boolean))].sort();
   const kelasSel = document.getElementById('muridFilterKelas');
-  kelasSel.innerHTML = '<option value="">Semua Kelas</option>' +
-    kelasSet.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+  if (kelasSel) {
+    kelasSel.innerHTML = '<option value="">Semua Kelas</option>' +
+      kelasSet.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+  }
 
-  // Guru - filter by class (guru kelas)
   const guruKelasSet = [...new Set(guru.map(u => u.class).filter(Boolean))].sort();
   const jawatanSel = document.getElementById('guruFilterJawatan');
-  jawatanSel.innerHTML = '<option value="">Semua Kelas</option>' +
-    guruKelasSet.map(j => `<option value="${escapeHtml(j)}">${escapeHtml(j)}</option>`).join('');
+  if (jawatanSel) {
+    jawatanSel.innerHTML = '<option value="">Semua Kelas</option>' +
+      guruKelasSet.map(j => `<option value="${escapeHtml(j)}">${escapeHtml(j)}</option>`).join('');
+  }
 
   const tahunSet = [...new Set(allUsers.map(u => u.sessionYear).filter(Boolean))].sort().reverse();
   const tahunOpts = '<option value="">Semua Tahun</option>' +
     tahunSet.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
-  document.getElementById('muridFilterTahun').innerHTML = tahunOpts;
-  document.getElementById('guruFilterTahun').innerHTML = tahunOpts;
+
+  const mtEl = document.getElementById('muridFilterTahun');
+  const gtEl = document.getElementById('guruFilterTahun');
+  if (mtEl) mtEl.innerHTML = tahunOpts;
+  if (gtEl) gtEl.innerHTML = tahunOpts;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RENDER TABLES
+   📋 RENDER TABLES
    ═══════════════════════════════════════════════════════════════ */
 function renderMuridTable() {
   const tbody = document.getElementById('muridTableBody');
-  const search = document.getElementById('muridSearch').value.toLowerCase().trim();
-  const kelas = document.getElementById('muridFilterKelas').value;
-  const tahun = document.getElementById('muridFilterTahun').value;
+  if (!tbody) return;
+
+  const search = document.getElementById('muridSearch')?.value.toLowerCase().trim() || '';
+  const kelas = document.getElementById('muridFilterKelas')?.value || '';
+  const tahun = document.getElementById('muridFilterTahun')?.value || '';
 
   let list = allUsers.filter(u => u.role === 'murid');
   if (search) list = list.filter(u => (u.fullName || '').toLowerCase().includes(search) || (u.icNumber || '').includes(search));
   if (kelas) list = list.filter(u => u.class === kelas);
   if (tahun) list = list.filter(u => u.sessionYear === tahun);
 
-  document.getElementById('muridListCount').textContent = `${list.length} daripada ${allUsers.filter(u => u.role === 'murid').length} murid`;
+  const countEl = document.getElementById('muridListCount');
+  if (countEl) countEl.textContent = `${list.length} daripada ${allUsers.filter(u => u.role === 'murid').length} murid`;
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-user-graduate"></i><strong>Tiada murid</strong><p>Belum ada murid berdaftar atau tiada padanan carian.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-user-graduate"></i><strong>Tiada murid</strong><p>Belum ada murid berdaftar.</p></div></td></tr>`;
     return;
   }
 
-  tbody.innerHTML = list.map(u => renderUserRow(u, 'murid')).join('');
+  tbody.innerHTML = list.map(u => renderUserRow(u)).join('');
 }
 
 function renderGuruTable() {
   const tbody = document.getElementById('guruTableBody');
-  const search = document.getElementById('guruSearch').value.toLowerCase().trim();
-  const kelas = document.getElementById('guruFilterJawatan').value;
-  const tahun = document.getElementById('guruFilterTahun').value;
+  if (!tbody) return;
+
+  const search = document.getElementById('guruSearch')?.value.toLowerCase().trim() || '';
+  const kelas = document.getElementById('guruFilterJawatan')?.value || '';
+  const tahun = document.getElementById('guruFilterTahun')?.value || '';
 
   let list = allUsers.filter(u => u.role === 'guru');
   if (search) list = list.filter(u => (u.fullName || '').toLowerCase().includes(search) || (u.icNumber || '').includes(search));
   if (kelas) list = list.filter(u => u.class === kelas);
   if (tahun) list = list.filter(u => u.sessionYear === tahun);
 
-  document.getElementById('guruListCount').textContent = `${list.length} daripada ${allUsers.filter(u => u.role === 'guru').length} guru`;
+  const countEl = document.getElementById('guruListCount');
+  if (countEl) countEl.textContent = `${list.length} daripada ${allUsers.filter(u => u.role === 'guru').length} guru`;
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-chalkboard-teacher"></i><strong>Tiada guru</strong><p>Belum ada guru berdaftar atau tiada padanan carian.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-chalkboard-teacher"></i><strong>Tiada guru</strong><p>Belum ada guru berdaftar.</p></div></td></tr>`;
     return;
   }
 
-  tbody.innerHTML = list.map(u => {
-    const initial = (u.fullName || 'U').charAt(0).toUpperCase();
-    const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
-    let age = u.age;
-    if (!age && u.icNumber) age = getBirthInfoFromIC(u.icNumber).age;
-
-    return `
-      <tr>
-        <td>
-          <div class="user-cell">
-            <div class="user-avatar">${avatarHTML}</div>
-            <div class="user-info">
-              <strong>${escapeHtml(u.fullName || 'Tanpa Nama')}</strong>
-              <span>${escapeHtml(u.icNumber || '—')}</span>
-            </div>
-          </div>
-        </td>
-        <td>${escapeHtml(u.class || '—')}</td>
-        <td>${escapeHtml(u.title || '—')}</td>
-        <td>${age ? `${age} thn` : '—'}</td>
-        <td>
-          <div class="td-actions">
-            <button class="btn btn-secondary btn-icon btn-sm" onclick="viewUser('${u.id}')" title="Lihat">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="btn btn-secondary btn-icon btn-sm" onclick="editUser('${u.id}')" title="Edit">
-              <i class="fas fa-pen"></i>
-            </button>
-            <button class="btn btn-danger btn-icon btn-sm" onclick="deleteUser('${u.id}')" title="Padam">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
+  tbody.innerHTML = list.map(u => renderGuruRow(u)).join('');
 }
 
-function renderUserRow(u, group) {
+function renderUserRow(u) {
   const initial = (u.fullName || 'U').charAt(0).toUpperCase();
   const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
   let age = u.age;
@@ -1089,8 +1196,47 @@ function renderUserRow(u, group) {
   `;
 }
 
+function renderGuruRow(u) {
+  const initial = (u.fullName || 'U').charAt(0).toUpperCase();
+  const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
+  let age = u.age;
+  if (!age && u.icNumber) age = getBirthInfoFromIC(u.icNumber).age;
+
+  return `
+    <tr>
+      <td>
+        <div class="user-cell">
+          <div class="user-avatar">${avatarHTML}</div>
+          <div class="user-info">
+            <strong>${escapeHtml(u.fullName || 'Tanpa Nama')}</strong>
+            <span>${escapeHtml(u.icNumber || '—')}</span>
+          </div>
+        </div>
+      </td>
+      <td>${escapeHtml(u.class || '—')}</td>
+      <td>${escapeHtml(u.title || '—')}</td>
+      <td>${age ? `${age} thn` : '—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-secondary btn-icon btn-sm" onclick="viewUser('${u.id}')" title="Lihat">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="btn btn-secondary btn-icon btn-sm" onclick="editUser('${u.id}')" title="Edit">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="btn btn-danger btn-icon btn-sm" onclick="deleteUser('${u.id}')" title="Padam">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
 function renderKaunselorTable() {
   const tbody = document.getElementById('kaunselorTableBody');
+  if (!tbody) return;
+
   const list = allUsers.filter(u => u.role === 'kaunselor');
 
   if (!list.length) {
@@ -1120,7 +1266,7 @@ function renderKaunselorTable() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   VIEW / EDIT / DELETE
+   👁️ VIEW / EDIT / DELETE
    ═══════════════════════════════════════════════════════════════ */
 window.viewUser = function(id) {
   const u = allUsers.find(x => x.id === id);
@@ -1129,10 +1275,11 @@ window.viewUser = function(id) {
   const info = u.icNumber ? getBirthInfoFromIC(u.icNumber) : {};
   const age = u.age || info.age;
   const birthYear = u.birthYear || info.birthYear;
+  const isGuru = u.role === 'guru';
 
   const modal = document.getElementById('viewModal');
   const container = document.getElementById('viewUserInfo');
-  const isGuru = u.role === 'guru';
+  if (!modal || !container) return;
 
   container.innerHTML = `
     <div class="view-row">
@@ -1197,29 +1344,19 @@ window.viewUser = function(id) {
         </div>
       </div>
     ` : ''}
-    ${u.email ? `
-      <div class="view-row">
-        <i class="fas fa-envelope"></i>
-        <div class="view-row-content">
-          <strong>E-mel</strong>
-          <span>${escapeHtml(u.email)}</span>
-        </div>
-      </div>
-    ` : ''}
   `;
 
   modal.classList.add('active');
 };
 
 window.closeViewModal = function() {
-  document.getElementById('viewModal').classList.remove('active');
+  document.getElementById('viewModal')?.classList.remove('active');
 };
 
 window.editUser = function(id) {
   const u = allUsers.find(x => x.id === id);
   if (!u) return;
   editingUserId = id;
-  editingUserRole = u.role;
 
   document.getElementById('editFullName').value = u.fullName || '';
   document.getElementById('editFormLevel').value = u.formLevel || '';
@@ -1227,13 +1364,12 @@ window.editUser = function(id) {
   document.getElementById('editTitle').value = u.title || '';
   document.getElementById('editSessionYear').value = u.sessionYear || CURRENT_YEAR;
 
-  document.getElementById('editModal').classList.add('active');
+  document.getElementById('editModal')?.classList.add('active');
 };
 
 window.closeEditModal = function() {
-  document.getElementById('editModal').classList.remove('active');
+  document.getElementById('editModal')?.classList.remove('active');
   editingUserId = null;
-  editingUserRole = null;
 };
 
 window.saveEdit = async function() {
@@ -1289,7 +1425,7 @@ window.deleteUser = function(id) {
 
   showConfirmModal({
     title: 'Padam Pengguna?',
-    desc: `Padam akaun "${u.fullName}" (${u.icNumber})? Tindakan ini tidak boleh diundur.`,
+    desc: `Padam akaun "${u.fullName}" (${u.icNumber})?`,
     confirmText: 'Ya, Padam',
     onConfirm: async () => {
       try {
@@ -1309,27 +1445,27 @@ window.deleteUser = function(id) {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   CONFIRM MODAL
+   ✅ CONFIRM MODAL
    ═══════════════════════════════════════════════════════════════ */
 function showConfirmModal({ title, desc, confirmText, onConfirm }) {
   document.getElementById('confirmTitle').textContent = title;
   document.getElementById('confirmDesc').textContent = desc;
   document.getElementById('confirmBtn').innerHTML = `<i class="fas fa-check"></i> ${confirmText || 'Ya, Teruskan'}`;
   pendingConfirmAction = onConfirm;
-  document.getElementById('confirmModal').classList.add('active');
+  document.getElementById('confirmModal')?.classList.add('active');
 }
 
 window.closeConfirmModal = function() {
-  document.getElementById('confirmModal').classList.remove('active');
+  document.getElementById('confirmModal')?.classList.remove('active');
   pendingConfirmAction = null;
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   SIDEBAR + LOGOUT
+   🧭 SIDEBAR + LOGOUT
    ═══════════════════════════════════════════════════════════════ */
 window.toggleSidebar = function() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sbBackdrop').classList.toggle('active');
+  document.getElementById('sidebar')?.classList.toggle('open');
+  document.getElementById('sbBackdrop')?.classList.toggle('active');
 };
 
 window.logout = function() {
@@ -1351,10 +1487,12 @@ window.refreshAll = function() {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   TOAST
+   🔔 TOAST
    ═══════════════════════════════════════════════════════════════ */
 function showToast(title, message, type = 'success', duration = 4000) {
   const container = document.getElementById('toastContainer');
+  if (!container) return;
+
   const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
@@ -1380,7 +1518,7 @@ function escapeHtml(str) {
 }
 
 console.log(
-  "%c 👥 Dashboard User v4 ",
+  "%c 👥 Dashboard User v5 ",
   "background:linear-gradient(135deg,#0F766E,#4F46E5,#06B6D4);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
 );
-console.log("Guru Kelas + Tingkatan + Auto Year · Ready");
+console.log("FULLY FIXED · Auth + Profile + Form · Ready");
