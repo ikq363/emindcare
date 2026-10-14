@@ -645,13 +645,11 @@ select.input-field {
 }
 
 /* Multi-row grid layouts */
-/* Murid: Nama | IC | Tingkatan | Kelas | Tahun */
 .multi-row-grid.murid-grid {
   display: grid;
   grid-template-columns: 1.8fr 1fr 0.9fr 1fr 0.7fr;
   gap: 0.7rem;
 }
-/* Guru: Nama | IC | Tingkatan | Kelas | Jawatan Tambahan | Tahun */
 .multi-row-grid.guru-grid {
   display: grid;
   grid-template-columns: 1.5fr 0.9fr 0.7fr 0.9fr 1.3fr 0.7fr;
@@ -1298,10 +1296,6 @@ tbody td {
   .multi-row-grid.guru-grid {
     grid-template-columns: 1fr 1fr 1fr;
   }
-  .multi-row-grid.guru-grid .multi-row-field:nth-child(4),
-  .multi-row-grid.guru-grid .multi-row-field:nth-child(5) {
-    grid-column: span 1;
-  }
 }
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
@@ -1373,17 +1367,9 @@ tbody td {
       </a>
 
       <div class="sb-section-label">Kandungan Laman</div>
-      <a href="dashboard-announcements.html" class="sb-item">
+      <a href="dashboard-iklan.html" class="sb-item">
         <i class="fas fa-bullhorn"></i>
-        <span>Pengumuman</span>
-      </a>
-      <a href="dashboard-banners.html" class="sb-item">
-        <i class="fas fa-images"></i>
-        <span>Banner Iklan</span>
-      </a>
-      <a href="dashboard-collaborations.html" class="sb-item">
-        <i class="fas fa-handshake"></i>
-        <span>Kolaborasi</span>
+        <span>Pengumuman & Iklan</span>
       </a>
       <a href="dashboard-sunting-laman.html" class="sb-item">
         <i class="fas fa-paint-brush"></i>
@@ -1744,7 +1730,6 @@ tbody td {
             </button>
           </div>
 
-          <!-- Mode 1: Multi-Row -->
           <div class="mode-panel active" data-panel-guru="multi">
             <div class="multi-row-list" id="multiRowListGuru"></div>
             <div class="row-actions">
@@ -1782,7 +1767,6 @@ tbody td {
             </div>
           </div>
 
-          <!-- Mode 2: CSV -->
           <div class="mode-panel" data-panel-guru="csv">
             <div class="csv-drop" id="csvDropGuru">
               <input type="file" id="csvInputGuru" accept=".csv,.xlsx,.xls">
@@ -1848,7 +1832,6 @@ tbody td {
             </div>
           </div>
 
-          <!-- Mode 3: Single -->
           <div class="mode-panel" data-panel-guru="single">
             <form id="singleFormGuru">
               <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1.5fr 0.8fr;gap:0.9rem;" class="single-grid">
@@ -1917,7 +1900,6 @@ tbody td {
           </div>
         </div>
 
-        <!-- Senarai Guru -->
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
