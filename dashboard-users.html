@@ -1,1386 +1,2087 @@
-/* ═══════════════════════════════════════════════════════════════
-   e-MindCare · Dashboard User Script (v4)
-   Bulk Registration + CSV + Guru Kelas (bukan Subjek)
-   ═══════════════════════════════════════════════════════════════ */
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<title>Urus Pengguna · Dashboard · e-MindCare</title>
 
-import './config.js';
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
-/* ═══════════════════════════════════════════════════════════════
-   CONSTANTS
-   ═══════════════════════════════════════════════════════════════ */
-const SESSION_KEY = 'emindcare_session';
-const CURRENT_YEAR = new Date().getFullYear().toString();
-const CHUNK_SIZE = 450;
-
-/* ═══════════════════════════════════════════════════════════════
-   STATE
-   ═══════════════════════════════════════════════════════════════ */
-let currentUser = null;
-let allUsers = [];
-let csvData = { murid: [], guru: [] };
-let pendingConfirmAction = null;
-let editingUserId = null;
-let editingUserRole = null;
-let isSubmittingSingle = { murid: false, guru: false };
-let isSubmittingBulk = { murid: false, guru: false };
-
-/* ═══════════════════════════════════════════════════════════════
-   HELPER: Extract Birth Year & Age from IC
-   ═══════════════════════════════════════════════════════════════ */
-function getBirthInfoFromIC(icNumber) {
-  if (!icNumber || icNumber.length < 2) return { birthYear: null, age: null };
-  const yy = parseInt(icNumber.substring(0, 2), 10);
-  if (isNaN(yy)) return { birthYear: null, age: null };
-
-  const currentYear = new Date().getFullYear();
-  const currentYY = currentYear % 100;
-  let birthYear = yy <= currentYY ? 2000 + yy : 1900 + yy;
-  const age = currentYear - birthYear;
-  return { birthYear, age };
+<style>
+/* ═══════════════════════════════════════════════════
+   ROOT
+   ═══════════════════════════════════════════════════ */
+:root {
+  --teal: #0F766E;
+  --teal-light: #14B8A6;
+  --teal-glow: #2DD4BF;
+  --indigo: #4F46E5;
+  --indigo-light: #6366F1;
+  --cyan: #06B6D4;
+  --cyan-soft: #22D3EE;
+  --purple: #8B5CF6;
+  --pink: #EC4899;
+  --orange: #F59E0B;
+  --amber: #FBBF24;
+  --rose: #EF4444;
+  --emerald: #10B981;
+  --navy: #0F172A;
+  --pearl: #F8FAFC;
+  --white: #FFFFFF;
+  --ink: #0F172A;
+  --ink-soft: #64748B;
+  --ink-light: #94A3B8;
+  --line: rgba(15, 23, 42, 0.08);
+  --sidebar-w: 268px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   INIT
-   ═══════════════════════════════════════════════════════════════ */
-window.addEventListener('load', async () => {
-  await waitForEMindCare();
-  if (!authGuard()) return;
-  initUI();
-  applyBranding();
-  await loadUsers();
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
 
-  // Start rows
-  for (let i = 0; i < 3; i++) addRow('murid', true);
-  for (let i = 0; i < 2; i++) addRow('guru', true);
-});
-
-function waitForEMindCare() {
-  return new Promise((resolve, reject) => {
-    if (window.EMindCare) return resolve();
-    let tries = 0;
-    const timer = setInterval(() => {
-      tries++;
-      if (window.EMindCare) { clearInterval(timer); resolve(); }
-      else if (tries > 100) { clearInterval(timer); reject(new Error('SDK timeout')); }
-    }, 50);
-  });
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--pearl);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   AUTH GUARD
-   ═══════════════════════════════════════════════════════════════ */
-function authGuard() {
-  const raw = localStorage.getItem(SESSION_KEY);
-  if (!raw) { window.location.href = 'login.html'; return false; }
-  try {
-    const session = JSON.parse(raw);
-    if (session.role !== 'kaunselor') {
-      const redirects = { guru: 'dashboard-guru.html', murid: 'dashboard-murid.html' };
-      window.location.href = redirects[session.role] || 'login.html';
-      return false;
-    }
-    currentUser = session;
-    loadProfile();
-    return true;
-  } catch (e) {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.href = 'login.html';
-    return false;
+::selection { background: var(--teal); color: #fff; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
+
+/* ═══════ LAYOUT + SIDEBAR ═══════ */
+.app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 60;
+  transition: transform 0.4s var(--ease-out);
+  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+.sb-brand {
+  padding: 1.5rem 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+.sb-brand-logo {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1.15rem;
+  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.sb-brand-logo::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: shineSweep 4s linear infinite;
+}
+.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
+.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes shineSweep { to { transform: rotate(360deg); } }
+.sb-brand-text strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.sb-brand-text span {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.sb-profile {
+  margin: 1rem 1rem 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  color: inherit;
+}
+.sb-profile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+.sb-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sb-avatar::after {
+  content: "";
+  position: absolute;
+  bottom: -2px; right: -2px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--emerald);
+  border: 2px solid #1E293B;
+}
+.sb-profile-info { min-width: 0; flex: 1; }
+.sb-profile-info strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-profile-info span {
+  font-size: 0.68rem;
+  color: var(--teal-glow);
+  font-weight: 600;
+}
+
+.sb-menu {
+  flex: 1;
+  padding: 0.5rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.sb-section-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 1rem 0.6rem 0.4rem;
+}
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: all 0.3s var(--ease-out);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  position: relative;
+}
+.sb-item i:first-child {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+.sb-item:hover i:first-child {
+  background: rgba(20, 184, 166, 0.15);
+  color: var(--teal-glow);
+}
+.sb-item.active {
+  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
+  color: #fff;
+}
+.sb-item.active i:first-child {
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
+}
+.sb-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: var(--teal-glow);
+  border-radius: 0 4px 4px 0;
+}
+.sb-badge {
+  margin-left: auto;
+  padding: 0.1rem 0.5rem;
+  background: var(--rose);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  min-width: 22px;
+  text-align: center;
+}
+
+.sb-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+.sb-footer-btn {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #FCA5A5;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.sb-footer-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ═══════ MAIN ═══════ */
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.tb-toggle {
+  display: none;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tb-title { flex: 1; min-width: 0; }
+.tb-title h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 0.1rem;
+}
+.tb-title p {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.tb-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.tb-icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.tb-icon-btn:hover {
+  background: var(--pearl);
+  color: var(--teal);
+  transform: translateY(-1px);
+}
+
+.content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ═══════ TAB NAV ═══════ */
+.tab-nav {
+  display: flex;
+  gap: 0.35rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0.4rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex: 1;
+  min-width: fit-content;
+  padding: 0.75rem 1.15rem;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s var(--ease-out);
+  white-space: nowrap;
+}
+.tab-btn i { font-size: 0.82rem; }
+.tab-btn:hover:not(.active) { background: var(--pearl); color: var(--ink); }
+.tab-btn.active {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4);
+}
+.tab-btn .tab-count {
+  padding: 0.05rem 0.5rem;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 0.68rem;
+  font-weight: 800;
+  min-width: 24px;
+  text-align: center;
+}
+.tab-btn:not(.active) .tab-count {
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--ink-soft);
+}
+
+/* ═══════ TAB PANELS ═══════ */
+.tab-panel {
+  display: none;
+  animation: panelIn 0.45s var(--ease-out);
+}
+.tab-panel.active { display: block; }
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════ CARDS ═══════ */
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.6rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
+}
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.card-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.95rem;
+}
+.card-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--card-c1, var(--teal)), var(--card-c2, var(--indigo)));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 20px -6px var(--card-c1, rgba(15, 118, 110, 0.4));
+  flex-shrink: 0;
+}
+.card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  margin-bottom: 0.15rem;
+  line-height: 1.2;
+}
+.card-subtitle {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ═══════ MODE SWITCHER ═══════ */
+.mode-switcher {
+  display: flex;
+  gap: 0.4rem;
+  background: var(--pearl);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.35rem;
+  margin-bottom: 1.4rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mode-switcher::-webkit-scrollbar { display: none; }
+.mode-btn {
+  flex: 1;
+  min-width: fit-content;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: all 0.3s var(--ease-out);
+  white-space: nowrap;
+}
+.mode-btn:hover:not(.active) { background: rgba(255,255,255,0.6); color: var(--ink); }
+.mode-btn.active {
+  background: #fff;
+  color: var(--teal);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+.mode-btn i { font-size: 0.75rem; }
+
+.mode-panel { display: none; }
+.mode-panel.active { display: block; animation: panelIn 0.4s var(--ease-out); }
+
+/* ═══════ FORMS ═══════ */
+.form-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.form-label .req { color: var(--rose); margin-left: 3px; }
+.form-group { margin-bottom: 0.9rem; }
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--ink-light);
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 2;
+}
+.input-field {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.6rem;
+  background: var(--pearl);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--ink);
+  transition: all 0.3s var(--ease-out);
+  outline: none;
+}
+.input-field:hover { border-color: rgba(15, 118, 110, 0.2); background: #fff; }
+.input-field:focus {
+  border-color: var(--teal);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+}
+.input-wrap:focus-within .input-icon { color: var(--teal); }
+.input-field::placeholder { color: var(--ink-light); font-weight: 500; font-size: 0.78rem; }
+.input-field.no-icon { padding-left: 1rem; }
+.input-field.mono {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+}
+.input-field.upper { text-transform: uppercase; font-weight: 600; }
+
+select.input-field {
+  cursor: pointer;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748B' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+/* ═══════ MULTI-ROW ═══════ */
+.multi-row-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.multi-row {
+  background: var(--pearl);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.1rem;
+  transition: all 0.3s;
+}
+.multi-row:hover {
+  border-color: rgba(15, 118, 110, 0.25);
+  background: #fff;
+}
+.multi-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+.multi-row-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+}
+.multi-row-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-left: 0.6rem;
+}
+.multi-row-title { display: flex; align-items: center; }
+.multi-row-delete {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--rose);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  transition: all 0.3s;
+}
+.multi-row-delete:hover {
+  background: var(--rose);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Multi-row grid layouts */
+/* Murid: Nama | IC | Tingkatan | Kelas | Tahun */
+.multi-row-grid.murid-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 0.9fr 1fr 0.7fr;
+  gap: 0.7rem;
+}
+/* Guru: Nama | IC | Tingkatan | Kelas | Jawatan Tambahan | Tahun */
+.multi-row-grid.guru-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 0.9fr 0.7fr 0.9fr 1.3fr 0.7fr;
+  gap: 0.6rem;
+}
+
+.multi-row-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.multi-row-field-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding-left: 0.2rem;
+}
+.multi-row-input,
+.multi-row-select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink);
+  transition: all 0.3s;
+  outline: none;
+}
+.multi-row-input:focus,
+.multi-row-select:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
+.multi-row-input.upper { text-transform: uppercase; font-weight: 600; }
+.multi-row-input.mono {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+}
+.multi-row-input::placeholder { font-size: 0.7rem; color: var(--ink-light); }
+.multi-row-select {
+  cursor: pointer;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2364748B' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+}
+.multi-row-select.upper { text-transform: uppercase; font-weight: 600; }
+
+/* Auto-hint box */
+.auto-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.12), rgba(99, 102, 241, 0.12));
+  color: var(--teal);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-top: 0.3rem;
+  align-self: flex-start;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.auto-hint.show { opacity: 1; }
+.auto-hint i { font-size: 0.55rem; }
+
+/* Row actions */
+.row-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.row-actions-left { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.row-actions-right { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* ═══════ BUTTONS ═══════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.3rem;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -6px rgba(15, 118, 110, 0.5);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  background: var(--pearl);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #fff;
+  border-color: var(--ink-light);
+  transform: translateY(-1px);
+}
+.btn-emerald {
+  background: linear-gradient(120deg, var(--emerald), var(--teal-light));
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.4);
+}
+.btn-emerald:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -6px rgba(16, 185, 129, 0.5);
+}
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--rose);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.btn-danger:hover { background: var(--rose); color: #fff; }
+.btn-sm { padding: 0.5rem 0.9rem; font-size: 0.76rem; border-radius: 10px; }
+.btn-icon {
+  width: 34px; height: 34px;
+  padding: 0;
+  border-radius: 10px;
+}
+.btn .spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn.loading .btn-text { display: none; }
+.btn.loading .btn-loading { display: inline-flex; align-items: center; gap: 0.5rem; }
+.btn .btn-loading { display: none; }
+
+/* ═══════ CSV DROP ZONE ═══════ */
+.csv-drop {
+  position: relative;
+  border: 2px dashed rgba(15, 118, 110, 0.25);
+  border-radius: 16px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background: rgba(20, 184, 166, 0.02);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+}
+.csv-drop:hover,
+.csv-drop.dragover {
+  border-color: var(--teal);
+  background: rgba(20, 184, 166, 0.06);
+  transform: translateY(-2px);
+}
+.csv-drop input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.csv-icon {
+  width: 62px; height: 62px;
+  margin: 0 auto 1rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--emerald), var(--teal));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 12px 28px -6px rgba(16, 185, 129, 0.4);
+  transition: transform 0.4s var(--ease-elastic);
+}
+.csv-drop:hover .csv-icon { transform: translateY(-4px) scale(1.05); }
+.csv-drop h4 {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+.csv-drop p {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.csv-template {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.6rem 1.1rem;
+  background: #fff;
+  border: 1.5px solid rgba(15, 118, 110, 0.25);
+  color: var(--teal);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  font-family: inherit;
+}
+.csv-template:hover {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+
+/* ═══════ CSV PREVIEW TABLE ═══════ */
+.csv-preview-wrap {
+  margin-top: 1.5rem;
+  display: none;
+}
+.csv-preview-wrap.active { display: block; animation: panelIn 0.4s var(--ease-out); }
+.csv-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.csv-preview-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.csv-preview-title i { color: var(--emerald); }
+.csv-preview-count {
+  padding: 0.25rem 0.75rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+thead { background: var(--pearl); }
+thead th {
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+}
+tbody tr {
+  border-bottom: 1px solid var(--line);
+  transition: background 0.2s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(20, 184, 166, 0.03); }
+tbody td {
+  padding: 0.75rem 0.9rem;
+  color: var(--ink);
+  vertical-align: middle;
+}
+.td-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+}
+.td-actions {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 50px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.role-badge.murid { background: rgba(6, 182, 212, 0.12); color: var(--cyan); }
+.role-badge.guru { background: rgba(20, 184, 166, 0.12); color: var(--teal); }
+.role-badge.kaunselor { background: rgba(99, 102, 241, 0.12); color: var(--indigo); }
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.user-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-info strong {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.user-info span {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+.search-box i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-light);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+.search-box input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.7rem;
+  background: var(--pearl);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.3s;
+}
+.search-box input:focus {
+  border-color: var(--teal);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+}
+.filter-select {
+  padding: 0.75rem 2.3rem 0.75rem 1rem;
+  background: var(--pearl);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748B' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+}
+.filter-select:focus {
+  border-color: var(--teal);
+  background-color: #fff;
+}
+
+.bulk-progress {
+  display: none;
+  margin-top: 1.1rem;
+  padding: 1.1rem 1.25rem;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.06), rgba(99, 102, 241, 0.06));
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 14px;
+}
+.bulk-progress.active { display: block; }
+.bulk-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+.bulk-progress-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.bulk-progress-label i { color: var(--teal); }
+.bulk-progress-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+.bulk-progress-bar {
+  height: 8px;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 50px;
+  overflow: hidden;
+}
+.bulk-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal), var(--indigo));
+  border-radius: 50px;
+  transition: width 0.3s var(--ease-out);
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.5);
+}
+
+.empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.empty-state i {
+  font-size: 2.5rem;
+  color: var(--ink-light);
+  margin-bottom: 1rem;
+  display: block;
+  opacity: 0.5;
+}
+.empty-state strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+.empty-state p { font-size: 0.84rem; line-height: 1.6; }
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.modal.active { display: flex; opacity: 1; }
+.modal-card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 1.75rem 1.6rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
+  animation: modalPop 0.4s var(--ease-elastic);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-card.wide { max-width: 620px; }
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-icon {
+  width: 60px; height: 60px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+}
+.modal-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
+.modal-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.modal-icon.info { background: rgba(6, 182, 212, 0.1); color: var(--cyan); }
+.modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+.modal-desc {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+.modal-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
+.modal-actions .btn { flex: 1; }
+
+.view-user-info { display: grid; gap: 0.7rem; }
+.view-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem 0.95rem;
+  background: var(--pearl);
+  border-radius: 12px;
+}
+.view-row i {
+  color: var(--teal);
+  font-size: 0.9rem;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.view-row-content { flex: 1; min-width: 0; }
+.view-row-content strong {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.15rem;
+}
+.view-row-content span {
+  font-size: 0.88rem;
+  color: var(--ink);
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  pointer-events: none;
+  max-width: calc(100vw - 3rem);
+}
+.toast {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 20px 44px -8px rgba(15, 23, 42, 0.22);
+  border-left: 4px solid var(--emerald);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  min-width: 300px;
+  max-width: 420px;
+  font-size: 0.86rem;
+  animation: toastIn 0.45s var(--ease-elastic);
+  pointer-events: auto;
+}
+.toast.error { border-left-color: var(--rose); }
+.toast.info { border-left-color: var(--cyan); }
+.toast.warning { border-left-color: var(--orange); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(120%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.toast.removing { animation: toastOut 0.3s ease forwards; }
+@keyframes toastOut { to { opacity: 0; transform: translateX(120%); } }
+.toast-icon {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+.toast.error .toast-icon { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
+.toast.info .toast-icon { background: rgba(6, 182, 212, 0.1); color: var(--cyan); }
+.toast.warning .toast-icon { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.toast-content { flex: 1; min-width: 0; }
+.toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
+.toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
+
+.sb-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 55;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.sb-backdrop.active { display: block; opacity: 1; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .multi-row-grid.guru-grid {
+    grid-template-columns: 1.5fr 1fr 0.8fr 1fr 1.2fr;
+  }
+  .multi-row-grid.guru-grid .multi-row-field:nth-child(6) {
+    grid-column: span 1;
   }
 }
-
-function loadProfile() {
-  document.getElementById('sbProfileName').textContent = currentUser.fullName || 'Kaunselor';
-  const avatar = document.getElementById('sbAvatar');
-  if (currentUser.avatarUrl) {
-    avatar.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
-  } else {
-    avatar.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
+@media (max-width: 1024px) {
+  :root { --sidebar-w: 240px; }
+  .content { padding: 1.25rem; }
+  .multi-row-grid.guru-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .multi-row-grid.guru-grid .multi-row-field:nth-child(4),
+  .multi-row-grid.guru-grid .multi-row-field:nth-child(5) {
+    grid-column: span 1;
   }
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   INIT UI
-   ═══════════════════════════════════════════════════════════════ */
-function initUI() {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-  });
-
-  document.querySelectorAll('.mode-switcher').forEach(switcher => {
-    const group = switcher.dataset.group;
-    switcher.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        switcher.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        switchMode(group, btn.dataset.mode);
-      });
-    });
-  });
-
-  ['murid', 'guru'].forEach(group => initCsvDrop(group));
-
-  document.getElementById('muridSearch')?.addEventListener('input', renderMuridTable);
-  document.getElementById('muridFilterKelas')?.addEventListener('change', renderMuridTable);
-  document.getElementById('muridFilterTahun')?.addEventListener('change', renderMuridTable);
-  document.getElementById('guruSearch')?.addEventListener('input', renderGuruTable);
-  document.getElementById('guruFilterJawatan')?.addEventListener('change', renderGuruTable);
-  document.getElementById('guruFilterTahun')?.addEventListener('change', renderGuruTable);
-
-  document.getElementById('confirmBtn')?.addEventListener('click', async () => {
-    if (typeof pendingConfirmAction === 'function') {
-      const action = pendingConfirmAction;
-      closeConfirmModal();
-      await action();
-    }
-  });
-
-  document.getElementById('singleFormMurid')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    submitSingle(e, 'murid');
-  });
-  document.getElementById('singleFormGuru')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    submitSingle(e, 'guru');
-  });
-
-  document.querySelectorAll('.input-field.upper').forEach(el => {
-    if (el.dataset.fmtAttached) return;
-    el.dataset.fmtAttached = '1';
-    el.addEventListener('input', (e) => {
-      const start = e.target.selectionStart;
-      const oldLen = e.target.value.length;
-      e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
-      const diff = oldLen - e.target.value.length;
-      if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
-    });
-  });
-
-  document.querySelectorAll('.input-field.mono').forEach(el => {
-    if (el.dataset.fmtAttached) return;
-    el.dataset.fmtAttached = '1';
-    el.addEventListener('input', (e) => {
-      const start = e.target.selectionStart;
-      const oldLen = e.target.value.length;
-      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
-      const diff = oldLen - e.target.value.length;
-      if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
-    });
-  });
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .tb-toggle { display: flex; }
+  .topbar { padding: 0.75rem 1rem; }
+  .content { padding: 1rem; }
+  .multi-row-grid.murid-grid { grid-template-columns: 1fr 1fr; }
+  .multi-row-grid.guru-grid { grid-template-columns: 1fr 1fr; }
+  .single-grid { grid-template-columns: 1fr 1fr !important; }
 }
-
-window.switchTab = function(tabName) {
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.tab === tabName);
-  });
-  document.querySelectorAll('.tab-panel').forEach(p => {
-    p.classList.toggle('active', p.dataset.panel === tabName);
-  });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-window.switchMode = function(group, mode) {
-  document.querySelectorAll(`[data-panel-${group}]`).forEach(p => {
-    p.classList.toggle('active', p.dataset[`panel${capitalize(group)}`] === mode);
-  });
-};
-
-function capitalize(s) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
+@media (max-width: 520px) {
+  .topbar { padding: 0.65rem 0.85rem; }
+  .tb-icon-btn { width: 36px; height: 36px; }
+  .tb-toggle { width: 36px; height: 36px; }
+  .tb-title h1 { font-size: 1rem; }
+  .tb-title p { display: none; }
+  .content { padding: 0.85rem; }
+  .card { padding: 1.15rem; border-radius: 16px; }
+  .tab-btn { padding: 0.65rem 0.9rem; font-size: 0.78rem; }
+  .tab-btn span:not(.tab-count) { display: none; }
+  .tab-btn i { font-size: 0.9rem; }
+  .mode-btn { padding: 0.6rem 0.8rem; font-size: 0.72rem; }
+  .mode-btn span { display: none; }
+  .multi-row-grid.murid-grid { grid-template-columns: 1fr; }
+  .multi-row-grid.guru-grid { grid-template-columns: 1fr; }
+  .single-grid { grid-template-columns: 1fr !important; }
+  .card-header-left { gap: 0.75rem; }
+  .card-icon { width: 40px; height: 40px; font-size: 0.95rem; }
+  .card-title { font-size: 1rem; }
+  .toast-container { top: 0.85rem; right: 0.85rem; left: 0.85rem; max-width: none; }
+  .toast { min-width: auto; max-width: none; }
+  thead th, tbody td { padding: 0.6rem 0.7rem; font-size: 0.76rem; }
 }
+</style>
+</head>
+<body>
 
-/* ═══════════════════════════════════════════════════════════════
-   BRANDING
-   ═══════════════════════════════════════════════════════════════ */
-async function applyBranding() {
-  try {
-    const cfg = await window.EMindCare.getSiteConfig();
-    if (!cfg?.branding) return;
-    const b = cfg.branding;
-    if (b.name) document.getElementById('sbBrandName').textContent = b.name;
-    if (b.logoUrl) {
-      document.getElementById('sbLogo').innerHTML = `<img src="${b.logoUrl}" alt="">`;
-    } else if (b.logoIcon) {
-      document.getElementById('sbLogo').innerHTML = `<i class="${b.logoIcon}"></i>`;
-    }
-    if (b.primaryColor) document.documentElement.style.setProperty('--teal', b.primaryColor);
-    if (b.accentColor) document.documentElement.style.setProperty('--indigo', b.accentColor);
-  } catch (e) { /* ignore */ }
-}
+<div class="app">
 
-/* ═══════════════════════════════════════════════════════════════
-   ⚡ MULTI-ROW (Fixed + Tingkatan + Guru Kelas)
-   ═══════════════════════════════════════════════════════════════ */
-window.addRow = function(group, silent = false) {
-  const container = document.getElementById(`multiRowList${capitalize(group)}`);
-  if (!container) return;
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
+      <div class="sb-brand-text">
+        <strong id="sbBrandName">e-MindCare</strong>
+        <span>Dashboard Kaunselor</span>
+      </div>
+    </div>
 
-  const rowNum = container.children.length + 1;
-  const isGuru = group === 'guru';
-  const rowId = 'row_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    <a href="dashboard-profile.html" class="sb-profile">
+      <div class="sb-avatar" id="sbAvatar">K</div>
+      <div class="sb-profile-info">
+        <strong id="sbProfileName">Kaunselor</strong>
+        <span>Kaunselor UBK</span>
+      </div>
+    </a>
 
-  const row = document.createElement('div');
-  row.className = 'multi-row';
-  row.dataset.rowId = rowId;
+    <nav class="sb-menu">
+      <div class="sb-section-label">Utama</div>
+      <a href="dashboard-kaunselor.html" class="sb-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Overview</span>
+      </a>
+      <a href="dashboard-profile.html" class="sb-item">
+        <i class="fas fa-user-circle"></i>
+        <span>Profil Kaunselor</span>
+      </a>
 
-  if (isGuru) {
-    // GURU: Nama | IC | Tingkatan | Kelas | Jawatan Tambahan | Tahun
-    row.innerHTML = `
-      <div class="multi-row-header">
-        <div class="multi-row-title">
-          <span class="multi-row-num">${rowNum}</span>
-          <span class="multi-row-label">Guru #${rowNum}</span>
-        </div>
-        <button type="button" class="multi-row-delete" onclick="removeRow(this, '${group}')" title="Hapus baris">
-          <i class="fas fa-times"></i>
+      <div class="sb-section-label">Kandungan Laman</div>
+      <a href="dashboard-announcements.html" class="sb-item">
+        <i class="fas fa-bullhorn"></i>
+        <span>Pengumuman</span>
+      </a>
+      <a href="dashboard-banners.html" class="sb-item">
+        <i class="fas fa-images"></i>
+        <span>Banner Iklan</span>
+      </a>
+      <a href="dashboard-collaborations.html" class="sb-item">
+        <i class="fas fa-handshake"></i>
+        <span>Kolaborasi</span>
+      </a>
+      <a href="dashboard-sunting-laman.html" class="sb-item">
+        <i class="fas fa-paint-brush"></i>
+        <span>Sunting Laman</span>
+      </a>
+      <a href="dashboard-galeri.html" class="sb-item">
+        <i class="fas fa-photo-video"></i>
+        <span>Galeri UBK</span>
+      </a>
+      <a href="dashboard-contact.html" class="sb-item">
+        <i class="fas fa-address-book"></i>
+        <span>Hubungi & Lokasi</span>
+      </a>
+
+      <div class="sb-section-label">Pengurusan</div>
+      <a href="dashboard-inventories.html" class="sb-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Ujian Inventori</span>
+      </a>
+      <a href="dashboard-user.html" class="sb-item active">
+        <i class="fas fa-users"></i>
+        <span>Urus Pengguna</span>
+      </a>
+      <a href="dashboard-appointments.html" class="sb-item">
+        <i class="fas fa-calendar-check"></i>
+        <span>Tempahan Kaunseling</span>
+        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
+      </a>
+      <a href="dashboard-diaries.html" class="sb-item">
+        <i class="fas fa-book"></i>
+        <span>Diari & Catatan</span>
+      </a>
+
+      <div class="sb-section-label">Analitik</div>
+      <a href="dashboard-analytics.html" class="sb-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Data & Laporan</span>
+      </a>
+    </nav>
+
+    <div class="sb-footer">
+      <button class="sb-footer-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Log Keluar</span>
+      </button>
+    </div>
+  </aside>
+  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <div class="main">
+
+    <header class="topbar">
+      <button class="tb-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="tb-title">
+        <h1>Urus Pengguna</h1>
+        <p>Daftar & urus akaun murid, guru dan kaunselor</p>
+      </div>
+      <div class="tb-actions">
+        <a href="dashboard-kaunselor.html" class="tb-icon-btn" title="Kembali">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <button class="tb-icon-btn" onclick="refreshAll()" title="Refresh">
+          <i class="fas fa-sync-alt"></i>
         </button>
       </div>
-      <div class="multi-row-grid guru-grid">
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nama Penuh</label>
-          <input type="text" class="multi-row-input upper" placeholder="SEPERTI DALAM IC" data-field="fullName" maxlength="100">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nombor IC</label>
-          <input type="text" class="multi-row-input mono" placeholder="12 DIGIT" data-field="icNumber" maxlength="12" inputmode="numeric">
-          <span class="auto-hint" data-hint-for="${rowId}"></span>
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Tingkatan</label>
-          <select class="multi-row-select" data-field="formLevel">
-            <option value="">—</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Guru Kelas</label>
-          <input type="text" class="multi-row-input upper" placeholder="MAWAR" data-field="className" maxlength="40">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Jawatan Tambahan</label>
-          <input type="text" class="multi-row-input upper" placeholder="GURU MATEMATIK" data-field="title" maxlength="80">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Tahun</label>
-          <input type="text" class="multi-row-input" placeholder="${CURRENT_YEAR}" data-field="sessionYear" maxlength="4" inputmode="numeric">
-        </div>
-      </div>
-    `;
-  } else {
-    // MURID: Nama | IC | Tingkatan | Kelas | Tahun
-    row.innerHTML = `
-      <div class="multi-row-header">
-        <div class="multi-row-title">
-          <span class="multi-row-num">${rowNum}</span>
-          <span class="multi-row-label">Murid #${rowNum}</span>
-        </div>
-        <button type="button" class="multi-row-delete" onclick="removeRow(this, '${group}')" title="Hapus baris">
-          <i class="fas fa-times"></i>
+    </header>
+
+    <main class="content">
+
+      <!-- ═══════ TAB NAV ═══════ -->
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="murid">
+          <i class="fas fa-user-graduate"></i>
+          <span>Akaun Murid</span>
+          <span class="tab-count" id="muridCount">0</span>
+        </button>
+        <button class="tab-btn" data-tab="guru">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>Akaun Guru</span>
+          <span class="tab-count" id="guruCount">0</span>
+        </button>
+        <button class="tab-btn" data-tab="kaunselor">
+          <i class="fas fa-user-shield"></i>
+          <span>Akaun Kaunselor</span>
+          <span class="tab-count" id="kaunselorCount">0</span>
         </button>
       </div>
-      <div class="multi-row-grid murid-grid">
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nama Penuh</label>
-          <input type="text" class="multi-row-input upper" placeholder="SEPERTI DALAM IC" data-field="fullName" maxlength="100">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nombor IC</label>
-          <input type="text" class="multi-row-input mono" placeholder="12 DIGIT" data-field="icNumber" maxlength="12" inputmode="numeric">
-          <span class="auto-hint" data-hint-for="${rowId}"></span>
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Tingkatan</label>
-          <select class="multi-row-select" data-field="formLevel">
-            <option value="">—</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Nama Kelas</label>
-          <input type="text" class="multi-row-input upper" placeholder="MAWAR" data-field="className" maxlength="40">
-        </div>
-        <div class="multi-row-field">
-          <label class="multi-row-field-label">Tahun</label>
-          <input type="text" class="multi-row-input" placeholder="${CURRENT_YEAR}" data-field="sessionYear" maxlength="4" inputmode="numeric">
-        </div>
-      </div>
-    `;
-  }
 
-  // Auto-format
-  const nameInput = row.querySelector('[data-field="fullName"]');
-  const icInput = row.querySelector('[data-field="icNumber"]');
-  const classInput = row.querySelector('[data-field="className"]');
-  const titleInput = row.querySelector('[data-field="title"]');
-  const yearInput = row.querySelector('[data-field="sessionYear"]');
-
-  nameInput.addEventListener('input', (e) => {
-    const start = e.target.selectionStart;
-    const oldLen = e.target.value.length;
-    e.target.value = e.target.value.replace(/[^A-Za-z\s'\.]/g, '').toUpperCase();
-    const diff = oldLen - e.target.value.length;
-    if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
-  });
-
-  icInput.addEventListener('input', (e) => {
-    const start = e.target.selectionStart;
-    const oldLen = e.target.value.length;
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
-    const diff = oldLen - e.target.value.length;
-    if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
-    updateAutoHint(row, e.target.value);
-  });
-
-  classInput.addEventListener('input', (e) => {
-    const start = e.target.selectionStart;
-    const oldLen = e.target.value.length;
-    e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
-    const diff = oldLen - e.target.value.length;
-    if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
-  });
-
-  if (titleInput) {
-    titleInput.addEventListener('input', (e) => {
-      const start = e.target.selectionStart;
-      const oldLen = e.target.value.length;
-      e.target.value = e.target.value.replace(/[^A-Za-z0-9\s'\.\-]/g, '').toUpperCase();
-      const diff = oldLen - e.target.value.length;
-      if (diff > 0) e.target.setSelectionRange(Math.max(0, start - diff), Math.max(0, start - diff));
-    });
-  }
-
-  yearInput.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
-  });
-
-  // Enter key → tambah baris
-  row.querySelectorAll('input, select').forEach(input => {
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && input.tagName !== 'SELECT') {
-        e.preventDefault();
-        if (row === container.lastElementChild) addRow(group);
-      }
-    });
-  });
-
-  container.appendChild(row);
-
-  if (!silent) {
-    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    nameInput.focus();
-  }
-};
-
-function updateAutoHint(row, icValue) {
-  const hint = row.querySelector('.auto-hint');
-  if (!hint) return;
-
-  if (icValue.length < 2) {
-    hint.classList.remove('show');
-    hint.textContent = '';
-    return;
-  }
-
-  const { birthYear, age } = getBirthInfoFromIC(icValue);
-  if (birthYear && age) {
-    hint.innerHTML = `<i class="fas fa-cake-candles"></i> <span>Lahir ${birthYear} · ${age} tahun</span>`;
-    hint.classList.add('show');
-  } else {
-    hint.classList.remove('show');
-  }
-}
-
-window.removeRow = function(btn, group) {
-  const container = document.getElementById(`multiRowList${capitalize(group)}`);
-  const row = btn.closest('.multi-row');
-  if (!row) return;
-
-  if (container.children.length <= 1) {
-    showToast('Info', 'Perlu ada sekurang-kurangnya 1 baris.', 'warning');
-    return;
-  }
-
-  row.style.transition = 'all 0.3s';
-  row.style.opacity = '0';
-  row.style.transform = 'translateX(-20px)';
-  setTimeout(() => {
-    row.remove();
-    renumberRows(group);
-  }, 300);
-};
-
-function renumberRows(group) {
-  const container = document.getElementById(`multiRowList${capitalize(group)}`);
-  if (!container) return;
-  const isGuru = group === 'guru';
-  [...container.children].forEach((row, idx) => {
-    const num = row.querySelector('.multi-row-num');
-    const label = row.querySelector('.multi-row-label');
-    if (num) num.textContent = idx + 1;
-    if (label) label.textContent = `${isGuru ? 'Guru' : 'Murid'} #${idx + 1}`;
-  });
-}
-
-function getMultiRowData(group) {
-  const container = document.getElementById(`multiRowList${capitalize(group)}`);
-  if (!container) return [];
-
-  const isGuru = group === 'guru';
-  const data = [];
-
-  [...container.children].forEach(row => {
-    const fullName = row.querySelector('[data-field="fullName"]').value.trim();
-    const icNumber = row.querySelector('[data-field="icNumber"]').value.trim();
-    const className = row.querySelector('[data-field="className"]')?.value.trim() || '';
-    const title = row.querySelector('[data-field="title"]')?.value.trim() || '';
-    const sessionYear = row.querySelector('[data-field="sessionYear"]')?.value.trim() || CURRENT_YEAR;
-    const formLevel = row.querySelector('[data-field="formLevel"]')?.value || '';
-
-    if (!fullName && !icNumber) return;
-
-    // Gabungkan tingkatan + nama kelas
-    let finalClass = className;
-    if (formLevel && className) {
-      finalClass = `${formLevel} ${className}`.trim();
-    } else if (formLevel) {
-      finalClass = formLevel;
-    }
-
-    data.push({
-      fullName,
-      icNumber,
-      formLevel,
-      className: finalClass,
-      title: title || null,
-      sessionYear: sessionYear || CURRENT_YEAR
-    });
-  });
-  return data;
-}
-
-function clearAllRows(group) {
-  const container = document.getElementById(`multiRowList${capitalize(group)}`);
-  if (container) container.innerHTML = '';
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   BULK SUBMIT
-   ═══════════════════════════════════════════════════════════════ */
-window.submitBulk = async function(group) {
-  if (isSubmittingBulk[group]) return;
-
-  const data = getMultiRowData(group);
-
-  if (!data.length) {
-    return showToast('Ralat', 'Sila isi sekurang-kurangnya 1 pengguna.', 'warning');
-  }
-
-  const invalid = data.filter(d => !d.fullName || d.fullName.length < 3 || !/^\d{12}$/.test(d.icNumber));
-  if (invalid.length) {
-    return showToast('Ralat Validasi', `${invalid.length} pengguna tidak lengkap (nama atau IC tidak sah).`, 'error', 6000);
-  }
-
-  const icSet = new Set();
-  const dupInList = [];
-  data.forEach(d => {
-    if (icSet.has(d.icNumber)) dupInList.push(d.fullName);
-    icSet.add(d.icNumber);
-  });
-  if (dupInList.length) {
-    return showToast('IC Berulang', `${dupInList.length} IC berulang dalam senarai: ${dupInList[0]}`, 'error', 6000);
-  }
-
-  const existing = new Set(allUsers.map(u => u.icNumber));
-  const dupInDb = data.filter(d => existing.has(d.icNumber));
-  if (dupInDb.length) {
-    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar dalam sistem.`, 'error', 6000);
-  }
-
-  showConfirmModal({
-    title: `Daftar ${data.length} Pengguna?`,
-    desc: `Anda akan mendaftarkan ${data.length} akaun ${group} baharu ke dalam sistem.`,
-    confirmText: `Ya, Daftar ${data.length}`,
-    onConfirm: async () => {
-      await processBulkInsert(group, data);
-    }
-  });
-};
-
-async function processBulkInsert(group, data) {
-  isSubmittingBulk[group] = true;
-
-  const btn = document.getElementById(`bulkSubmit${capitalize(group)}`);
-  const progressEl = document.getElementById(`bulkProgress${capitalize(group)}`);
-  const fillEl = document.getElementById(`bulkProgressFill${capitalize(group)}`);
-  const pctEl = document.getElementById(`bulkProgressPct${capitalize(group)}`);
-  const labelEl = document.getElementById(`bulkProgressLabel${capitalize(group)}`);
-
-  btn?.classList.add('loading');
-  if (btn) btn.disabled = true;
-
-  progressEl?.classList.add('active');
-  if (fillEl) fillEl.style.width = '0%';
-  if (pctEl) pctEl.textContent = '0%';
-
-  try {
-    const { db, fs } = window.EMindCare;
-    const { doc, collection, writeBatch, serverTimestamp } = fs;
-
-    let processed = 0;
-    const total = data.length;
-
-    for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-      const chunk = data.slice(i, i + CHUNK_SIZE);
-      const batch = writeBatch(db);
-
-      chunk.forEach(item => {
-        const docRef = doc(collection(db, 'users'));
-        const { birthYear, age } = getBirthInfoFromIC(item.icNumber);
-
-        batch.set(docRef, {
-          fullName: item.fullName,
-          icNumber: item.icNumber,
-          role: group,
-          formLevel: item.formLevel || null,
-          class: item.className || null,
-          title: item.title || null,
-          sessionYear: item.sessionYear || CURRENT_YEAR,
-          birthYear: birthYear || null,
-          age: age || null,
-          createdAt: serverTimestamp(),
-          createdBy: currentUser.uid,
-          bulkImport: true
-        });
-      });
-
-      await batch.commit();
-      processed += chunk.length;
-
-      const pct = Math.round((processed / total) * 100);
-      if (fillEl) fillEl.style.width = pct + '%';
-      if (pctEl) pctEl.textContent = pct + '%';
-      if (labelEl) labelEl.textContent = `Menyimpan ${processed}/${total} akaun ${group}...`;
-    }
-
-    if (labelEl) labelEl.textContent = `✓ Selesai — ${total} akaun ${group} didaftarkan`;
-    showToast('Berjaya!', `${total} akaun ${group} berjaya didaftarkan.`, 'success', 6000);
-
-    clearAllRows(group);
-    const initialRows = group === 'murid' ? 3 : 2;
-    for (let i = 0; i < initialRows; i++) addRow(group, true);
-
-    await loadUsers();
-
-    setTimeout(() => progressEl?.classList.remove('active'), 2000);
-
-  } catch (err) {
-    console.error('Bulk insert error:', err);
-    showToast('Gagal', 'Ralat semasa menyimpan: ' + err.message, 'error', 6000);
-    progressEl?.classList.remove('active');
-  } finally {
-    btn?.classList.remove('loading');
-    if (btn) btn.disabled = false;
-    isSubmittingBulk[group] = false;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   CSV HANDLING
-   ═══════════════════════════════════════════════════════════════ */
-function initCsvDrop(group) {
-  const zone = document.getElementById(`csvDrop${capitalize(group)}`);
-  const input = document.getElementById(`csvInput${capitalize(group)}`);
-  if (!zone || !input) return;
-
-  input.addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (file) handleCsvFile(group, file);
-  });
-
-  ['dragenter', 'dragover'].forEach(ev => {
-    zone.addEventListener(ev, e => {
-      e.preventDefault();
-      zone.classList.add('dragover');
-    });
-  });
-  ['dragleave', 'drop'].forEach(ev => {
-    zone.addEventListener(ev, e => {
-      e.preventDefault();
-      zone.classList.remove('dragover');
-    });
-  });
-  zone.addEventListener('drop', e => {
-    const file = e.dataTransfer.files[0];
-    if (file) handleCsvFile(group, file);
-  });
-}
-
-function handleCsvFile(group, file) {
-  if (!file.name.match(/\.(csv|xlsx|xls)$/i)) {
-    return showToast('Format Salah', 'Sila pilih fail CSV sahaja.', 'error');
-  }
-
-  Papa.parse(file, {
-    header: true,
-    skipEmptyLines: true,
-    complete: (results) => {
-      const isGuru = group === 'guru';
-
-      const data = results.data.map(row => {
-        const fullName = (row.fullName || row.nama || row.name || row['Nama Penuh'] || row['NAMA PENUH'] || '').trim().toUpperCase();
-        const icNumber = (row.icNumber || row.ic || row['Nombor IC'] || row['NOMBOR IC'] || row['no_ic'] || '').toString().replace(/\D/g, '').slice(0, 12);
-        const sessionYear = (row.sessionYear || row.tahun || row.year || row['Tahun'] || row['TAHUN'] || CURRENT_YEAR).toString().trim();
-        const title = (row.title || row.jawatan || row.subjek || row['Jawatan'] || row['JAWATAN'] || '').trim().toUpperCase();
-
-        let formLevel = (row.formLevel || row.tingkatan || row.level || row['Tingkatan'] || row['TINGKATAN'] || '').toString().trim();
-        let className = (row.className || row.kelas || row.class || row['Kelas'] || row['KELAS'] || '').trim().toUpperCase();
-
-        // Kalau formLevel dalam format "Tingkatan 1", ambil digit
-        if (formLevel) {
-          const match = formLevel.match(/\d+/);
-          formLevel = match ? match[0] : formLevel;
-        }
-
-        // Kalau className ada nombor depan (contoh "1 MAWAR"), pisahkan
-        if (!formLevel && className) {
-          const match = className.match(/^(\d+)\s+(.+)$/);
-          if (match) {
-            formLevel = match[1];
-            className = match[2];
-          }
-        }
-
-        // Gabungkan
-        let finalClass = className;
-        if (formLevel && className) {
-          finalClass = `${formLevel} ${className}`.trim();
-        } else if (formLevel) {
-          finalClass = formLevel;
-        }
-
-        const { birthYear, age } = getBirthInfoFromIC(icNumber);
-
-        return {
-          fullName,
-          icNumber,
-          formLevel,
-          className: finalClass,
-          title: title || null,
-          sessionYear: sessionYear || CURRENT_YEAR,
-          birthYear,
-          age
-        };
-      }).filter(d => d.fullName && d.icNumber);
-
-      if (!data.length) {
-        return showToast('Fail Kosong', 'Tiada data sah dijumpai dalam fail CSV.', 'warning');
-      }
-
-      csvData[group] = data;
-      renderCsvPreview(group);
-    },
-    error: (err) => {
-      console.error('CSV parse error:', err);
-      showToast('Ralat CSV', 'Gagal membaca fail: ' + err.message, 'error');
-    }
-  });
-}
-
-function renderCsvPreview(group) {
-  const wrap = document.getElementById(`csvPreview${capitalize(group)}`);
-  const tbody = document.getElementById(`csvPreviewBody${capitalize(group)}`);
-  const countEl = document.getElementById(`csvCount${capitalize(group)}`);
-  if (!wrap || !tbody) return;
-
-  const data = csvData[group];
-  wrap.classList.add('active');
-  if (countEl) countEl.textContent = `${data.length} rekod`;
-
-  tbody.innerHTML = data.map((item, idx) => `
-    <tr>
-      <td>${idx + 1}</td>
-      <td><strong>${escapeHtml(item.fullName)}</strong></td>
-      <td class="td-mono">${escapeHtml(item.icNumber)}</td>
-      <td>${escapeHtml(item.className || '—')}</td>
-      <td>${item.age ? `${item.age} thn` : '—'}</td>
-    </tr>
-  `).join('');
-}
-
-window.clearCsv = function(group) {
-  csvData[group] = [];
-  document.getElementById(`csvPreview${capitalize(group)}`)?.classList.remove('active');
-  document.getElementById(`csvInput${capitalize(group)}`).value = '';
-};
-
-window.downloadTemplate = function(group) {
-  const isGuru = group === 'guru';
-
-  let csv;
-  if (isGuru) {
-    csv = 'fullName,icNumber,formLevel,className,title,sessionYear\n' +
-      'AHMAD BIN ALI,850101015678,3,MAWAR,GURU MATEMATIK,2026\n' +
-      'SITI BINTI HASSAN,860202016789,5,DEDIKASI,GURU BAHASA MELAYU,2026\n' +
-      'MUHAMMAD IKQRAM,900303017890,,,PENOLONG KANAN,2026';
-  } else {
-    csv = 'fullName,icNumber,formLevel,className,sessionYear\n' +
-      'AHMAD BIN ALI,080101015678,1,MAWAR,2026\n' +
-      'SITI BINTI HASSAN,080202016789,2,MELATI,2026\n' +
-      'MUHAMMAD IKQRAM,080303017890,5,DEDIKASI,2026';
-  }
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `template-${group}-emindcare.csv`;
-  link.click();
-  showToast('Template Dimuat', 'Fail template CSV telah dimuat turun.', 'success', 3000);
-};
-
-window.importCsv = async function(group) {
-  const data = csvData[group];
-  if (!data || !data.length) {
-    return showToast('Ralat', 'Tiada data untuk diimport.', 'warning');
-  }
-
-  const invalid = data.filter(d => !/^\d{12}$/.test(d.icNumber));
-  if (invalid.length) {
-    return showToast('Ralat Validasi', `${invalid.length} rekod mempunyai IC tidak sah.`, 'error', 6000);
-  }
-
-  const icSet = new Set();
-  const dupInList = [];
-  data.forEach(d => {
-    if (icSet.has(d.icNumber)) dupInList.push(d.fullName);
-    icSet.add(d.icNumber);
-  });
-  if (dupInList.length) {
-    return showToast('IC Berulang', `${dupInList.length} IC berulang dalam fail CSV.`, 'error', 6000);
-  }
-
-  const existing = new Set(allUsers.map(u => u.icNumber));
-  const dupInDb = data.filter(d => existing.has(d.icNumber));
-  if (dupInDb.length) {
-    return showToast('IC Sudah Wujud', `${dupInDb.length} IC sudah berdaftar dalam sistem.`, 'error', 6000);
-  }
-
-  showConfirmModal({
-    title: `Import ${data.length} Pengguna?`,
-    desc: `Anda akan mengimport ${data.length} akaun ${group} dari fail CSV.`,
-    confirmText: `Ya, Import ${data.length}`,
-    onConfirm: async () => {
-      await processCsvImport(group, data);
-    }
-  });
-};
-
-async function processCsvImport(group, data) {
-  const progressEl = document.getElementById(`csvProgress${capitalize(group)}`);
-  const fillEl = document.getElementById(`csvProgressFill${capitalize(group)}`);
-  const pctEl = document.getElementById(`csvProgressPct${capitalize(group)}`);
-  const labelEl = document.getElementById(`csvProgressLabel${capitalize(group)}`);
-
-  progressEl?.classList.add('active');
-  if (fillEl) fillEl.style.width = '0%';
-
-  try {
-    const { db, fs } = window.EMindCare;
-    const { doc, collection, writeBatch, serverTimestamp } = fs;
-
-    let processed = 0;
-    const total = data.length;
-
-    for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-      const chunk = data.slice(i, i + CHUNK_SIZE);
-      const batch = writeBatch(db);
-
-      chunk.forEach(item => {
-        const docRef = doc(collection(db, 'users'));
-        const { birthYear, age } = getBirthInfoFromIC(item.icNumber);
-
-        batch.set(docRef, {
-          fullName: item.fullName,
-          icNumber: item.icNumber,
-          role: group,
-          formLevel: item.formLevel || null,
-          class: item.className || null,
-          title: item.title || null,
-          sessionYear: item.sessionYear || CURRENT_YEAR,
-          birthYear: birthYear || null,
-          age: age || null,
-          createdAt: serverTimestamp(),
-          createdBy: currentUser.uid,
-          csvImport: true
-        });
-      });
-
-      await batch.commit();
-      processed += chunk.length;
-
-      const pct = Math.round((processed / total) * 100);
-      if (fillEl) fillEl.style.width = pct + '%';
-      if (pctEl) pctEl.textContent = pct + '%';
-      if (labelEl) labelEl.textContent = `Mengimport ${processed}/${total}...`;
-    }
-
-    if (labelEl) labelEl.textContent = `✓ Selesai — ${total} akaun diimport`;
-    showToast('Berjaya!', `${total} akaun ${group} berjaya diimport.`, 'success', 6000);
-
-    clearCsv(group);
-    await loadUsers();
-
-    setTimeout(() => progressEl?.classList.remove('active'), 2000);
-
-  } catch (err) {
-    console.error('CSV import error:', err);
-    showToast('Gagal', 'Ralat semasa import: ' + err.message, 'error', 6000);
-    progressEl?.classList.remove('active');
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   SINGLE REGISTRATION
-   ═══════════════════════════════════════════════════════════════ */
-window.submitSingle = async function(e, group) {
-  if (e) e.preventDefault();
-  if (isSubmittingSingle[group]) return;
-
-  const form = e?.target || document.getElementById(`singleForm${capitalize(group)}`);
-  if (!form) return;
-  const btn = form.querySelector('button[type="submit"]');
-
-  const fullName = form.querySelector('[name="fullName"]').value.trim().toUpperCase();
-  const icNumber = form.querySelector('[name="icNumber"]').value.trim();
-  const className = form.querySelector('[name="className"]')?.value.trim().toUpperCase() || '';
-  const title = form.querySelector('[name="title"]')?.value.trim().toUpperCase() || '';
-  const sessionYear = form.querySelector('[name="sessionYear"]')?.value.trim() || CURRENT_YEAR;
-  const formLevel = form.querySelector('[name="formLevel"]')?.value || '';
-
-  let finalClass = className;
-  if (formLevel && className) {
-    finalClass = `${formLevel} ${className}`;
-  } else if (formLevel) {
-    finalClass = formLevel;
-  }
-
-  if (!fullName || fullName.length < 3) return showToast('Ralat', 'Nama tidak sah.', 'error');
-  if (!/^\d{12}$/.test(icNumber)) return showToast('Ralat', 'Nombor IC perlu 12 digit.', 'error');
-
-  if (allUsers.find(u => u.icNumber === icNumber)) {
-    return showToast('IC Berulang', `IC ${icNumber} sudah wujud dalam sistem.`, 'error', 6000);
-  }
-
-  isSubmittingSingle[group] = true;
-  btn.classList.add('loading');
-  btn.disabled = true;
-
-  try {
-    const { db, fs } = window.EMindCare;
-    const { addDoc, collection, serverTimestamp } = fs;
-    const { birthYear, age } = getBirthInfoFromIC(icNumber);
-
-    const data = {
-      fullName,
-      icNumber,
-      role: group,
-      formLevel: formLevel || null,
-      class: finalClass || null,
-      title: title || null,
-      sessionYear,
-      birthYear: birthYear || null,
-      age: age || null,
-      createdAt: serverTimestamp(),
-      createdBy: currentUser.uid
-    };
-
-    await addDoc(collection(db, 'users'), data);
-    form.reset();
-    await loadUsers();
-    showToast('Berjaya', `${group === 'murid' ? 'Murid' : 'Guru'} baharu didaftarkan.`, 'success');
-  } catch (err) {
-    console.error('Single submit error:', err);
-    showToast('Gagal', err.message, 'error');
-  } finally {
-    btn.classList.remove('loading');
-    btn.disabled = false;
-    isSubmittingSingle[group] = false;
-  }
-};
-
-/* ═══════════════════════════════════════════════════════════════
-   LOAD USERS
-   ═══════════════════════════════════════════════════════════════ */
-async function loadUsers() {
-  try {
-    const { db, fs } = window.EMindCare;
-    const snap = await fs.getDocs(fs.collection(db, 'users'));
-    allUsers = [];
-    snap.forEach(d => allUsers.push({ id: d.id, ...d.data() }));
-
-    allUsers.sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
-
-    updateCounts();
-    populateFilters();
-    renderMuridTable();
-    renderGuruTable();
-    renderKaunselorTable();
-
-  } catch (err) {
-    console.error('Load users error:', err);
-    showToast('Ralat', 'Gagal memuatkan data pengguna.', 'error');
-  }
-}
-
-function updateCounts() {
-  const murid = allUsers.filter(u => u.role === 'murid').length;
-  const guru = allUsers.filter(u => u.role === 'guru').length;
-  const kaunselor = allUsers.filter(u => u.role === 'kaunselor').length;
-
-  document.getElementById('muridCount').textContent = murid;
-  document.getElementById('guruCount').textContent = guru;
-  document.getElementById('kaunselorCount').textContent = kaunselor;
-}
-
-function populateFilters() {
-  const murid = allUsers.filter(u => u.role === 'murid');
-  const guru = allUsers.filter(u => u.role === 'guru');
-
-  const kelasSet = [...new Set(murid.map(u => u.class).filter(Boolean))].sort();
-  const kelasSel = document.getElementById('muridFilterKelas');
-  kelasSel.innerHTML = '<option value="">Semua Kelas</option>' +
-    kelasSet.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
-
-  // Guru - filter by class (guru kelas)
-  const guruKelasSet = [...new Set(guru.map(u => u.class).filter(Boolean))].sort();
-  const jawatanSel = document.getElementById('guruFilterJawatan');
-  jawatanSel.innerHTML = '<option value="">Semua Kelas</option>' +
-    guruKelasSet.map(j => `<option value="${escapeHtml(j)}">${escapeHtml(j)}</option>`).join('');
-
-  const tahunSet = [...new Set(allUsers.map(u => u.sessionYear).filter(Boolean))].sort().reverse();
-  const tahunOpts = '<option value="">Semua Tahun</option>' +
-    tahunSet.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
-  document.getElementById('muridFilterTahun').innerHTML = tahunOpts;
-  document.getElementById('guruFilterTahun').innerHTML = tahunOpts;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   RENDER TABLES
-   ═══════════════════════════════════════════════════════════════ */
-function renderMuridTable() {
-  const tbody = document.getElementById('muridTableBody');
-  const search = document.getElementById('muridSearch').value.toLowerCase().trim();
-  const kelas = document.getElementById('muridFilterKelas').value;
-  const tahun = document.getElementById('muridFilterTahun').value;
-
-  let list = allUsers.filter(u => u.role === 'murid');
-  if (search) list = list.filter(u => (u.fullName || '').toLowerCase().includes(search) || (u.icNumber || '').includes(search));
-  if (kelas) list = list.filter(u => u.class === kelas);
-  if (tahun) list = list.filter(u => u.sessionYear === tahun);
-
-  document.getElementById('muridListCount').textContent = `${list.length} daripada ${allUsers.filter(u => u.role === 'murid').length} murid`;
-
-  if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-user-graduate"></i><strong>Tiada murid</strong><p>Belum ada murid berdaftar atau tiada padanan carian.</p></div></td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = list.map(u => renderUserRow(u, 'murid')).join('');
-}
-
-function renderGuruTable() {
-  const tbody = document.getElementById('guruTableBody');
-  const search = document.getElementById('guruSearch').value.toLowerCase().trim();
-  const kelas = document.getElementById('guruFilterJawatan').value;
-  const tahun = document.getElementById('guruFilterTahun').value;
-
-  let list = allUsers.filter(u => u.role === 'guru');
-  if (search) list = list.filter(u => (u.fullName || '').toLowerCase().includes(search) || (u.icNumber || '').includes(search));
-  if (kelas) list = list.filter(u => u.class === kelas);
-  if (tahun) list = list.filter(u => u.sessionYear === tahun);
-
-  document.getElementById('guruListCount').textContent = `${list.length} daripada ${allUsers.filter(u => u.role === 'guru').length} guru`;
-
-  if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-chalkboard-teacher"></i><strong>Tiada guru</strong><p>Belum ada guru berdaftar atau tiada padanan carian.</p></div></td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = list.map(u => {
-    const initial = (u.fullName || 'U').charAt(0).toUpperCase();
-    const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
-    let age = u.age;
-    if (!age && u.icNumber) age = getBirthInfoFromIC(u.icNumber).age;
-
-    return `
-      <tr>
-        <td>
-          <div class="user-cell">
-            <div class="user-avatar">${avatarHTML}</div>
-            <div class="user-info">
-              <strong>${escapeHtml(u.fullName || 'Tanpa Nama')}</strong>
-              <span>${escapeHtml(u.icNumber || '—')}</span>
+      <!-- ═══════ TAB 1: AKAUN MURID ═══════ -->
+      <section class="tab-panel active" data-panel="murid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#06B6D4; --card-c2:#4F46E5;">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Pendaftaran Akaun Murid</h2>
+                <p class="card-subtitle">Daftar seorang atau ramai murid serentak</p>
+              </div>
             </div>
           </div>
-        </td>
-        <td>${escapeHtml(u.class || '—')}</td>
-        <td>${escapeHtml(u.title || '—')}</td>
-        <td>${age ? `${age} thn` : '—'}</td>
-        <td>
-          <div class="td-actions">
-            <button class="btn btn-secondary btn-icon btn-sm" onclick="viewUser('${u.id}')" title="Lihat">
-              <i class="fas fa-eye"></i>
+
+          <div class="mode-switcher" data-group="murid">
+            <button class="mode-btn active" data-mode="multi">
+              <i class="fas fa-list-ol"></i>
+              <span>Pendaftaran Pukal (Multi-Row)</span>
             </button>
-            <button class="btn btn-secondary btn-icon btn-sm" onclick="editUser('${u.id}')" title="Edit">
-              <i class="fas fa-pen"></i>
+            <button class="mode-btn" data-mode="csv">
+              <i class="fas fa-file-csv"></i>
+              <span>Import CSV / Excel</span>
             </button>
-            <button class="btn btn-danger btn-icon btn-sm" onclick="deleteUser('${u.id}')" title="Padam">
-              <i class="fas fa-trash"></i>
+            <button class="mode-btn" data-mode="single">
+              <i class="fas fa-user-plus"></i>
+              <span>Pendaftaran Individu</span>
             </button>
           </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
 
-function renderUserRow(u, group) {
-  const initial = (u.fullName || 'U').charAt(0).toUpperCase();
-  const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
-  let age = u.age;
-  if (!age && u.icNumber) age = getBirthInfoFromIC(u.icNumber).age;
+          <!-- Mode 1: Multi-Row -->
+          <div class="mode-panel active" data-panel-murid="multi">
+            <div class="multi-row-list" id="multiRowListMurid"></div>
+            <div class="row-actions">
+              <div class="row-actions-left">
+                <button class="btn btn-secondary" onclick="addRow('murid')">
+                  <i class="fas fa-plus"></i>
+                  <span>Tambah Baris Pengguna</span>
+                </button>
+              </div>
+              <div class="row-actions-right">
+                <button class="btn btn-primary" id="bulkSubmitMurid" onclick="submitBulk('murid')">
+                  <span class="btn-text">
+                    <i class="fas fa-save"></i>
+                    <span>Daftar Semua Pengguna</span>
+                  </span>
+                  <span class="btn-loading">
+                    <span class="spinner"></span>
+                    <span>Menyimpan...</span>
+                  </span>
+                </button>
+              </div>
+            </div>
 
-  return `
-    <tr>
-      <td>
-        <div class="user-cell">
-          <div class="user-avatar">${avatarHTML}</div>
-          <div class="user-info">
-            <strong>${escapeHtml(u.fullName || 'Tanpa Nama')}</strong>
-            <span>${escapeHtml(u.icNumber || '—')}</span>
-          </div>
-        </div>
-      </td>
-      <td>${escapeHtml(u.class || '—')}</td>
-      <td>${age ? `${age} thn` : '—'}</td>
-      <td>
-        <div class="td-actions">
-          <button class="btn btn-secondary btn-icon btn-sm" onclick="viewUser('${u.id}')" title="Lihat">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button class="btn btn-secondary btn-icon btn-sm" onclick="editUser('${u.id}')" title="Edit">
-            <i class="fas fa-pen"></i>
-          </button>
-          <button class="btn btn-danger btn-icon btn-sm" onclick="deleteUser('${u.id}')" title="Padam">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      </td>
-    </tr>
-  `;
-}
-
-function renderKaunselorTable() {
-  const tbody = document.getElementById('kaunselorTableBody');
-  const list = allUsers.filter(u => u.role === 'kaunselor');
-
-  if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state"><i class="fas fa-user-shield"></i><strong>Tiada kaunselor</strong><p>Belum ada kaunselor berdaftar.</p></div></td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = list.map(u => {
-    const initial = (u.fullName || 'K').charAt(0).toUpperCase();
-    const avatarHTML = u.profileImage ? `<img src="${u.profileImage}" alt="">` : initial;
-    return `
-      <tr>
-        <td>
-          <div class="user-cell">
-            <div class="user-avatar">${avatarHTML}</div>
-            <div class="user-info">
-              <strong>${escapeHtml(u.fullName || 'Tanpa Nama')}</strong>
-              <span>${escapeHtml(u.icNumber || '—')}</span>
+            <div class="bulk-progress" id="bulkProgressMurid">
+              <div class="bulk-progress-header">
+                <div class="bulk-progress-label">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span id="bulkProgressLabelMurid">Memproses...</span>
+                </div>
+                <span class="bulk-progress-pct" id="bulkProgressPctMurid">0%</span>
+              </div>
+              <div class="bulk-progress-bar">
+                <div class="bulk-progress-fill" id="bulkProgressFillMurid"></div>
+              </div>
             </div>
           </div>
-        </td>
-        <td>${escapeHtml(u.title || 'Kaunselor UBK')}</td>
-        <td>${escapeHtml(u.email || '—')}</td>
-      </tr>
-    `;
-  }).join('');
-}
 
-/* ═══════════════════════════════════════════════════════════════
-   VIEW / EDIT / DELETE
-   ═══════════════════════════════════════════════════════════════ */
-window.viewUser = function(id) {
-  const u = allUsers.find(x => x.id === id);
-  if (!u) return;
+          <!-- Mode 2: CSV -->
+          <div class="mode-panel" data-panel-murid="csv">
+            <div class="csv-drop" id="csvDropMurid">
+              <input type="file" id="csvInputMurid" accept=".csv,.xlsx,.xls">
+              <div class="csv-icon"><i class="fas fa-file-csv"></i></div>
+              <h4>Klik atau seret fail CSV ke sini</h4>
+              <p>Format: Nama, NomborIC, Tingkatan, Kelas, Tahun</p>
+              <button type="button" class="csv-template" onclick="downloadTemplate('murid')">
+                <i class="fas fa-download"></i>
+                <span>Muat Turun Template CSV</span>
+              </button>
+            </div>
 
-  const info = u.icNumber ? getBirthInfoFromIC(u.icNumber) : {};
-  const age = u.age || info.age;
-  const birthYear = u.birthYear || info.birthYear;
+            <div class="csv-preview-wrap" id="csvPreviewMurid">
+              <div class="csv-preview-header">
+                <div class="csv-preview-title">
+                  <i class="fas fa-check-circle"></i>
+                  <span>Pratonton Data</span>
+                </div>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                  <span class="csv-preview-count" id="csvCountMurid">0 rekod</span>
+                  <button class="btn btn-secondary btn-sm" onclick="clearCsv('murid')">
+                    <i class="fas fa-times"></i> Buang
+                  </button>
+                  <button class="btn btn-emerald" onclick="importCsv('murid')">
+                    <span class="btn-text">
+                      <i class="fas fa-file-import"></i>
+                      <span>Sahkan & Import</span>
+                    </span>
+                    <span class="btn-loading">
+                      <span class="spinner"></span>
+                      <span>Mengimport...</span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nama Penuh</th>
+                      <th>Nombor IC</th>
+                      <th>Kelas</th>
+                      <th>Umur</th>
+                    </tr>
+                  </thead>
+                  <tbody id="csvPreviewBodyMurid"></tbody>
+                </table>
+              </div>
+            </div>
 
-  const modal = document.getElementById('viewModal');
-  const container = document.getElementById('viewUserInfo');
-  const isGuru = u.role === 'guru';
+            <div class="bulk-progress" id="csvProgressMurid">
+              <div class="bulk-progress-header">
+                <div class="bulk-progress-label">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span id="csvProgressLabelMurid">Mengimport...</span>
+                </div>
+                <span class="bulk-progress-pct" id="csvProgressPctMurid">0%</span>
+              </div>
+              <div class="bulk-progress-bar">
+                <div class="bulk-progress-fill" id="csvProgressFillMurid"></div>
+              </div>
+            </div>
+          </div>
 
-  container.innerHTML = `
-    <div class="view-row">
-      <i class="fas fa-user"></i>
-      <div class="view-row-content">
-        <strong>Nama Penuh</strong>
-        <span>${escapeHtml(u.fullName || '—')}</span>
-      </div>
-    </div>
-    <div class="view-row">
-      <i class="fas fa-id-card"></i>
-      <div class="view-row-content">
-        <strong>Nombor IC</strong>
-        <span>${escapeHtml(u.icNumber || '—')}</span>
-      </div>
-    </div>
-    <div class="view-row">
-      <i class="fas fa-user-tag"></i>
-      <div class="view-row-content">
-        <strong>Peranan</strong>
-        <span>${escapeHtml(capitalize(u.role || 'murid'))}</span>
-      </div>
-    </div>
-    ${u.formLevel ? `
-      <div class="view-row">
-        <i class="fas fa-layer-group"></i>
-        <div class="view-row-content">
-          <strong>Tingkatan</strong>
-          <span>Tingkatan ${escapeHtml(u.formLevel)}</span>
+          <!-- Mode 3: Single -->
+          <div class="mode-panel" data-panel-murid="single">
+            <form id="singleFormMurid">
+              <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 0.8fr;gap:0.9rem;" class="single-grid">
+                <div class="form-group">
+                  <label class="form-label">Nama Penuh <span class="req">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" class="input-field upper" name="fullName" placeholder="SEPERTI DALAM KAD PENGENALAN" maxlength="100" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nombor IC <span class="req">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-id-card input-icon"></i>
+                    <input type="text" class="input-field mono" name="icNumber" placeholder="12 DIGIT" maxlength="12" inputmode="numeric" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tingkatan <span class="req">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-layer-group input-icon"></i>
+                    <select class="input-field" name="formLevel" required>
+                      <option value="">— Pilih —</option>
+                      <option value="1">Tingkatan 1</option>
+                      <option value="2">Tingkatan 2</option>
+                      <option value="3">Tingkatan 3</option>
+                      <option value="4">Tingkatan 4</option>
+                      <option value="5">Tingkatan 5</option>
+                      <option value="6">Tingkatan 6</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nama Kelas</label>
+                  <div class="input-wrap">
+                    <i class="fas fa-graduation-cap input-icon"></i>
+                    <input type="text" class="input-field upper" name="className" placeholder="MAWAR" maxlength="40">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tahun</label>
+                  <div class="input-wrap">
+                    <i class="fas fa-calendar input-icon"></i>
+                    <input type="text" class="input-field" name="sessionYear" placeholder="2026" maxlength="4" inputmode="numeric">
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top:0.5rem;">
+                <span class="btn-text">
+                  <i class="fas fa-save"></i>
+                  <span>Daftar Murid</span>
+                </span>
+                <span class="btn-loading">
+                  <span class="spinner"></span>
+                  <span>Menyimpan...</span>
+                </span>
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-    ` : ''}
-    <div class="view-row">
-      <i class="fas fa-graduation-cap"></i>
-      <div class="view-row-content">
-        <strong>${isGuru ? 'Guru Kelas' : 'Kelas'}</strong>
-        <span>${escapeHtml(u.class || '—')}</span>
+
+        <!-- Senarai Murid -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#4F46E5; --card-c2:#6366F1;">
+                <i class="fas fa-list"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Senarai Murid Berdaftar</h2>
+                <p class="card-subtitle" id="muridListCount">0 murid</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="muridSearch" placeholder="Cari nama atau IC...">
+            </div>
+            <select id="muridFilterKelas" class="filter-select">
+              <option value="">Semua Kelas</option>
+            </select>
+            <select id="muridFilterTahun" class="filter-select">
+              <option value="">Semua Tahun</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pengguna</th>
+                  <th>Kelas</th>
+                  <th>Umur</th>
+                  <th style="text-align:right;">Tindakan</th>
+                </tr>
+              </thead>
+              <tbody id="muridTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ TAB 2: AKAUN GURU ═══════ -->
+      <section class="tab-panel" data-panel="guru">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#14B8A6; --card-c2:#0F766E;">
+                <i class="fas fa-chalkboard-teacher"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Pendaftaran Akaun Guru</h2>
+                <p class="card-subtitle">Daftar seorang atau ramai guru serentak</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mode-switcher" data-group="guru">
+            <button class="mode-btn active" data-mode="multi">
+              <i class="fas fa-list-ol"></i>
+              <span>Pendaftaran Pukal (Multi-Row)</span>
+            </button>
+            <button class="mode-btn" data-mode="csv">
+              <i class="fas fa-file-csv"></i>
+              <span>Import CSV / Excel</span>
+            </button>
+            <button class="mode-btn" data-mode="single">
+              <i class="fas fa-user-plus"></i>
+              <span>Pendaftaran Individu</span>
+            </button>
+          </div>
+
+          <!-- Mode 1: Multi-Row -->
+          <div class="mode-panel active" data-panel-guru="multi">
+            <div class="multi-row-list" id="multiRowListGuru"></div>
+            <div class="row-actions">
+              <div class="row-actions-left">
+                <button class="btn btn-secondary" onclick="addRow('guru')">
+                  <i class="fas fa-plus"></i>
+                  <span>Tambah Baris Pengguna</span>
+                </button>
+              </div>
+              <div class="row-actions-right">
+                <button class="btn btn-primary" id="bulkSubmitGuru" onclick="submitBulk('guru')">
+                  <span class="btn-text">
+                    <i class="fas fa-save"></i>
+                    <span>Daftar Semua Pengguna</span>
+                  </span>
+                  <span class="btn-loading">
+                    <span class="spinner"></span>
+                    <span>Menyimpan...</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div class="bulk-progress" id="bulkProgressGuru">
+              <div class="bulk-progress-header">
+                <div class="bulk-progress-label">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span id="bulkProgressLabelGuru">Memproses...</span>
+                </div>
+                <span class="bulk-progress-pct" id="bulkProgressPctGuru">0%</span>
+              </div>
+              <div class="bulk-progress-bar">
+                <div class="bulk-progress-fill" id="bulkProgressFillGuru"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mode 2: CSV -->
+          <div class="mode-panel" data-panel-guru="csv">
+            <div class="csv-drop" id="csvDropGuru">
+              <input type="file" id="csvInputGuru" accept=".csv,.xlsx,.xls">
+              <div class="csv-icon"><i class="fas fa-file-csv"></i></div>
+              <h4>Klik atau seret fail CSV ke sini</h4>
+              <p>Format: Nama, NomborIC, Tingkatan, Kelas, Jawatan, Tahun</p>
+              <button type="button" class="csv-template" onclick="downloadTemplate('guru')">
+                <i class="fas fa-download"></i>
+                <span>Muat Turun Template CSV</span>
+              </button>
+            </div>
+
+            <div class="csv-preview-wrap" id="csvPreviewGuru">
+              <div class="csv-preview-header">
+                <div class="csv-preview-title">
+                  <i class="fas fa-check-circle"></i>
+                  <span>Pratonton Data</span>
+                </div>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                  <span class="csv-preview-count" id="csvCountGuru">0 rekod</span>
+                  <button class="btn btn-secondary btn-sm" onclick="clearCsv('guru')">
+                    <i class="fas fa-times"></i> Buang
+                  </button>
+                  <button class="btn btn-emerald" onclick="importCsv('guru')">
+                    <span class="btn-text">
+                      <i class="fas fa-file-import"></i>
+                      <span>Sahkan & Import</span>
+                    </span>
+                    <span class="btn-loading">
+                      <span class="spinner"></span>
+                      <span>Mengimport...</span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nama Penuh</th>
+                      <th>Nombor IC</th>
+                      <th>Guru Kelas</th>
+                      <th>Umur</th>
+                    </tr>
+                  </thead>
+                  <tbody id="csvPreviewBodyGuru"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="bulk-progress" id="csvProgressGuru">
+              <div class="bulk-progress-header">
+                <div class="bulk-progress-label">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span id="csvProgressLabelGuru">Mengimport...</span>
+                </div>
+                <span class="bulk-progress-pct" id="csvProgressPctGuru">0%</span>
+              </div>
+              <div class="bulk-progress-bar">
+                <div class="bulk-progress-fill" id="csvProgressFillGuru"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mode 3: Single -->
+          <div class="mode-panel" data-panel-guru="single">
+            <form id="singleFormGuru">
+              <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1.5fr 0.8fr;gap:0.9rem;" class="single-grid">
+                <div class="form-group">
+                  <label class="form-label">Nama Penuh <span class="req">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" class="input-field upper" name="fullName" placeholder="SEPERTI DALAM KAD PENGENALAN" maxlength="100" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nombor IC <span class="req">*</span></label>
+                  <div class="input-wrap">
+                    <i class="fas fa-id-card input-icon"></i>
+                    <input type="text" class="input-field mono" name="icNumber" placeholder="12 DIGIT" maxlength="12" inputmode="numeric" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tingkatan (Guru Kelas)</label>
+                  <div class="input-wrap">
+                    <i class="fas fa-layer-group input-icon"></i>
+                    <select class="input-field" name="formLevel">
+                      <option value="">— Pilih —</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nama Kelas</label>
+                  <div class="input-wrap">
+                    <i class="fas fa-graduation-cap input-icon"></i>
+                    <input type="text" class="input-field upper" name="className" placeholder="MAWAR" maxlength="40">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Jawatan Tambahan</label>
+                  <div class="input-wrap">
+                    <i class="fas fa-briefcase input-icon"></i>
+                    <input type="text" class="input-field upper" name="title" placeholder="GURU MATEMATIK" maxlength="80">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tahun</label>
+                  <div class="input-wrap">
+                    <i class="fas fa-calendar input-icon"></i>
+                    <input type="text" class="input-field" name="sessionYear" placeholder="2026" maxlength="4" inputmode="numeric">
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top:0.5rem;">
+                <span class="btn-text">
+                  <i class="fas fa-save"></i>
+                  <span>Daftar Guru</span>
+                </span>
+                <span class="btn-loading">
+                  <span class="spinner"></span>
+                  <span>Menyimpan...</span>
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Senarai Guru -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#14B8A6; --card-c2:#0F766E;">
+                <i class="fas fa-list"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Senarai Guru Berdaftar</h2>
+                <p class="card-subtitle" id="guruListCount">0 guru</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="guruSearch" placeholder="Cari nama atau IC...">
+            </div>
+            <select id="guruFilterJawatan" class="filter-select">
+              <option value="">Semua Kelas</option>
+            </select>
+            <select id="guruFilterTahun" class="filter-select">
+              <option value="">Semua Tahun</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pengguna</th>
+                  <th>Guru Kelas</th>
+                  <th>Jawatan</th>
+                  <th>Umur</th>
+                  <th style="text-align:right;">Tindakan</th>
+                </tr>
+              </thead>
+              <tbody id="guruTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ TAB 3: AKAUN KAUNSELOR ═══════ -->
+      <section class="tab-panel" data-panel="kaunselor">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon" style="--card-c1:#6366F1; --card-c2:#8B5CF6;">
+                <i class="fas fa-user-shield"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Akaun Kaunselor</h2>
+                <p class="card-subtitle">Senarai kaunselor berdaftar (paparan sahaja)</p>
+              </div>
+            </div>
+            <div style="padding:0.5rem 0.9rem;background:rgba(99,102,241,0.08);border-radius:50px;font-size:0.72rem;font-weight:800;color:var(--indigo);display:flex;align-items:center;gap:0.4rem;">
+              <i class="fas fa-lock"></i>
+              <span>Read-Only</span>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kaunselor</th>
+                  <th>Jawatan</th>
+                  <th>E-mel</th>
+                </tr>
+              </thead>
+              <tbody id="kaunselorTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════ VIEW USER MODAL ═══════ -->
+<div class="modal" id="viewModal">
+  <div class="modal-card wide">
+    <div class="modal-icon info"><i class="fas fa-user-circle"></i></div>
+    <h3 class="modal-title">Maklumat Pengguna</h3>
+    <p class="modal-desc">Butiran penuh akaun pengguna</p>
+    <div class="view-user-info" id="viewUserInfo"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeViewModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ EDIT USER MODAL ═══════ -->
+<div class="modal" id="editModal">
+  <div class="modal-card wide">
+    <div class="modal-icon warning"><i class="fas fa-pen"></i></div>
+    <h3 class="modal-title">Edit Pengguna</h3>
+    <p class="modal-desc">Kemaskini maklumat pengguna</p>
+
+    <div class="form-group">
+      <label class="form-label">Nama Penuh</label>
+      <div class="input-wrap">
+        <i class="fas fa-user input-icon"></i>
+        <input type="text" id="editFullName" class="input-field upper" maxlength="100">
       </div>
     </div>
-    ${isGuru && u.title ? `
-      <div class="view-row">
-        <i class="fas fa-briefcase"></i>
-        <div class="view-row-content">
-          <strong>Jawatan Tambahan</strong>
-          <span>${escapeHtml(u.title)}</span>
-        </div>
-      </div>
-    ` : ''}
-    <div class="view-row">
-      <i class="fas fa-calendar"></i>
-      <div class="view-row-content">
-        <strong>Tahun / Sesi</strong>
-        <span>${escapeHtml(u.sessionYear || '—')}</span>
+    <div class="form-group">
+      <label class="form-label">Tingkatan</label>
+      <div class="input-wrap">
+        <i class="fas fa-layer-group input-icon"></i>
+        <input type="text" id="editFormLevel" class="input-field upper" maxlength="10">
       </div>
     </div>
-    ${birthYear ? `
-      <div class="view-row">
-        <i class="fas fa-cake-candles"></i>
-        <div class="view-row-content">
-          <strong>Umur</strong>
-          <span>${age} tahun (lahir ${birthYear})</span>
-        </div>
+    <div class="form-group">
+      <label class="form-label">Nama Kelas</label>
+      <div class="input-wrap">
+        <i class="fas fa-graduation-cap input-icon"></i>
+        <input type="text" id="editClassName" class="input-field upper" maxlength="80">
       </div>
-    ` : ''}
-    ${u.email ? `
-      <div class="view-row">
-        <i class="fas fa-envelope"></i>
-        <div class="view-row-content">
-          <strong>E-mel</strong>
-          <span>${escapeHtml(u.email)}</span>
-        </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Jawatan Tambahan</label>
+      <div class="input-wrap">
+        <i class="fas fa-briefcase input-icon"></i>
+        <input type="text" id="editTitle" class="input-field upper" maxlength="80">
       </div>
-    ` : ''}
-  `;
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tahun / Sesi</label>
+      <div class="input-wrap">
+        <i class="fas fa-calendar input-icon"></i>
+        <input type="text" id="editSessionYear" class="input-field" maxlength="4" inputmode="numeric">
+      </div>
+    </div>
 
-  modal.classList.add('active');
-};
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
+      <button class="btn btn-primary" id="editSaveBtn" onclick="saveEdit()">
+        <span class="btn-text"><i class="fas fa-save"></i> Simpan</span>
+        <span class="btn-loading"><span class="spinner"></span> Menyimpan...</span>
+      </button>
+    </div>
+  </div>
+</div>
 
-window.closeViewModal = function() {
-  document.getElementById('viewModal').classList.remove('active');
-};
+<!-- ═══════ CONFIRM MODAL ═══════ -->
+<div class="modal" id="confirmModal">
+  <div class="modal-card">
+    <div class="modal-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+    <h3 class="modal-title" id="confirmTitle">Padam Pengguna?</h3>
+    <p class="modal-desc" id="confirmDesc">Tindakan ini tidak boleh diundur.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeConfirmModal()">Batal</button>
+      <button class="btn btn-danger" id="confirmBtn">Ya, Padam</button>
+    </div>
+  </div>
+</div>
 
-window.editUser = function(id) {
-  const u = allUsers.find(x => x.id === id);
-  if (!u) return;
-  editingUserId = id;
-  editingUserRole = u.role;
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
 
-  document.getElementById('editFullName').value = u.fullName || '';
-  document.getElementById('editFormLevel').value = u.formLevel || '';
-  document.getElementById('editClassName').value = u.class || '';
-  document.getElementById('editTitle').value = u.title || '';
-  document.getElementById('editSessionYear').value = u.sessionYear || CURRENT_YEAR;
+<script type="module" src="dashboard-user.js"></script>
 
-  document.getElementById('editModal').classList.add('active');
-};
-
-window.closeEditModal = function() {
-  document.getElementById('editModal').classList.remove('active');
-  editingUserId = null;
-  editingUserRole = null;
-};
-
-window.saveEdit = async function() {
-  if (!editingUserId) return;
-
-  const fullName = document.getElementById('editFullName').value.trim().toUpperCase();
-  const formLevel = document.getElementById('editFormLevel').value.trim().toUpperCase();
-  const className = document.getElementById('editClassName').value.trim().toUpperCase();
-  const title = document.getElementById('editTitle').value.trim().toUpperCase();
-  const sessionYear = document.getElementById('editSessionYear').value.trim() || CURRENT_YEAR;
-
-  if (!fullName || fullName.length < 3) return showToast('Ralat', 'Nama tidak sah.', 'error');
-
-  const btn = document.getElementById('editSaveBtn');
-  btn.classList.add('loading');
-  btn.disabled = true;
-
-  try {
-    const { db, fs } = window.EMindCare;
-    await fs.updateDoc(fs.doc(db, 'users', editingUserId), {
-      fullName,
-      formLevel: formLevel || null,
-      class: className || null,
-      title: title || null,
-      sessionYear,
-      updatedAt: fs.serverTimestamp()
-    });
-
-    const u = allUsers.find(x => x.id === editingUserId);
-    if (u) {
-      u.fullName = fullName;
-      u.formLevel = formLevel || null;
-      u.class = className || null;
-      u.title = title || null;
-      u.sessionYear = sessionYear;
-    }
-
-    closeEditModal();
-    renderMuridTable();
-    renderGuruTable();
-    showToast('Berjaya', 'Pengguna dikemas kini.', 'success');
-  } catch (err) {
-    showToast('Gagal', err.message, 'error');
-  } finally {
-    btn.classList.remove('loading');
-    btn.disabled = false;
-  }
-};
-
-window.deleteUser = function(id) {
-  const u = allUsers.find(x => x.id === id);
-  if (!u) return;
-
-  showConfirmModal({
-    title: 'Padam Pengguna?',
-    desc: `Padam akaun "${u.fullName}" (${u.icNumber})? Tindakan ini tidak boleh diundur.`,
-    confirmText: 'Ya, Padam',
-    onConfirm: async () => {
-      try {
-        const { db, fs } = window.EMindCare;
-        await fs.deleteDoc(fs.doc(db, 'users', id));
-        allUsers = allUsers.filter(x => x.id !== id);
-        updateCounts();
-        renderMuridTable();
-        renderGuruTable();
-        renderKaunselorTable();
-        showToast('Berjaya', 'Pengguna dipadam.', 'success');
-      } catch (err) {
-        showToast('Gagal', err.message, 'error');
-      }
-    }
-  });
-};
-
-/* ═══════════════════════════════════════════════════════════════
-   CONFIRM MODAL
-   ═══════════════════════════════════════════════════════════════ */
-function showConfirmModal({ title, desc, confirmText, onConfirm }) {
-  document.getElementById('confirmTitle').textContent = title;
-  document.getElementById('confirmDesc').textContent = desc;
-  document.getElementById('confirmBtn').innerHTML = `<i class="fas fa-check"></i> ${confirmText || 'Ya, Teruskan'}`;
-  pendingConfirmAction = onConfirm;
-  document.getElementById('confirmModal').classList.add('active');
-}
-
-window.closeConfirmModal = function() {
-  document.getElementById('confirmModal').classList.remove('active');
-  pendingConfirmAction = null;
-};
-
-/* ═══════════════════════════════════════════════════════════════
-   SIDEBAR + LOGOUT
-   ═══════════════════════════════════════════════════════════════ */
-window.toggleSidebar = function() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sbBackdrop').classList.toggle('active');
-};
-
-window.logout = function() {
-  showConfirmModal({
-    title: 'Log Keluar?',
-    desc: 'Anda akan dikembalikan ke halaman log masuk.',
-    confirmText: 'Ya, Log Keluar',
-    onConfirm: () => {
-      localStorage.removeItem(SESSION_KEY);
-      sessionStorage.removeItem(SESSION_KEY);
-      window.location.href = 'login.html';
-    }
-  });
-};
-
-window.refreshAll = function() {
-  showToast('Memuat semula', 'Mengambil data terkini...', 'info', 2000);
-  loadUsers();
-};
-
-/* ═══════════════════════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════════════════════ */
-function showToast(title, message, type = 'success', duration = 4000) {
-  const container = document.getElementById('toastContainer');
-  const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `
-    <div class="toast-icon"><i class="fas ${icons[type] || 'fa-info'}"></i></div>
-    <div class="toast-content"><strong>${title}</strong><span>${message}</span></div>
-  `;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.classList.add('removing');
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   UTILS
-   ═══════════════════════════════════════════════════════════════ */
-function escapeHtml(str) {
-  if (!str) return '';
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
-
-console.log(
-  "%c 👥 Dashboard User v4 ",
-  "background:linear-gradient(135deg,#0F766E,#4F46E5,#06B6D4);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
-);
-console.log("Guru Kelas + Tingkatan + Auto Year · Ready");
+</body>
+</html>
