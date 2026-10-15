@@ -1,9 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════
    e-MindCare · Tempah Kaunseling Script
-   Logik: Profile + Avatar + Kalendar + Slot + Tempahan
+   Logik: Profile + Avatar + Kalendar + Slot + Counselor Cards
+   VERSION: 2.1
    ═══════════════════════════════════════════════════════════════ */
 
 import './config.js';
+
+/* ═══════════════════════════════════════════════════════════════
+   DEBUG
+   ═══════════════════════════════════════════════════════════════ */
+const DEBUG = true;
+const log = (...a) => DEBUG && console.log('[Tempah]', ...a);
+const warn = (...a) => DEBUG && console.warn('[Tempah]', ...a);
+
+log('✅ tempah-kaunseling.js LOADED');
 
 /* ═══════════════════════════════════════════════════════════════
    CONSTANTS
@@ -42,13 +52,14 @@ let selectedDate = null;
 let selectedTime = null;
 let selectedCounselorId = '';
 let currentTab = 'pending';
+let emindcare = null;
 
 /* ═══════════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('load', async () => {
   try {
-    await waitForEMindCare();
+    emindcare = await waitForEMindCare();
     if (!authGuard()) return;
     initUI();
     applyBranding();
@@ -70,6 +81,8 @@ window.addEventListener('load', async () => {
     bindEvents();
     updateTabBadges();
 
+    log('🎉 INIT COMPLETE');
+
   } catch (err) {
     console.error('Init error:', err);
     showToast('Ralat', 'Gagal memuatkan halaman: ' + err.message, 'error');
@@ -78,10 +91,10 @@ window.addEventListener('load', async () => {
 
 function waitForEMindCare() {
   return new Promise((resolve, reject) => {
-    if (window.EMindCare) return resolve();
+    if (window.EMindCare) return resolve(window.EMindCare);
     let tries = 0;
     const t = setInterval(() => {
-      if (window.EMindCare) { clearInterval(t); resolve(); }
+      if (window.EMindCare) { clearInterval(t); resolve(window.EMindCare); }
       else if (++tries > 100) { clearInterval(t); reject(new Error('SDK timeout')); }
     }, 50);
   });
@@ -117,11 +130,11 @@ function initUI() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   APPLY BRANDING
+   BRANDING
    ═══════════════════════════════════════════════════════════════ */
 async function applyBranding() {
   try {
-    const cfg = await window.EMindCare.getSiteConfig();
+    const cfg = await emindcare.getSiteConfig();
     if (!cfg?.branding) return;
     const b = cfg.branding;
     if (b.name) {
@@ -144,7 +157,7 @@ async function applyBranding() {
    ═══════════════════════════════════════════════════════════════ */
 async function loadProfile() {
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const snap = await fs.getDoc(fs.doc(db, USERS_COLLECTION, currentUser.uid));
     if (!snap.exists()) {
       showToast('Ralat', 'Data profil tidak dijumpai.', 'error');
@@ -166,9 +179,6 @@ async function loadProfile() {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RENDER PROFILE
-   ═══════════════════════════════════════════════════════════════ */
 function renderProfile(data) {
   const name = data.fullName || 'Murid';
   const firstName = name.split(' ')[0];
@@ -270,14 +280,14 @@ async function handleAvatarUpload(e) {
   try {
     const result = await uploadWithProgress(file, {
       resourceType: 'image',
-      folder: `${window.EMindCare.CLOUDINARY_CONFIG.folder}/murid-profiles`,
+      folder: `${emindcare.CLOUDINARY_CONFIG.folder}/murid-profiles`,
       onProgress: (pct) => {
         fillEl.style.width = pct + '%';
         pctEl.textContent = pct + '%';
       }
     });
 
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     await fs.updateDoc(fs.doc(db, USERS_COLLECTION, currentUser.uid), {
       profileImage: result.secure_url,
       updatedAt: fs.serverTimestamp()
@@ -298,7 +308,8 @@ async function handleAvatarUpload(e) {
     progressEl.classList.remove('active');
     showToast('Upload Gagal', err.message, 'error');
     if (profileData?.profileImage) {
-      document.getElementById('profileAvatar').querySelector('img').src = profileData.profileImage;
+      const img = document.getElementById('profileAvatar').querySelector('img');
+      if (img) img.src = profileData.profileImage;
     }
   }
 
@@ -306,7 +317,7 @@ async function handleAvatarUpload(e) {
 }
 
 function uploadWithProgress(file, options = {}) {
-  const { CLOUDINARY_CONFIG } = window.EMindCare;
+  const { CLOUDINARY_CONFIG } = emindcare;
   const { resourceType = 'image', folder, onProgress } = options;
 
   const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/${resourceType}/upload`;
@@ -341,30 +352,36 @@ function uploadWithProgress(file, options = {}) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   LOAD SCHEDULE / BLOCKED / COUNSELORS
+   LOAD SCHEDULE / BLOCKED
    ═══════════════════════════════════════════════════════════════ */
 async function loadScheduleSettings() {
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const snap = await fs.getDoc(fs.doc(db, SCHEDULE_COLLECTION, SCHEDULE_DOC_ID));
     if (snap.exists()) {
       scheduleSettings = { ...scheduleSettings, ...snap.data() };
     }
-  } catch (err) { console.warn('Schedule error:', err); }
+    log('Schedule:', scheduleSettings);
+  } catch (err) { warn('Schedule error:', err); }
 }
 
 async function loadBlockedDates() {
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const snap = await fs.getDocs(fs.collection(db, BLOCKED_COLLECTION));
     blockedDates = [];
     snap.forEach(d => blockedDates.push({ id: d.id, ...d.data() }));
-  } catch (err) { console.warn('Blocked error:', err); }
+    log('Blocked dates:', blockedDates.length);
+  } catch (err) { warn('Blocked error:', err); }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   ⭐ LOAD COUNSELORS + RENDER CARDS
+   ═══════════════════════════════════════════════════════════════ */
 async function loadCounselors() {
+  log('👥 Loading counselors...');
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const q = fs.query(
       fs.collection(db, USERS_COLLECTION),
       fs.where('role', '==', 'kaunselor')
@@ -376,29 +393,93 @@ async function loadCounselors() {
       counselors.push({
         id: d.id,
         fullName: data.fullName || 'Kaunselor',
-        avatarUrl: data.profileImage || data.avatarUrl || null
+        avatarUrl: data.profileImage || data.avatarUrl || null,
+        email: data.email || null,
+        role: 'kaunselor'
       });
     });
+    log(`✅ ${counselors.length} kaunselor dijumpai`);
   } catch (err) {
-    console.warn('Counselors error:', err);
-    counselors = [{ id: 'demo', fullName: 'Kaunselor UBK', avatarUrl: null }];
+    warn('Counselors error:', err);
+    counselors = [];
   }
 
-  const sel = document.getElementById('counselorSelect');
-  if (counselors.length === 0) {
-    sel.innerHTML = '<option value="">— Tiada kaunselor berdaftar —</option>';
-  } else {
-    sel.innerHTML = '<option value="">— Pilih Kaunselor —</option>' +
-      counselors.map(c => `<option value="${c.id}">${escapeHtml(c.fullName)}</option>`).join('');
-  }
+  renderCounselorCards();
 }
+
+function renderCounselorCards() {
+  const grid = document.getElementById('counselorGrid');
+  const hint = document.getElementById('counselorHint');
+  if (!grid) return;
+
+  if (!counselors.length) {
+    grid.innerHTML = `
+      <div class="counselor-empty">
+        <i class="fas fa-user-slash"></i>
+        <strong>Tiada Kaunselor Berdaftar</strong>
+        <p>Sila hubungi pihak pentadbir UBK untuk maklumat lanjut.</p>
+      </div>`;
+    if (hint) hint.textContent = '';
+    return;
+  }
+
+  if (hint) hint.textContent = `${counselors.length} kaunselor`;
+
+  grid.innerHTML = counselors.map(c => {
+    const initials = (c.fullName || 'K')
+      .split(' ')
+      .filter(Boolean)
+      .map(w => w[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+
+    const avatarHTML = c.avatarUrl
+      ? `<img src="${c.avatarUrl}" alt="${escapeHtml(c.fullName)}" loading="lazy">`
+      : `<span>${initials}</span>`;
+
+    const isSelected = selectedCounselorId === c.id;
+
+    return `
+      <button
+        type="button"
+        class="counselor-card${isSelected ? ' selected' : ''}"
+        data-id="${c.id}"
+        onclick="selectCounselor('${c.id}')"
+        title="Pilih ${escapeHtml(c.fullName)}"
+      >
+        <div class="counselor-check"><i class="fas fa-check"></i></div>
+        <div class="counselor-avatar">${avatarHTML}</div>
+        <div class="counselor-info">
+          <div class="counselor-name">${escapeHtml(c.fullName)}</div>
+          <span class="counselor-role">
+            <i class="fas fa-shield-alt"></i>
+            Kaunselor UBK
+          </span>
+        </div>
+      </button>
+    `;
+  }).join('');
+}
+
+/* ⭐ Select counselor (dipanggil bila klik kad) */
+window.selectCounselor = function(id) {
+  log('👤 Counselor selected:', id);
+  if (selectedCounselorId === id) {
+    // Deselect
+    selectedCounselorId = '';
+  } else {
+    selectedCounselorId = id;
+  }
+  renderCounselorCards();
+};
 
 /* ═══════════════════════════════════════════════════════════════
    LOAD APPOINTMENTS
    ═══════════════════════════════════════════════════════════════ */
 async function loadAppointments() {
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const snap = await fs.getDocs(fs.collection(db, APPOINTMENTS_COLLECTION));
     allAppointments = [];
     snap.forEach(d => allAppointments.push({ id: d.id, ...d.data() }));
@@ -496,7 +577,9 @@ window.selectDate = function(dateStr) {
   selectedDate = dateStr;
   selectedTime = null;
   selectedCounselorId = '';
-  document.getElementById('counselorSelect').value = '';
+
+  // Reset counselor cards
+  renderCounselorCards();
 
   renderCalendar();
 
@@ -571,7 +654,7 @@ function generateSlots(startTime, endTime, minutes) {
       out.push(minutesToLabel(cur));
       cur += minutes;
     }
-  } catch (e) { console.warn(e); }
+  } catch (e) { warn(e); }
   return out;
 }
 
@@ -601,10 +684,6 @@ function bindEvents() {
   const ta = document.getElementById('feelingNotes');
   ta.addEventListener('input', () => {
     document.getElementById('feelingCounter').textContent = `${ta.value.length} / 500`;
-  });
-
-  document.getElementById('counselorSelect').addEventListener('change', (e) => {
-    selectedCounselorId = e.target.value;
   });
 
   document.querySelectorAll('.tab').forEach(tab => {
@@ -638,6 +717,7 @@ async function handleSubmit(e) {
   const studentIC = profileData?.icNumber || currentUser.icNumber || '';
   const studentClass = profileData?.class || currentUser.class || '';
 
+  // Double-check conflict
   const conflict = allAppointments.find(a =>
     a.date === selectedDate &&
     a.timeSlot === selectedTime &&
@@ -654,7 +734,7 @@ async function handleSubmit(e) {
   btn.innerHTML = '<span class="spinner"></span><span>Menghantar...</span>';
 
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const ref = fs.doc(fs.collection(db, APPOINTMENTS_COLLECTION));
 
     const payload = {
@@ -683,14 +763,15 @@ async function handleSubmit(e) {
       counselor: counselor?.fullName || 'Kaunselor'
     };
 
+    // Reset form
     selectedTime = null;
     selectedCounselorId = '';
     document.getElementById('feelingNotes').value = '';
     document.getElementById('feelingCounter').textContent = '0 / 500';
-    document.getElementById('counselorSelect').value = '';
     document.querySelector('input[name="urgency"][value="low"]').checked = true;
 
     renderTimeSlots(selectedDate);
+    renderCounselorCards();
     renderMyAppointments();
     updateTabBadges();
     showSuccessModal(successInfo);
@@ -883,7 +964,7 @@ window.cancelAppt = function(id) {
     btn.innerHTML = '<span class="spinner"></span> Memproses...';
 
     try {
-      const { db, fs } = window.EMindCare;
+      const { db, fs } = emindcare;
       await fs.updateDoc(fs.doc(db, APPOINTMENTS_COLLECTION, id), {
         status: 'cancelled',
         cancelledBy: 'murid',
@@ -1016,7 +1097,7 @@ function escapeHtml(str) {
 }
 
 console.log(
-  "%c 📅 Tempah Kaunseling ",
+  "%c 📅 Tempah Kaunseling v2.1 ",
   "background:linear-gradient(135deg,#0F766E,#4F46E5,#06B6D4);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
 );
-console.log("Ready · v2.0");
+log('🎯 Ready — counselor cards enabled');
