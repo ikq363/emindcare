@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<title>Tempahan Kaunseling · Dashboard Kaunselor · e-MindCare</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ═══════════════════════════════════════════════════
+   ROOT & BASE STYLES (IKUT SEBIJIK DASHBOARD OVERVIEW)
+   ═══════════════════════════════════════════════════ */
+:root {
+  --teal: #0F766E;
+  --teal-light: #14B8A6;
+  --teal-glow: #2DD4BF;
+  --indigo: #4F46E5;
+  --indigo-light: #6366F1;
+  --cyan: #06B6D4;
+  --cyan-soft: #22D3EE;
+  --purple: #8B5CF6;
+  --pink: #EC4899;
+  --orange: #F59E0B;
+  --amber: #FBBF24;
+  --rose: #EF4444;
+  --emerald: #10B981;
+  --navy: #0F172A;
+  --navy-mid: #1E293B;
+  --pearl: #F8FAFC;
+  --white: #FFFFFF;
+  --ink: #0F172A;
+  --ink-soft: #64748B;
+  --ink-light: #94A3B8;
+  --line: rgba(15, 23, 42, 0.08);
+  --sidebar-w: 268px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--pearl);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--teal); color: #fff; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
+
+/* LAYOUT */
+.app { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 60;
+  transition: transform 0.4s var(--ease-out);
+  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
+  overflow-y: auto;
+}
+.sb-brand {
+  padding: 1.5rem 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0;
+}
+.sb-brand-logo {
+  width: 42px; height: 42px; border-radius: 13px;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1.15rem; flex-shrink: 0;
+}
+.sb-brand-text strong { display: block; font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 900; color: #fff; }
+.sb-brand-text span { font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+
+.sb-profile {
+  margin: 1rem 1rem 0.5rem; padding: 1rem;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px; display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;
+}
+.sb-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
+  color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800;
+}
+.sb-profile-info strong { display: block; font-size: 0.85rem; color: #fff; font-weight: 700; }
+.sb-profile-info span { font-size: 0.68rem; color: var(--teal-glow); font-weight: 600; }
+
+.sb-menu { flex: 1; padding: 0.5rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.sb-section-label { font-size: 0.62rem; font-weight: 800; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; padding: 1rem 0.6rem 0.4rem; }
+.sb-item {
+  display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 0.85rem;
+  border-radius: 12px; color: #cbd5e1; text-decoration: none; font-size: 0.84rem; font-weight: 600;
+  transition: all 0.3s; position: relative;
+}
+.sb-item i:first-child {
+  width: 32px; height: 32px; border-radius: 9px; background: rgba(255, 255, 255, 0.06);
+  display: flex; align-items: center; justify-content: center; font-size: 0.82rem;
+}
+.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+.sb-item.active { background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12)); color: #fff; }
+.sb-item.active i:first-child { background: linear-gradient(135deg, var(--teal-light), var(--indigo-light)); color: #fff; }
+.sb-item.active::before { content: ""; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; background: var(--teal-glow); border-radius: 0 4px 4px 0; }
+.sb-badge { margin-left: auto; padding: 0.1rem 0.5rem; background: var(--rose); color: #fff; border-radius: 50px; font-size: 0.62rem; font-weight: 800; }
+
+.sb-footer { padding: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.sb-footer-btn {
+  width: 100%; padding: 0.7rem 0.9rem; border-radius: 12px;
+  background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #FCA5A5; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+
+/* MAIN & TOPBAR */
+.main { flex: 1; margin-left: var(--sidebar-w); min-width: 0; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar {
+  position: sticky; top: 0; z-index: 50; background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: blur(24px); border-bottom: 1px solid var(--line); padding: 0.9rem 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.tb-toggle { display: none; width: 40px; height: 40px; border-radius: 12px; background: #fff; border: 1px solid var(--line); align-items: center; justify-content: center; cursor: pointer; }
+.tb-title { flex: 1; min-width: 0; }
+.tb-title h1 { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 900; color: var(--ink); }
+.tb-title p { font-size: 0.76rem; color: var(--ink-soft); }
+.tb-actions { display: flex; gap: 0.6rem; }
+.tb-icon-btn { width: 40px; height: 40px; border-radius: 12px; background: #fff; border: 1px solid var(--line); color: var(--ink-soft); display: flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer; }
+
+.content { flex: 1; padding: 1.5rem; max-width: 1400px; width: 100%; }
+
+/* CARD & TABLES */
+.card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03); margin-bottom: 1.5rem; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
+.card-title { font-family: 'Fraunces', serif; font-size: 1.08rem; font-weight: 900; color: var(--ink); display: flex; align-items: center; gap: 0.6rem; }
+.card-title i { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, rgba(20, 184, 166, 0.12), rgba(99, 102, 241, 0.12)); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1rem; }
+.form-label { display: block; font-size: 0.7rem; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
+.form-control { width: 100%; padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid var(--line); background: var(--pearl); font-family: inherit; font-size: 0.85rem; outline: none; }
+.form-control:focus { border-color: var(--teal); background: #fff; }
+
+.tab-bar { display: flex; gap: 0.5rem; background: var(--pearl); padding: 0.35rem; border-radius: 50px; border: 1px solid var(--line); margin-bottom: 1.5rem; overflow-x: auto; }
+.tab-btn { border: none; background: transparent; padding: 0.55rem 1.2rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+.tab-btn.active { background: #fff; color: var(--teal); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06); }
+
+/* APPOINTMENT CARDS */
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; }
+.app-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 1.3rem; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s; }
+.app-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
+.status-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.22rem 0.65rem; border-radius: 50px; font-size: 0.66rem; font-weight: 800; text-transform: uppercase; }
+.status-badge.pending { background: rgba(245, 158, 11, 0.12); color: var(--orange); }
+.status-badge.approved { background: rgba(16, 185, 129, 0.12); color: var(--emerald); }
+.status-badge.deferred { background: rgba(99, 102, 241, 0.12); color: var(--indigo); }
+.status-badge.cancelled { background: rgba(239, 68, 68, 0.12); color: var(--rose); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.7rem 1.3rem; border-radius: 12px; font-family: inherit; font-size: 0.84rem; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+.btn-teal { background: linear-gradient(120deg, var(--teal), var(--indigo)); color: #fff; box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4); }
+.btn-dark { background: var(--navy); color: #fff; }
+
+/* MODAL & TOAST */
+.modal { position: fixed; inset: 0; z-index: 9997; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+.modal.active { display: flex; }
+.modal-card { background: #fff; border-radius: 22px; padding: 1.75rem 1.6rem; max-width: 460px; width: 100%; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3); }
+
+.toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.65rem; pointer-events: none; }
+.toast { background: #fff; border-radius: 16px; padding: 1rem 1.1rem; box-shadow: 0 20px 44px -8px rgba(15, 23, 42, 0.22); border-left: 4px solid var(--emerald); display: flex; align-items: flex-start; gap: 0.8rem; min-width: 300px; pointer-events: auto; }
+.toast.error { border-left-color: var(--rose); }
+
+.sb-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 55; display: none; }
+.sb-backdrop.active { display: block; }
+
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .tb-toggle { display: flex; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
+      <div class="sb-brand-text">
+        <strong id="sbBrandName">e-MindCare</strong>
+        <span>Dashboard Kaunselor</span>
+      </div>
+    </div>
+
+    <a href="dashboard-profile.html" class="sb-profile">
+      <div class="sb-avatar" id="sbAvatar">K</div>
+      <div class="sb-profile-info">
+        <strong id="sbProfileName">Kaunselor</strong>
+        <span>Kaunselor UBK</span>
+      </div>
+    </a>
+
+    <nav class="sb-menu">
+      <div class="sb-section-label">Utama</div>
+      <a href="dashboard-kaunselor.html" class="sb-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Overview</span>
+      </a>
+      <a href="dashboard-profile.html" class="sb-item">
+        <i class="fas fa-user-circle"></i>
+        <span>Profil Kaunselor</span>
+      </a>
+
+      <div class="sb-section-label">Kandungan Laman</div>
+      <a href="dashboard-announcements.html" class="sb-item">
+        <i class="fas fa-bullhorn"></i>
+        <span>Pengumuman</span>
+      </a>
+      <a href="dashboard-banners.html" class="sb-item">
+        <i class="fas fa-images"></i>
+        <span>Banner Iklan</span>
+      </a>
+      <a href="dashboard-collaborations.html" class="sb-item">
+        <i class="fas fa-handshake"></i>
+        <span>Kolaborasi</span>
+      </a>
+
+      <div class="sb-section-label">Pengurusan</div>
+      <a href="dashboard-users.html" class="sb-item">
+        <i class="fas fa-users"></i>
+        <span>Urus Pengguna</span>
+      </a>
+      <a href="dashboard-appointments.html" class="sb-item active">
+        <i class="fas fa-calendar-check"></i>
+        <span>Tempahan Kaunseling</span>
+        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
+      </a>
+    </nav>
+
+    <div class="sb-footer">
+      <button class="sb-footer-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Log Keluar</span>
+      </button>
+    </div>
+  </aside>
+  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <header class="topbar">
+      <button class="tb-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="tb-title">
+        <h1>Tempahan Kaunseling</h1>
+        <p>Urus jadual, blocked dates, dan permohonan sesi pelajar.</p>
+      </div>
+      <div class="tb-actions">
+        <a href="index.html" class="tb-icon-btn" title="Laman Utama" target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+        <button class="tb-icon-btn" onclick="refreshAll()" title="Refresh">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- SETTINGS ROW -->
+      <div class="grid-2">
+        <!-- BLOCK DATES -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-calendar-times"></i> Cuti & Blocked Dates</h2>
+          </div>
+          <form id="formBlockDate">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+              <div class="form-group">
+                <label class="form-label">Tarikh</label>
+                <input type="date" id="blockDateInput" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Jenis Block</label>
+                <select id="blockTypeSelect" class="form-control" required>
+                  <option value="red">🔴 Merah (Cuti Umum)</option>
+                  <option value="yellow">🟨 Kuning (Tidak Available)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Catatan / Sebab</label>
+              <input type="text" id="blockReasonInput" class="form-control" placeholder="Contoh: Kursus Kaunseling Daerah" required>
+            </div>
+            <button type="submit" class="btn btn-dark" style="width:100%;"><i class="fas fa-plus-circle"></i> Simpan Block Date</button>
+          </form>
+
+          <div style="margin-top:1.5rem;">
+            <label class="form-label">Senarai Blocked Dates Aktif</label>
+            <div id="blockedDatesList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:160px; overflow-y:auto;"></div>
+          </div>
+        </div>
+
+        <!-- SCHEDULE SETTINGS -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-clock"></i> Waktu Operasi & Masa Sesi</h2>
+          </div>
+          <form id="formScheduleSettings">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+              <div class="form-group">
+                <label class="form-label">Masa Mula</label>
+                <input type="time" id="startTimeInput" value="08:00" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Masa Tamat</label>
+                <input type="time" id="endTimeInput" value="14:00" class="form-control" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sela Masa Per Sesi</label>
+              <select id="slotIntervalSelect" class="form-control">
+                <option value="30">30 Minit</option>
+                <option value="60" selected>1 Jam (60 Minit)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hari Operasi</label>
+              <div style="display:flex; flex-wrap:wrap; gap:0.6rem; font-size:0.8rem; font-weight:600;">
+                <label><input type="checkbox" name="workDays" value="1" checked> Isnin</label>
+                <label><input type="checkbox" name="workDays" value="2" checked> Selasa</label>
+                <label><input type="checkbox" name="workDays" value="3" checked> Rabu</label>
+                <label><input type="checkbox" name="workDays" value="4" checked> Khamis</label>
+                <label><input type="checkbox" name="workDays" value="5" checked> Jumaat</label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-teal" style="width:100%;"><i class="fas fa-save"></i> Simpan Tetapan Operasi</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- APPOINTMENTS MANAGEMENT SECTION -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-list-check"></i> Permohonan Kaunseling</h2>
+        </div>
+
+        <div class="tab-bar">
+          <button class="tab-btn active" id="tabPendingBtn" onclick="switchTab('pending')">1. Permohonan Baru</button>
+          <button class="tab-btn" id="tabActiveBtn" onclick="switchTab('active')">2. Status Active / Approved</button>
+          <button class="tab-btn" id="tabHistoryBtn" onclick="switchTab('history')">3. Rekod Selesai & Batal</button>
+        </div>
+
+        <div id="partisiPending" class="tab-content"><div id="pendingList" class="app-grid"></div></div>
+        <div id="partisiActive" class="tab-content" style="display:none;"><div id="activeList" class="app-grid"></div></div>
+        <div id="partisiHistory" class="tab-content" style="display:none;"><div id="historyList" class="app-grid"></div></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL ACTION -->
+<div class="modal" id="actionModal">
+  <div class="modal-card">
+    <h3 class="card-title" id="modalTitle" style="margin-bottom:0.5rem;">Tindakan Permohonan</h3>
+    <p id="modalStudentName" style="font-size:0.8rem; color:var(--ink-soft); margin-bottom:1.2rem;"></p>
+    <input type="hidden" id="modalAppointmentId">
+    <input type="hidden" id="modalActionType">
+
+    <div id="rescheduleFields" style="display:none;" class="form-group">
+      <div class="form-group">
+        <label class="form-label">Tarikh Baharu</label>
+        <input type="date" id="modalNewDate" class="form-control">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Slot Masa Baharu</label>
+        <input type="time" id="modalNewTime" class="form-control">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Catatan / Pautan Sesi / Nota Kaunselor</label>
+      <textarea id="modalCounselorNotes" class="form-control" rows="3" placeholder="Masukkan nota atau pautan bilik kaunseling..."></textarea>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:0.6rem;">
+      <button type="button" class="btn" style="background:var(--pearl);" onclick="closeActionModal()">Batal</button>
+      <button type="button" class="btn btn-teal" onclick="submitModalAction()">Sahkan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="dashboard-appointments.js"></script>
+</body>
+</html>
