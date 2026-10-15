@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0F172A">
-<title>Tempahan Kaunseling · Dashboard Kaunselor · e-MindCare</title>
+<title>Tempahan Kaunseling · e-MindCare Kaunselor</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,7 @@
 
 <style>
 /* ═══════════════════════════════════════════════════
-   ROOT STYLES (SEBIJIK DENGAN OVERVIEW)
+   ROOT — Navy Admin Theme
    ═══════════════════════════════════════════════════ */
 :root {
   --teal: #0F766E;
@@ -29,17 +29,18 @@
   --amber: #FBBF24;
   --rose: #EF4444;
   --emerald: #10B981;
-  --navy: #0F172A;
-  --navy-mid: #1E293B;
   --pearl: #F8FAFC;
   --white: #FFFFFF;
   --ink: #0F172A;
   --ink-soft: #64748B;
   --ink-light: #94A3B8;
   --line: rgba(15, 23, 42, 0.08);
-  --sidebar-w: 268px;
+  --navy: #0F172A;
+  --navy-mid: #1E293B;
+  --navy-soft: #334155;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sb-width: 268px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,424 +60,1689 @@ body {
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.25); }
 
-/* LAYOUT */
-.app { display: flex; min-height: 100vh; }
+/* ═══════ BACKGROUND ORBS ═══════ */
+.bg-decor {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+  overflow: hidden;
+}
+.bg-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.22;
+  animation: orbDrift 24s ease-in-out infinite;
+}
+.bg-orb.o1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, var(--teal-light), transparent 70%);
+  top: -220px; right: -180px;
+}
+.bg-orb.o2 {
+  width: 460px; height: 460px;
+  background: radial-gradient(circle, var(--indigo-light), transparent 70%);
+  bottom: -200px; left: -160px;
+  animation-delay: 8s; opacity: 0.18;
+}
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -60px) scale(1.15); }
+}
 
 /* ═══════════════════════════════════════════════════
-   SIDEBAR (SENARAI NAVIGASI PENUH SEBIJIK)
+   SIDEBAR — Dark Navy
    ═══════════════════════════════════════════════════ */
 .sidebar {
-  width: var(--sidebar-w);
-  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
-  color: #cbd5e1;
-  display: flex;
-  flex-direction: column;
   position: fixed;
   top: 0; left: 0; bottom: 0;
-  z-index: 60;
+  width: var(--sb-width);
+  background: linear-gradient(180deg, #0F172A 0%, #1E1B4B 100%);
+  color: #E2E8F0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
   transition: transform 0.4s var(--ease-out);
-  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
-  overflow-y: auto;
+  overflow: hidden;
+  box-shadow: 4px 0 32px rgba(15, 23, 42, 0.15);
 }
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+.sidebar::before {
+  content: "";
+  position: absolute;
+  top: -150px; right: -150px;
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.18), transparent 70%);
+  pointer-events: none;
+}
+.sidebar::after {
+  content: "";
+  position: absolute;
+  bottom: -180px; left: -180px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.22), transparent 70%);
+  pointer-events: none;
+}
 
+/* Brand */
 .sb-brand {
-  padding: 1.5rem 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  padding: 1.35rem 1.35rem 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.sb-brand-logo {
-  width: 42px; height: 42px; border-radius: 13px;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1.15rem; box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
-  flex-shrink: 0; position: relative; overflow: hidden;
+.sb-logo {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.2rem;
+  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.35);
+  flex-shrink: 0;
+  overflow: hidden;
 }
-.sb-brand-logo::before {
-  content: ""; position: absolute; inset: -50%;
-  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
-  animation: shineSweep 4s linear infinite;
+.sb-logo img { width: 100%; height: 100%; object-fit: cover; }
+.sb-brand-text {
+  display: flex; flex-direction: column; line-height: 1.15;
+  min-width: 0;
 }
-@keyframes shineSweep { to { transform: rotate(360deg); } }
-.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
-.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+.sb-brand-text strong {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem; font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-brand-text span {
+  font-size: 0.62rem;
+  color: #94A3B8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
 
-.sb-brand-text strong { display: block; font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1.1; }
-.sb-brand-text span { font-size: 0.65rem; color: #94a3b8; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; }
-
+/* Profile */
 .sb-profile {
-  margin: 1rem 1rem 0.5rem; padding: 1rem;
-  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px; display: flex; align-items: center; gap: 0.75rem;
-  cursor: pointer; transition: all 0.3s; text-decoration: none; color: inherit;
+  position: relative;
+  z-index: 2;
+  padding: 1rem 1.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.3s;
 }
-.sb-profile:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
+.sb-profile:hover { background: rgba(255, 255, 255, 0.04); }
 .sb-avatar {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff; display: flex; align-items: center; justify-content: center;
-  font-size: 1rem; font-weight: 800; flex-shrink: 0; position: relative; overflow: hidden;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.3);
+  border: 2px solid rgba(255,255,255,0.1);
 }
 .sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sb-avatar::after {
-  content: ""; position: absolute; bottom: -2px; right: -2px;
-  width: 12px; height: 12px; border-radius: 50%; background: var(--emerald); border: 2px solid #1E293B;
+.sb-profile-info {
+  display: flex; flex-direction: column;
+  min-width: 0; flex: 1;
+  line-height: 1.2;
 }
-.sb-profile-info { min-width: 0; flex: 1; }
-.sb-profile-info strong { display: block; font-size: 0.85rem; color: #fff; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sb-profile-info span { font-size: 0.68rem; color: var(--teal-glow); font-weight: 600; }
+.sb-profile-name {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-profile-role {
+  font-size: 0.68rem;
+  color: var(--teal-glow);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.sb-profile-chevron {
+  color: #64748B;
+  font-size: 0.72rem;
+  transition: transform 0.3s;
+}
+.sb-profile:hover .sb-profile-chevron {
+  transform: translateX(3px);
+  color: var(--teal-glow);
+}
 
-.sb-menu { flex: 1; padding: 0.5rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; }
-.sb-section-label { font-size: 0.62rem; font-weight: 800; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; padding: 1rem 0.6rem 0.4rem; }
+/* Menu scroll area */
+.sb-menu-wrap {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0.85rem 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.sb-menu-wrap::-webkit-scrollbar { width: 4px; }
+.sb-menu-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+
+.sb-section {
+  margin-bottom: 1.35rem;
+}
+.sb-section:last-child { margin-bottom: 0.25rem; }
+.sb-section-title {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #475569;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  padding: 0 0.6rem;
+  margin-bottom: 0.55rem;
+}
+.sb-menu { list-style: none; display: flex; flex-direction: column; gap: 0.15rem; }
 .sb-item {
-  display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 0.85rem;
-  border-radius: 12px; color: #cbd5e1; text-decoration: none; font-size: 0.84rem;
-  font-weight: 600; transition: all 0.3s var(--ease-out); cursor: pointer;
-  border: none; background: transparent; width: 100%; text-align: left; font-family: inherit; position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 11px;
+  color: #CBD5E1;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.25s var(--ease-out);
+  position: relative;
+  white-space: nowrap;
 }
-.sb-item i:first-child {
-  width: 32px; height: 32px; border-radius: 9px; background: rgba(255, 255, 255, 0.06);
-  display: flex; align-items: center; justify-content: center; font-size: 0.82rem; flex-shrink: 0; transition: all 0.3s;
+.sb-item i {
+  width: 22px;
+  font-size: 0.88rem;
+  text-align: center;
+  color: #94A3B8;
+  transition: all 0.25s;
+  flex-shrink: 0;
 }
-.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.sb-item:hover i:first-child { background: rgba(20, 184, 166, 0.15); color: var(--teal-glow); }
-.sb-item.active { background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12)); color: #fff; }
-.sb-item.active i:first-child { background: linear-gradient(135deg, var(--teal-light), var(--indigo-light)); color: #fff; box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35); }
-.sb-item.active::before { content: ""; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; background: var(--teal-glow); border-radius: 0 4px 4px 0; }
-.sb-badge { margin-left: auto; padding: 0.1rem 0.5rem; background: var(--rose); color: #fff; border-radius: 50px; font-size: 0.62rem; font-weight: 800; min-width: 22px; text-align: center; }
+.sb-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+.sb-item:hover i { color: var(--teal-glow); }
+.sb-item.active {
+  background: linear-gradient(120deg, rgba(20, 184, 166, 0.22), rgba(99, 102, 241, 0.22));
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.15);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+}
+.sb-item.active i { color: var(--teal-glow); }
+.sb-item.active::before {
+  content: "";
+  position: absolute;
+  left: -0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 22px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, var(--teal-glow), var(--indigo-light));
+  box-shadow: 0 0 12px var(--teal-glow);
+}
+.sb-item-badge {
+  margin-left: auto;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 50px;
+  background: var(--rose);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+}
+.sb-item-badge.hidden { display: none; }
 
-.sb-footer { padding: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.06); flex-shrink: 0; }
-.sb-footer-btn {
-  width: 100%; padding: 0.7rem 0.9rem; border-radius: 12px; background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2); color: #FCA5A5; font-family: inherit; font-size: 0.82rem;
-  font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+/* Sidebar footer logout */
+.sb-footer {
+  position: relative;
+  z-index: 2;
+  padding: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
-.sb-footer-btn:hover { background: rgba(239, 68, 68, 0.2); color: #fff; transform: translateY(-1px); }
+.sb-logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #FCA5A5;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+}
+.sb-logout-btn:hover {
+  background: var(--rose);
+  color: #fff;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(239, 68, 68, 0.4);
+}
 
-/* MAIN CONTAINER & TOPBAR */
-.main { flex: 1; margin-left: var(--sidebar-w); min-width: 0; display: flex; flex-direction: column; min-height: 100vh; }
+/* Backdrop */
+.sb-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 99;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.sb-backdrop.active {
+  display: block;
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════
+   TOPBAR
+   ═══════════════════════════════════════════════════ */
+.app-shell {
+  margin-left: var(--sb-width);
+  min-height: 100vh;
+  position: relative;
+  z-index: 2;
+  transition: margin 0.4s var(--ease-out);
+}
 .topbar {
-  position: sticky; top: 0; z-index: 50; background: rgba(248, 250, 252, 0.85);
-  backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--line);
-  padding: 0.9rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
-.tb-toggle { display: none; width: 40px; height: 40px; border-radius: 12px; background: #fff; border: 1px solid var(--line); color: var(--ink); font-size: 0.95rem; cursor: pointer; align-items: center; justify-content: center; flex-shrink: 0; }
-.tb-title { flex: 1; min-width: 0; }
-.tb-title h1 { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 900; color: var(--ink); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 0.1rem; }
-.tb-title p { font-size: 0.76rem; color: var(--ink-soft); font-weight: 500; }
-.tb-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
-.tb-icon-btn { width: 40px; height: 40px; border-radius: 12px; background: #fff; border: 1px solid var(--line); color: var(--ink-soft); font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; text-decoration: none; position: relative; }
-.tb-icon-btn:hover { background: var(--pearl); color: var(--teal); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08); }
+.tb-burger {
+  display: none;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+.tb-burger:hover {
+  background: var(--pearl);
+  color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+.tb-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+.tb-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tb-sub {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tb-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.tb-icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  text-decoration: none;
+  position: relative;
+}
+.tb-icon-btn:hover {
+  background: var(--pearl);
+  color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+.tb-icon-btn.spinning i { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.content { flex: 1; padding: 1.5rem; max-width: 1400px; width: 100%; }
+/* ═══════════════════════════════════════════════════
+   MAIN
+   ═══════════════════════════════════════════════════ */
+.main {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
 
-/* CARDS, TABS & FORMS */
-.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
-.card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03); margin-bottom: 1.5rem; transition: box-shadow 0.3s; }
-.card:hover { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06); }
-.card-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
-.card-title { font-family: 'Fraunces', serif; font-size: 1.08rem; font-weight: 900; color: var(--ink); letter-spacing: -0.015em; display: flex; align-items: center; gap: 0.6rem; line-height: 1.2; }
-.card-title i { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, rgba(20, 184, 166, 0.12), rgba(99, 102, 241, 0.12)); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+/* ═══════════════════════════════════════════════════
+   SETTINGS GRID
+   ═══════════════════════════════════════════════════ */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 980px) {
+  .settings-grid { grid-template-columns: 1fr; }
+}
 
-.form-group { margin-bottom: 1rem; }
-.form-label { display: block; font-size: 0.7rem; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
-.form-control { width: 100%; padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid var(--line); background: var(--pearl); font-family: inherit; font-size: 0.85rem; outline: none; transition: border 0.3s; }
-.form-control:focus { border-color: var(--teal); background: #fff; }
+/* ═══════════════════════════════════════════════════
+   CARD
+   ═══════════════════════════════════════════════════ */
+.card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 22px;
+  padding: 1.4rem;
+  box-shadow: 0 12px 40px -12px rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.15rem;
+}
+.card-head-icon {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4);
+  flex-shrink: 0;
+}
+.card-head-text {
+  flex: 1;
+  min-width: 0;
+}
+.card-head-text h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.02rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin-bottom: 0.15rem;
+}
+.card-head-text p {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
 
-.tab-bar { display: flex; gap: 0.5rem; background: var(--pearl); padding: 0.35rem; border-radius: 50px; border: 1px solid var(--line); margin-bottom: 1.5rem; overflow-x: auto; }
-.tab-btn { border: none; background: transparent; padding: 0.55rem 1.2rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; transition: all 0.3s; white-space: nowrap; }
-.tab-btn.active { background: #fff; color: var(--teal); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06); }
+/* ═══════════════════════════════════════════════════
+   FORM ELEMENTS
+   ═══════════════════════════════════════════════════ */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+@media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
 
-/* APPOINTMENT CARDS */
-.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; }
-.app-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 1.3rem; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s; }
-.app-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
+.form-group { margin-bottom: 0.9rem; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
+.form-label i { color: var(--teal); font-size: 0.7rem; }
+.form-label .req { color: var(--rose); margin-left: 2px; }
 
-.status-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.22rem 0.65rem; border-radius: 50px; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }
+.input, .select, .textarea {
+  width: 100%;
+  padding: 0.75rem 0.95rem;
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  outline: none;
+  transition: all 0.25s;
+}
+.input:hover, .select:hover, .textarea:hover {
+  border-color: rgba(15, 118, 110, 0.3);
+}
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+}
+.textarea { resize: vertical; min-height: 75px; line-height: 1.55; }
+.textarea::placeholder, .input::placeholder { color: var(--ink-light); }
+
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 0.95rem;
+  top: 50%;
+  transform: translateY(-70%) rotate(45deg);
+  width: 8px; height: 8px;
+  border-right: 2px solid var(--ink-soft);
+  border-bottom: 2px solid var(--ink-soft);
+  pointer-events: none;
+}
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.4rem;
+  cursor: pointer;
+}
+
+/* Work days */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+}
+@media (max-width: 520px) {
+  .days-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.day-chip {
+  padding: 0.6rem 0.3rem;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+}
+.day-chip:hover { border-color: var(--teal); color: var(--teal); }
+.day-chip.selected {
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 16px -4px rgba(15, 118, 110, 0.4);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: none;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  text-decoration: none;
+  white-space: nowrap;
+  letter-spacing: 0.1px;
+}
+.btn-primary {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  background-size: 200% auto;
+  color: #fff;
+  box-shadow: 0 10px 24px -6px rgba(15, 118, 110, 0.4);
+}
+.btn-primary:hover:not(:disabled) {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px -6px rgba(15, 118, 110, 0.5);
+}
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-full { width: 100%; }
+.btn-sm { padding: 0.55rem 0.9rem; font-size: 0.74rem; border-radius: 10px; }
+.btn-success {
+  background: linear-gradient(120deg, var(--emerald), #059669);
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.4);
+}
+.btn-success:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -6px rgba(16, 185, 129, 0.5); }
+.btn-warning {
+  background: linear-gradient(120deg, var(--orange), #D97706);
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.4);
+}
+.btn-warning:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -6px rgba(245, 158, 11, 0.5); }
+.btn-danger {
+  background: linear-gradient(120deg, var(--rose), #DC2626);
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(239, 68, 68, 0.4);
+}
+.btn-danger:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -6px rgba(239, 68, 68, 0.5); }
+.btn-outline {
+  background: #fff;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+}
+.btn-outline:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.04);
+}
+.btn-ghost {
+  background: var(--pearl);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+.btn-ghost:hover { color: var(--ink); border-color: var(--ink-light); }
+
+/* Spinner */
+.btn .spinner {
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════
+   BLOCKED DATES LIST
+   ═══════════════════════════════════════════════════ */
+.blocked-list-wrap {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--line);
+}
+.blocked-list-title {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.blocked-list-title .count-badge {
+  background: var(--pearl);
+  color: var(--ink-soft);
+  padding: 0.1rem 0.5rem;
+  border-radius: 50px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border: 1px solid var(--line);
+}
+.blocked-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  scrollbar-width: thin;
+}
+.blocked-list::-webkit-scrollbar { width: 4px; }
+.blocked-list::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
+.blocked-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.8rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--rose);
+  border-radius: 11px;
+  transition: all 0.25s;
+}
+.blocked-item.amber { border-left-color: var(--orange); }
+.blocked-item:hover {
+  background: var(--pearl);
+  transform: translateX(2px);
+}
+.blocked-item-info { flex: 1; min-width: 0; }
+.blocked-item-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1.2;
+  margin-bottom: 0.15rem;
+}
+.blocked-item-note {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.blocked-item-delete {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--rose);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  flex-shrink: 0;
+}
+.blocked-item-delete:hover {
+  background: var(--rose);
+  color: #fff;
+  transform: scale(1.1);
+}
+.blocked-empty {
+  text-align: center;
+  padding: 1.25rem 1rem;
+  font-size: 0.76rem;
+  color: var(--ink-light);
+  font-style: italic;
+  background: var(--pearl);
+  border: 1px dashed var(--line);
+  border-radius: 11px;
+}
+.blocked-empty i {
+  display: block;
+  font-size: 1.35rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.4;
+  color: var(--ink-light);
+}
+
+/* ═══════════════════════════════════════════════════
+   TABS
+   ═══════════════════════════════════════════════════ */
+.tabs-wrap {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px -12px rgba(15, 23, 42, 0.1);
+}
+.tabs-head {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.6rem;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: rgba(248, 250, 252, 0.5);
+}
+.tabs-head::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1;
+  min-width: 155px;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--ink); background: rgba(15, 118, 110, 0.06); }
+.tab.active {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4);
+}
+.tab-badge {
+  min-width: 22px; height: 20px;
+  padding: 0 6px;
+  border-radius: 50px;
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--ink);
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tab.active .tab-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.tab-panels { padding: 1.4rem; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Cards grid */
+.appt-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1rem;
+}
+@media (max-width: 420px) {
+  .appt-cards-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════
+   APPOINTMENT CARD
+   ═══════════════════════════════════════════════════ */
+.appt-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1.15rem;
+  overflow: hidden;
+  transition: all 0.35s var(--ease-out);
+  animation: cardIn 0.5s var(--ease-out) both;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.appt-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--status-color, var(--indigo));
+  transition: width 0.35s;
+}
+.appt-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 52px -14px rgba(15, 23, 42, 0.18);
+  border-color: transparent;
+}
+.appt-card:hover::before { width: 6px; }
+
+.appt-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+.appt-avatar {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 0.98rem;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.35);
+  font-family: 'Fraunces', serif;
+}
+.appt-name-block { flex: 1; min-width: 0; }
+.appt-name {
+  font-family: 'Fraunces', serif;
+  font-size: 0.98rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin-bottom: 0.15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.appt-meta-line {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.appt-meta-line i { color: var(--teal); margin-right: 0.15rem; }
+
+/* Urgency pill */
+.urgency-pill {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 50px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  flex-shrink: 0;
+}
+.urgency-pill.high { background: rgba(239, 68, 68, 0.12); color: #B91C1C; }
+.urgency-pill.medium { background: rgba(245, 158, 11, 0.14); color: #B45309; }
+.urgency-pill.low { background: rgba(6, 182, 212, 0.14); color: #0E7490; }
+
+/* Info grid */
+.appt-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 0.85rem;
+  margin-bottom: 0.95rem;
+  padding: 0.8rem 0.9rem;
+  background: var(--pearl);
+  border-radius: 13px;
+}
+.appt-info-item {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  min-width: 0;
+}
+.appt-info-item.full { grid-column: 1 / -1; }
+.appt-info-icon {
+  width: 24px; height: 24px;
+  border-radius: 8px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+.appt-info-text {
+  min-width: 0; flex: 1;
+}
+.appt-info-label {
+  font-size: 0.58rem;
+  color: var(--ink-light);
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.appt-info-value {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.appt-info-value.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.76rem;
+}
+
+/* Feeling note */
+.appt-note {
+  padding: 0.7rem 0.85rem;
+  background: linear-gradient(120deg, rgba(34, 211, 238, 0.06), rgba(99, 102, 241, 0.06));
+  border-left: 3px solid var(--cyan);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 0.95rem;
+  max-height: 95px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.appt-note::before {
+  content: "\f10d";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: var(--cyan);
+  font-size: 0.6rem;
+  margin-right: 0.4rem;
+  opacity: 0.7;
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 0.32rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 50px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
 .status-badge.pending { background: rgba(245, 158, 11, 0.12); color: var(--orange); }
 .status-badge.approved { background: rgba(16, 185, 129, 0.12); color: var(--emerald); }
 .status-badge.deferred { background: rgba(99, 102, 241, 0.12); color: var(--indigo); }
+.status-badge.completed { background: rgba(15, 118, 110, 0.12); color: var(--teal); }
 .status-badge.cancelled { background: rgba(239, 68, 68, 0.12); color: var(--rose); }
 
-/* BUTTONS */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.7rem 1.3rem; border-radius: 12px; font-family: inherit; font-size: 0.84rem; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s var(--ease-out); text-decoration: none; }
-.btn-teal { background: linear-gradient(120deg, var(--teal), var(--indigo)); color: #fff; box-shadow: 0 8px 20px -6px rgba(15, 118, 110, 0.4); }
-.btn-teal:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -6px rgba(15, 118, 110, 0.5); }
-.btn-dark { background: var(--navy); color: #fff; }
+.appt-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+.appt-time-ago {
+  font-size: 0.66rem;
+  color: var(--ink-light);
+  font-weight: 600;
+}
 
-/* MODAL & TOAST */
-.modal { position: fixed; inset: 0; z-index: 9997; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 1.5rem; }
-.modal.active { display: flex; }
-.modal-card { background: #fff; border-radius: 22px; padding: 1.75rem 1.6rem; max-width: 460px; width: 100%; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3); animation: modalPop 0.4s var(--ease-elastic); }
-@keyframes modalPop { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+/* Card actions */
+.appt-actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+.appt-actions .btn { flex: 1; min-width: 0; padding: 0.55rem 0.7rem; font-size: 0.72rem; }
 
-.toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.65rem; pointer-events: none; max-width: calc(100vw - 3rem); }
-.toast { background: #fff; border-radius: 16px; padding: 1rem 1.1rem; box-shadow: 0 20px 44px -8px rgba(15, 23, 42, 0.22); border-left: 4px solid var(--emerald); display: flex; align-items: flex-start; gap: 0.8rem; min-width: 300px; max-width: 400px; font-size: 0.86rem; animation: toastIn 0.45s var(--ease-elastic); pointer-events: auto; }
+/* ═══════════════════════════════════════════════════
+   EMPTY / SKELETON
+   ═══════════════════════════════════════════════════ */
+.panel-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--pearl);
+  border: 2px dashed var(--line);
+  border-radius: 18px;
+}
+.panel-empty i {
+  font-size: 2.4rem;
+  color: var(--ink-light);
+  opacity: 0.4;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+.panel-empty h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+.panel-empty p {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.skeleton-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1.15rem;
+}
+.skel-line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  margin-bottom: 0.6rem;
+}
+.skel-line.short { width: 40%; }
+.skel-line.medium { width: 65%; }
+.skel-box {
+  height: 46px;
+  width: 46px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+   ═══════════════════════════════════════════════════ */
+.modal {
+  position: fixed; inset: 0;
+  z-index: 9997;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.modal.active { display: flex; opacity: 1; }
+.modal-card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 1.75rem 1.6rem;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
+  animation: modalPop 0.4s var(--ease-elastic);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-icon {
+  width: 60px; height: 60px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+}
+.modal-icon.success { background: rgba(16, 185, 129, 0.1); color: var(--emerald); }
+.modal-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.modal-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
+.modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.015em;
+}
+.modal-desc {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.55;
+  margin-bottom: 1.4rem;
+}
+.modal-info-block {
+  background: var(--pearl);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 0.9rem;
+  margin-bottom: 1.15rem;
+  font-size: 0.82rem;
+}
+.modal-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--line);
+  gap: 0.75rem;
+}
+.modal-info-row:last-child { border-bottom: none; }
+.modal-info-row span:first-child { color: var(--ink-soft); font-weight: 500; flex-shrink: 0; }
+.modal-info-row span:last-child { color: var(--ink); font-weight: 700; text-align: right; }
+.modal-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.15rem;
+}
+.modal-actions .btn { flex: 1; }
+
+/* Reschedule fields */
+#rescheduleFields {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px dashed var(--line);
+  display: none;
+}
+#rescheduleFields.active { display: block; }
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════ */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  pointer-events: none;
+  max-width: calc(100vw - 3rem);
+}
+.toast {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 20px 44px -8px rgba(15, 23, 42, 0.22);
+  border-left: 4px solid var(--emerald);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  min-width: 300px;
+  max-width: 400px;
+  font-size: 0.86rem;
+  animation: toastIn 0.45s var(--ease-elastic);
+  pointer-events: auto;
+}
 .toast.error { border-left-color: var(--rose); }
 .toast.info { border-left-color: var(--cyan); }
-@keyframes toastIn { from { opacity: 0; transform: translateX(120%); } to { opacity: 1; transform: translateX(0); } }
+.toast.warning { border-left-color: var(--orange); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(120%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.toast.removing { animation: toastOut 0.3s ease forwards; }
+@keyframes toastOut { to { opacity: 0; transform: translateX(120%); } }
+.toast-icon {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+.toast.error .toast-icon { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
+.toast.info .toast-icon { background: rgba(6, 182, 212, 0.1); color: var(--cyan); }
+.toast.warning .toast-icon { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.toast-content { flex: 1; min-width: 0; }
+.toast-content strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.85rem;
+  margin-bottom: 0.15rem;
+  font-weight: 700;
+}
+.toast-content span {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  display: block;
+}
 
-.sb-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 55; display: none; opacity: 0; transition: opacity 0.3s; }
-.sb-backdrop.active { display: block; opacity: 1; }
+/* ═══════════════════════════════════════════════════
+   LOADING OVERLAY
+   ═══════════════════════════════════════════════════ */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: rgba(248, 250, 252, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+.loading-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-ring {
+  width: 48px; height: 48px;
+  position: relative;
+}
+.loader-ring::before,
+.loader-ring::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+}
+.loader-ring::before {
+  border-top-color: var(--teal);
+  border-right-color: var(--teal);
+  animation: spin 1s linear infinite;
+}
+.loader-ring::after {
+  inset: 8px;
+  border-bottom-color: var(--indigo);
+  animation: spin 1.4s linear infinite reverse;
+}
+.loader-text {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
 
-@media (max-width: 900px) {
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
-  .main { margin-left: 0; }
-  .tb-toggle { display: flex; }
+  .app-shell { margin-left: 0; }
+  .tb-burger { display: flex; }
+}
+@media (max-width: 640px) {
+  .main { padding: 1rem; }
+  .topbar { padding: 0.75rem 1rem; }
+  .tb-title { font-size: 1rem; }
+  .tb-sub { font-size: 0.66rem; }
+  .tab-panels { padding: 1rem; }
+  .tabs-head { padding: 0.5rem; }
+  .tab { min-width: 125px; padding: 0.7rem 0.8rem; font-size: 0.75rem; }
+  .card { padding: 1.15rem 1rem; border-radius: 18px; }
+  .appt-info { grid-template-columns: 1fr; padding: 0.7rem 0.75rem; }
+  .appt-card { padding: 1rem; }
+  .toast-container { top: 0.85rem; right: 0.85rem; left: 0.85rem; max-width: none; }
+  .toast { min-width: auto; max-width: none; }
+  .modal-card { padding: 1.4rem 1.2rem; }
 }
 </style>
 </head>
 <body>
 
-<div class="app">
+<!-- BACKGROUND -->
+<div class="bg-decor">
+  <div class="bg-orb o1"></div>
+  <div class="bg-orb o2"></div>
+</div>
 
-  <!-- ═══════════════════════════════════════════════════
-       SIDEBAR (SEMUA NAVIGASI SEBIJIK MACAM OVERVIEW)
-       ═══════════════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
-      <div class="sb-brand-text">
-        <strong id="sbBrandName">e-MindCare</strong>
-        <span>Dashboard Kaunselor</span>
-      </div>
+<!-- ═══════ SIDEBAR ═══════ -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Brand -->
+  <div class="sb-brand">
+    <div class="sb-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
+    <div class="sb-brand-text">
+      <strong id="sbBrandName">e-MindCare</strong>
+      <span>Dashboard Kaunselor</span>
+    </div>
+  </div>
+
+  <!-- Profile -->
+  <a href="dashboard-profile.html" class="sb-profile">
+    <div class="sb-avatar" id="sbAvatar">K</div>
+    <div class="sb-profile-info">
+      <span class="sb-profile-name" id="sbProfileName">Kaunselor</span>
+      <span class="sb-profile-role">Kaunselor UBK</span>
+    </div>
+    <i class="fas fa-chevron-right sb-profile-chevron"></i>
+  </a>
+
+  <!-- Menu -->
+  <div class="sb-menu-wrap">
+    <div class="sb-section">
+      <div class="sb-section-title">Utama</div>
+      <ul class="sb-menu">
+        <li><a href="dashboard-kaunselor.html" class="sb-item"><i class="fas fa-th-large"></i> <span>Overview</span></a></li>
+        <li><a href="dashboard-profile.html" class="sb-item"><i class="fas fa-user-circle"></i> <span>Profil Kaunselor</span></a></li>
+      </ul>
     </div>
 
-    <a href="dashboard-profile.html" class="sb-profile">
-      <div class="sb-avatar" id="sbAvatar">K</div>
-      <div class="sb-profile-info">
-        <strong id="sbProfileName">Kaunselor</strong>
-        <span>Kaunselor UBK</span>
-      </div>
-    </a>
+    <div class="sb-section">
+      <div class="sb-section-title">Kandungan Laman</div>
+      <ul class="sb-menu">
+        <li><a href="dashboard-announcements.html" class="sb-item"><i class="fas fa-bullhorn"></i> <span>Pengumuman</span></a></li>
+        <li><a href="dashboard-banners.html" class="sb-item"><i class="fas fa-images"></i> <span>Banner Iklan</span></a></li>
+        <li><a href="dashboard-collaborations.html" class="sb-item"><i class="fas fa-handshake"></i> <span>Kolaborasi</span></a></li>
+        <li><a href="dashboard-landing.html" class="sb-item"><i class="fas fa-edit"></i> <span>Sunting Laman</span></a></li>
+        <li><a href="dashboard-gallery.html" class="sb-item"><i class="fas fa-photo-video"></i> <span>Galeri UBK</span></a></li>
+        <li><a href="dashboard-contact.html" class="sb-item"><i class="fas fa-address-book"></i> <span>Hubungi &amp; Lokasi</span></a></li>
+      </ul>
+    </div>
 
-    <nav class="sb-menu">
-      <div class="sb-section-label">Utama</div>
-      <a href="dashboard-kaunselor.html" class="sb-item">
-        <i class="fas fa-chart-pie"></i>
-        <span>Overview</span>
-      </a>
-      <a href="dashboard-profile.html" class="sb-item">
-        <i class="fas fa-user-circle"></i>
-        <span>Profil Kaunselor</span>
-      </a>
+    <div class="sb-section">
+      <div class="sb-section-title">Pengurusan</div>
+      <ul class="sb-menu">
+        <li><a href="dashboard-inventories.html" class="sb-item"><i class="fas fa-clipboard-list"></i> <span>Ujian Inventori</span></a></li>
+        <li><a href="dashboard-users.html" class="sb-item"><i class="fas fa-users-cog"></i> <span>Urus Pengguna</span></a></li>
+        <li>
+          <a href="dashboard-appointments.html" class="sb-item active">
+            <i class="fas fa-calendar-check"></i>
+            <span>Tempahan Kaunseling</span>
+            <span class="sb-item-badge hidden" id="pendingBadge">0</span>
+          </a>
+        </li>
+        <li><a href="dashboard-diaries.html" class="sb-item"><i class="fas fa-book"></i> <span>Diari &amp; Catatan</span></a></li>
+      </ul>
+    </div>
 
-      <div class="sb-section-label">Kandungan Laman</div>
-      <a href="dashboard-announcements.html" class="sb-item">
-        <i class="fas fa-bullhorn"></i>
-        <span>Pengumuman</span>
-      </a>
-      <a href="dashboard-banners.html" class="sb-item">
-        <i class="fas fa-images"></i>
-        <span>Banner Iklan</span>
-      </a>
-      <a href="dashboard-collaborations.html" class="sb-item">
-        <i class="fas fa-handshake"></i>
-        <span>Kolaborasi</span>
-      </a>
-      <a href="dashboard-landing.html" class="sb-item">
-        <i class="fas fa-paint-brush"></i>
-        <span>Sunting Laman</span>
-      </a>
-      <a href="dashboard-gallery.html" class="sb-item">
-        <i class="fas fa-photo-video"></i>
-        <span>Galeri UBK</span>
-      </a>
-      <a href="dashboard-contact.html" class="sb-item">
-        <i class="fas fa-address-book"></i>
-        <span>Hubungi & Lokasi</span>
-      </a>
+    <div class="sb-section">
+      <div class="sb-section-title">Analitik</div>
+      <ul class="sb-menu">
+        <li><a href="dashboard-analytics.html" class="sb-item"><i class="fas fa-chart-line"></i> <span>Data &amp; Laporan</span></a></li>
+      </ul>
+    </div>
+  </div>
 
-      <div class="sb-section-label">Pengurusan</div>
-      <a href="dashboard-inventories.html" class="sb-item">
-        <i class="fas fa-clipboard-list"></i>
-        <span>Ujian Inventori</span>
-      </a>
-      <a href="dashboard-users.html" class="sb-item">
-        <i class="fas fa-users"></i>
-        <span>Urus Pengguna</span>
-      </a>
-      <a href="dashboard-appointments.html" class="sb-item active">
-        <i class="fas fa-calendar-check"></i>
-        <span>Tempahan Kaunseling</span>
-        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
-      </a>
-      <a href="dashboard-diaries.html" class="sb-item">
-        <i class="fas fa-book"></i>
-        <span>Diari & Catatan</span>
-      </a>
+  <!-- Footer -->
+  <div class="sb-footer">
+    <button class="sb-logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Log Keluar</span>
+    </button>
+  </div>
+</aside>
 
-      <div class="sb-section-label">Analitik</div>
-      <a href="dashboard-analytics.html" class="sb-item">
-        <i class="fas fa-chart-line"></i>
-        <span>Data & Laporan</span>
-      </a>
-    </nav>
+<div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
 
-    <div class="sb-footer">
-      <button class="sb-footer-btn" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Log Keluar</span>
+<!-- ═══════ APP SHELL ═══════ -->
+<div class="app-shell">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <button class="tb-burger" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="tb-title-wrap">
+      <div class="tb-title">Tempahan Kaunseling</div>
+      <div class="tb-sub">Urus jadual, blocked dates, dan permohonan sesi pelajar.</div>
+    </div>
+    <div class="tb-actions">
+      <a href="index.html" class="tb-icon-btn" title="Laman Utama">
+        <i class="fas fa-home"></i>
+      </a>
+      <button class="tb-icon-btn" id="refreshBtn" onclick="refreshAll()" title="Refresh">
+        <i class="fas fa-sync-alt"></i>
       </button>
     </div>
-  </aside>
-  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
+  </header>
 
-  <!-- ═══════════════════════════════════════════════════
-       MAIN CONTENT
-       ═══════════════════════════════════════════════════ -->
-  <div class="main">
+  <!-- Main -->
+  <main class="main">
 
-    <header class="topbar">
-      <button class="tb-toggle" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-      </button>
-      <div class="tb-title">
-        <h1>Tempahan Kaunseling</h1>
-        <p>Urus jadual, blocked dates, dan permohonan sesi pelajar.</p>
-      </div>
-      <div class="tb-actions">
-        <a href="index.html" class="tb-icon-btn" title="Laman Utama" target="_blank">
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-        <button class="tb-icon-btn" onclick="refreshAll()" title="Refresh">
-          <i class="fas fa-sync-alt"></i>
-        </button>
-      </div>
-    </header>
+    <!-- ═══ SETTINGS GRID ═══ -->
+    <div class="settings-grid">
 
-    <main class="content">
-
-      <!-- SETTINGS ROW -->
-      <div class="grid-2">
-        <!-- BLOCK DATES -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-calendar-times"></i> Cuti & Blocked Dates</h2>
+      <!-- ═══ CARD 1: Blocked Dates ═══ -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon"><i class="fas fa-calendar-times"></i></div>
+          <div class="card-head-text">
+            <h2>Cuti &amp; Blocked Dates</h2>
+            <p>Tetapkan tarikh yang tidak boleh ditempah</p>
           </div>
-          <form id="formBlockDate">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
-              <div class="form-group">
-                <label class="form-label">Tarikh</label>
-                <input type="date" id="blockDateInput" class="form-control" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Jenis Block</label>
-                <select id="blockTypeSelect" class="form-control" required>
-                  <option value="red">🔴 Merah (Cuti Umum)</option>
-                  <option value="yellow">🟨 Kuning (Tidak Available)</option>
+        </div>
+
+        <form id="formBlockDate">
+          <div class="form-group">
+            <label class="form-label" for="blockDateInput">
+              <i class="fas fa-calendar"></i>
+              Tarikh <span class="req">*</span>
+            </label>
+            <input type="date" id="blockDateInput" class="input" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="blockTypeSelect">
+                <i class="fas fa-tag"></i>
+                Jenis Block <span class="req">*</span>
+              </label>
+              <div class="select-wrap">
+                <select id="blockTypeSelect" class="select">
+                  <option value="red">🔴 Merah - Cuti Umum</option>
+                  <option value="amber">🟨 Kuning - Tidak Available</option>
                 </select>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Catatan / Sebab</label>
-              <input type="text" id="blockReasonInput" class="form-control" placeholder="Contoh: Kursus Kaunseling Daerah" required>
-            </div>
-            <button type="submit" class="btn btn-dark" style="width:100%;"><i class="fas fa-plus-circle"></i> Simpan Block Date</button>
-          </form>
 
-          <div style="margin-top:1.5rem;">
-            <label class="form-label">Senarai Blocked Dates Aktif</label>
-            <div id="blockedDatesList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:160px; overflow-y:auto;"></div>
+            <div class="form-group">
+              <label class="form-label" for="blockReasonInput">
+                <i class="fas fa-comment-alt"></i>
+                Catatan <span class="req">*</span>
+              </label>
+              <input type="text" id="blockReasonInput" class="input" placeholder="Cth: Kursus Daerah" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" id="saveBlockBtn">
+            <i class="fas fa-plus"></i>
+            <span>Simpan Block Date</span>
+          </button>
+        </form>
+
+        <div class="blocked-list-wrap">
+          <div class="blocked-list-title">
+            <i class="fas fa-list"></i>
+            Senarai Tarikh Block
+            <span class="count-badge" id="blockedCount">0</span>
+          </div>
+          <div class="blocked-list" id="blockedDatesList">
+            <div class="blocked-empty">
+              <i class="fas fa-inbox"></i>
+              Belum ada tarikh block
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CARD 2: Schedule Settings ═══ -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon"><i class="fas fa-clock"></i></div>
+          <div class="card-head-text">
+            <h2>Waktu Operasi &amp; Sesi</h2>
+            <p>Tetapkan waktu beroperasi kaunselor</p>
           </div>
         </div>
 
-        <!-- SCHEDULE SETTINGS -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-clock"></i> Waktu Operasi & Masa Sesi</h2>
-          </div>
-          <form id="formScheduleSettings">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
-              <div class="form-group">
-                <label class="form-label">Masa Mula</label>
-                <input type="time" id="startTimeInput" value="08:00" class="form-control" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Masa Tamat</label>
-                <input type="time" id="endTimeInput" value="14:00" class="form-control" required>
-              </div>
-            </div>
+        <form id="formScheduleSettings">
+          <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Sela Masa Per Sesi</label>
-              <select id="slotIntervalSelect" class="form-control">
-                <option value="30">30 Minit</option>
-                <option value="60" selected>1 Jam (60 Minit)</option>
+              <label class="form-label" for="startTimeInput">
+                <i class="fas fa-play"></i>
+                Masa Mula <span class="req">*</span>
+              </label>
+              <input type="time" id="startTimeInput" class="input" value="08:00" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="endTimeInput">
+                <i class="fas fa-stop"></i>
+                Masa Tamat <span class="req">*</span>
+              </label>
+              <input type="time" id="endTimeInput" class="input" value="14:00" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="slotIntervalSelect">
+              <i class="fas fa-hourglass-half"></i>
+              Sela Masa Sesi <span class="req">*</span>
+            </label>
+            <div class="select-wrap">
+              <select id="slotIntervalSelect" class="select">
+                <option value="15">15 minit</option>
+                <option value="30" selected>30 minit</option>
+                <option value="45">45 minit</option>
+                <option value="60">1 jam</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label">Hari Operasi</label>
-              <div style="display:flex; flex-wrap:wrap; gap:0.6rem; font-size:0.8rem; font-weight:600;">
-                <label><input type="checkbox" name="workDays" value="1" checked> Isnin</label>
-                <label><input type="checkbox" name="workDays" value="2" checked> Selasa</label>
-                <label><input type="checkbox" name="workDays" value="3" checked> Rabu</label>
-                <label><input type="checkbox" name="workDays" value="4" checked> Khamis</label>
-                <label><input type="checkbox" name="workDays" value="5" checked> Jumaat</label>
-              </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-calendar-day"></i>
+              Hari Beroperasi <span class="req">*</span>
+            </label>
+            <div class="days-grid" id="workDaysGrid">
+              <button type="button" class="day-chip" data-day="1">Isn</button>
+              <button type="button" class="day-chip" data-day="2">Sel</button>
+              <button type="button" class="day-chip" data-day="3">Rab</button>
+              <button type="button" class="day-chip" data-day="4">Kha</button>
+              <button type="button" class="day-chip" data-day="5">Jum</button>
+              <button type="button" class="day-chip" data-day="6">Sab</button>
+              <button type="button" class="day-chip" data-day="0">Ahd</button>
             </div>
-            <button type="submit" class="btn btn-teal" style="width:100%;"><i class="fas fa-save"></i> Simpan Tetapan Operasi</button>
-          </form>
-        </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" id="saveScheduleBtn">
+            <i class="fas fa-save"></i>
+            <span>Simpan Tetapan Operasi</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═══ TAB PANEL ═══ -->
+    <div class="tabs-wrap">
+
+      <div class="tabs-head">
+        <button class="tab active" id="tabPendingBtn" data-tab="pending" onclick="switchTab('pending')">
+          <i class="fas fa-clock"></i>
+          <span>1. Permohonan Baru</span>
+          <span class="tab-badge" id="tabBadgePending">0</span>
+        </button>
+
+        <button class="tab" id="tabActiveBtn" data-tab="active" onclick="switchTab('active')">
+          <i class="fas fa-calendar-check"></i>
+          <span>2. Status Active / Approved</span>
+          <span class="tab-badge" id="tabBadgeActive">0</span>
+        </button>
+
+        <button class="tab" id="tabHistoryBtn" data-tab="history" onclick="switchTab('history')">
+          <i class="fas fa-history"></i>
+          <span>3. Rekod Selesai &amp; Batal</span>
+          <span class="tab-badge" id="tabBadgeHistory">0</span>
+        </button>
       </div>
 
-      <!-- APPOINTMENTS MANAGEMENT SECTION -->
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-list-check"></i> Permohonan Kaunseling</h2>
+      <div class="tab-panels">
+
+        <!-- Partisi 1: Pending -->
+        <div class="panel active" id="partisiPending">
+          <div class="appt-cards-grid" id="pendingList">
+            <div class="skeleton-card">
+              <div class="skel-box"></div>
+              <div class="skel-line medium"></div>
+              <div class="skel-line short"></div>
+            </div>
+            <div class="skeleton-card">
+              <div class="skel-box"></div>
+              <div class="skel-line medium"></div>
+              <div class="skel-line short"></div>
+            </div>
+          </div>
         </div>
 
-        <div class="tab-bar">
-          <button class="tab-btn active" id="tabPendingBtn" onclick="switchTab('pending')">1. Permohonan Baru</button>
-          <button class="tab-btn" id="tabActiveBtn" onclick="switchTab('active')">2. Status Active / Approved</button>
-          <button class="tab-btn" id="tabHistoryBtn" onclick="switchTab('history')">3. Rekod Selesai & Batal</button>
+        <!-- Partisi 2: Active -->
+        <div class="panel" id="partisiActive">
+          <div class="appt-cards-grid" id="activeList"></div>
         </div>
 
-        <div id="partisiPending" class="tab-content"><div id="pendingList" class="app-grid"></div></div>
-        <div id="partisiActive" class="tab-content" style="display:none;"><div id="activeList" class="app-grid"></div></div>
-        <div id="partisiHistory" class="tab-content" style="display:none;"><div id="historyList" class="app-grid"></div></div>
+        <!-- Partisi 3: History -->
+        <div class="panel" id="partisiHistory">
+          <div class="appt-cards-grid" id="historyList"></div>
+        </div>
+
       </div>
+    </div>
 
-    </main>
-  </div>
+  </main>
 </div>
 
-<!-- MODAL ACTION -->
+<!-- ═══════ ACTION MODAL ═══════ -->
 <div class="modal" id="actionModal">
   <div class="modal-card">
-    <h3 class="card-title" id="modalTitle" style="margin-bottom:0.5rem;">Tindakan Permohonan</h3>
-    <p id="modalStudentName" style="font-size:0.8rem; color:var(--ink-soft); margin-bottom:1.2rem;"></p>
+    <div class="modal-icon" id="modalIcon">
+      <i class="fas fa-question-circle"></i>
+    </div>
+    <h3 class="modal-title" id="modalTitle">Sahkan Tindakan</h3>
+    <p class="modal-desc" id="modalDesc">Sila isi butiran di bawah.</p>
+
+    <!-- Hidden fields -->
     <input type="hidden" id="modalAppointmentId">
     <input type="hidden" id="modalActionType">
 
-    <div id="rescheduleFields" style="display:none;" class="form-group">
-      <div class="form-group">
-        <label class="form-label">Tarikh Baharu</label>
-        <input type="date" id="modalNewDate" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Slot Masa Baharu</label>
-        <input type="time" id="modalNewTime" class="form-control">
+    <!-- Reschedule fields (hidden by default) -->
+    <div id="rescheduleFields">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="modalNewDate">
+            <i class="fas fa-calendar"></i>
+            Tarikh Baharu
+          </label>
+          <input type="date" id="modalNewDate" class="input">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="modalNewTime">
+            <i class="fas fa-clock"></i>
+            Masa Baharu
+          </label>
+          <input type="text" id="modalNewTime" class="input" placeholder="09:00 AM">
+        </div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Catatan / Pautan Sesi / Nota Kaunselor</label>
-      <textarea id="modalCounselorNotes" class="form-control" rows="3" placeholder="Masukkan nota atau lokasi perjumpaan..."></textarea>
+    <!-- Notes -->
+    <div class="form-group" style="margin-top:1rem;">
+      <label class="form-label" for="modalCounselorNotes">
+        <i class="fas fa-comment-dots"></i>
+        <span id="notesLabel">Catatan / Nota Kaunselor</span>
+      </label>
+      <textarea id="modalCounselorNotes" class="textarea" placeholder="Taip nota anda di sini..."></textarea>
     </div>
 
-    <div style="display:flex; justify-content:flex-end; gap:0.6rem;">
-      <button type="button" class="btn" style="background:var(--pearl);" onclick="closeActionModal()">Batal</button>
-      <button type="button" class="btn btn-teal" onclick="submitModalAction()">Sahkan</button>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeActionModal()">
+        <i class="fas fa-times"></i>
+        Batal
+      </button>
+      <button class="btn btn-primary" id="modalConfirmBtn" onclick="submitModalAction()">
+        <i class="fas fa-check"></i>
+        <span>Sahkan</span>
+      </button>
     </div>
   </div>
 </div>
 
+<!-- ═══════ LOADING OVERLAY ═══════ -->
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="loader-ring"></div>
+  <div class="loader-text" id="loadingText">Memuatkan...</div>
+</div>
+
+<!-- ═══════ TOAST ═══════ -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script type="module" src="dashboard-appointments.js"></script>
+
 </body>
 </html>
