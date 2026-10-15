@@ -1,9 +1,20 @@
 /* ═══════════════════════════════════════════════════════════════
    e-MindCare · Dashboard Appointments (Kaunselor)
    Logik: Setup blocked dates + schedule + urus permohonan
+   VERSION: 2.1 FIXED
    ═══════════════════════════════════════════════════════════════ */
 
 import './config.js';
+
+/* ═══════════════════════════════════════════════════════════════
+   DEBUG HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+const DEBUG = true;
+function log(...args) { if (DEBUG) console.log('[Appt]', ...args); }
+function warn(...args) { if (DEBUG) console.warn('[Appt]', ...args); }
+function err(...args) { console.error('[Appt]', ...args); }
+
+log('✅ dashboard-appointments.js LOADED');
 
 /* ═══════════════════════════════════════════════════════════════
    CONSTANTS
@@ -17,7 +28,6 @@ const APPOINTMENTS_COLLECTION = 'appointments';
 const MONTHS_SHORT = ['JAN', 'FEB', 'MAC', 'APR', 'MEI', 'JUN', 'JUL', 'OGO', 'SEP', 'OKT', 'NOV', 'DIS'];
 const MONTHS_FULL = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
   'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
-const DAYS_MS = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
 
 /* ═══════════════════════════════════════════════════════════════
    STATE
@@ -37,42 +47,79 @@ let appointments = {
 };
 let currentTab = 'pending';
 let unsubAppointments = null;
+let emindcare = null;
 
 /* ═══════════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('load', async () => {
+  log('📄 Window loaded — starting init...');
+
   try {
-    await waitForEMindCare();
-    if (!authGuard()) return;
-    applyBranding();
+    // Step 1: Wait for EMindCare global
+    emindcare = await waitForEMindCare();
+    log('✅ EMindCare available:', Object.keys(emindcare));
+
+    // Step 2: Auth Guard
+    if (!authGuard()) {
+      log('❌ Auth guard failed — redirecting');
+      return;
+    }
+    log('✅ Auth OK — user:', currentUser.fullName, 'role:', currentUser.role);
+
+    // Step 3: Apply branding (non-blocking)
+    applyBranding().catch(e => warn('Branding failed:', e.message));
+
+    // Step 4: Populate profile
     populateProfile();
 
+    // Step 5: Setup UI
     initBlockDateDefault();
     bindEvents();
     bindDayChips();
+    log('✅ Events bound');
 
-    await Promise.all([
+    // Step 6: Load data (non-blocking, error tolerant)
+    await Promise.allSettled([
       loadScheduleSettings(),
       loadBlockedDates()
     ]);
+    log('✅ Data loaded');
 
-    // Real-time listener untuk appointments
+    // Step 7: Setup real-time appointments
     setupAppointmentsListener();
+    log('✅ Appointments listener active');
 
-  } catch (err) {
-    console.error('Init error:', err);
-    showToast('Ralat Sistem', 'Gagal memuatkan halaman: ' + err.message, 'error');
+    log('🎉 INIT COMPLETE');
+
+  } catch (e) {
+    err('💥 INIT FAILED:', e);
+    showToast('Ralat Sistem', 'Gagal memuatkan halaman: ' + e.message, 'error');
   }
 });
 
+/* ═══════════════════════════════════════════════════════════════
+   WAIT FOR EMindCare
+   ═══════════════════════════════════════════════════════════════ */
 function waitForEMindCare() {
   return new Promise((resolve, reject) => {
-    if (window.EMindCare) return resolve();
+    if (window.EMindCare) {
+      log('EMindCare already available');
+      return resolve(window.EMindCare);
+    }
+    log('⏳ Waiting for EMindCare...');
     let tries = 0;
-    const t = setInterval(() => {
-      if (window.EMindCare) { clearInterval(t); resolve(); }
-      else if (++tries > 100) { clearInterval(t); reject(new Error('SDK timeout')); }
+    const timer = setInterval(() => {
+      tries++;
+      if (window.EMindCare) {
+        clearInterval(timer);
+        log(`EMindCare loaded after ${tries} tries`);
+        resolve(window.EMindCare);
+      } else if (tries > 100) {
+        clearInterval(timer);
+        err('EMindCare TIMEOUT — config.js not loaded!');
+        reject(new Error('Firebase SDK timeout — pastikan config.js wujud dan guna Live Server'));
+      }
     }, 50);
   });
 }
@@ -81,19 +128,37 @@ function waitForEMindCare() {
    AUTH GUARD
    ═══════════════════════════════════════════════════════════════ */
 function authGuard() {
-  const raw = localStorage.getItem(SESSION_KEY);
-  if (!raw) { window.location.href = 'login.html'; return false; }
+  log('🔐 Checking auth...');
+
+  let raw = null;
+  try {
+    raw = localStorage.getItem(SESSION_KEY);
+  } catch (e) {
+    err('localStorage error:', e.message);
+  }
+
+  if (!raw) {
+    warn('No session found — redirecting to login');
+    window.location.href = 'login.html';
+    return false;
+  }
+
   try {
     const session = JSON.parse(raw);
+    log('Session:', { name: session.fullName, role: session.role });
+
     if (session.role !== 'kaunselor') {
+      warn('Role not kaunselor:', session.role);
       const redirects = { murid: 'dashboard-murid.html', guru: 'dashboard-guru.html' };
       window.location.href = redirects[session.role] || 'login.html';
       return false;
     }
+
     currentUser = session;
     return true;
   } catch (e) {
-    localStorage.removeItem(SESSION_KEY);
+    err('Session parse error:', e.message);
+    try { localStorage.removeItem(SESSION_KEY); } catch {}
     window.location.href = 'login.html';
     return false;
   }
@@ -105,12 +170,20 @@ function authGuard() {
 function populateProfile() {
   if (!currentUser) return;
   const name = currentUser.fullName || 'Kaunselor';
-  document.getElementById('sbProfileName').textContent = name;
-  document.getElementById('sbAvatar').textContent = name.charAt(0).toUpperCase();
-  if (currentUser.avatarUrl) {
-    document.getElementById('sbAvatar').innerHTML =
-      `<img src="${currentUser.avatarUrl}" alt="${escapeHtml(name)}">`;
+
+  const nameEl = document.getElementById('sbProfileName');
+  const avatarEl = document.getElementById('sbAvatar');
+
+  if (nameEl) nameEl.textContent = name;
+  if (avatarEl) {
+    if (currentUser.avatarUrl) {
+      avatarEl.innerHTML = `<img src="${currentUser.avatarUrl}" alt="${escapeHtml(name)}">`;
+    } else {
+      avatarEl.textContent = name.charAt(0).toUpperCase();
+    }
   }
+
+  log('✅ Profile populated:', name);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -118,29 +191,38 @@ function populateProfile() {
    ═══════════════════════════════════════════════════════════════ */
 async function applyBranding() {
   try {
-    const cfg = await window.EMindCare.getSiteConfig();
+    const cfg = await emindcare.getSiteConfig();
     if (!cfg?.branding) return;
     const b = cfg.branding;
+
     if (b.name) {
-      document.getElementById('sbBrandName').textContent = b.name;
+      const el = document.getElementById('sbBrandName');
+      if (el) el.textContent = b.name;
       document.title = 'Tempahan Kaunseling · ' + b.name;
     }
     if (b.logoUrl) {
-      document.getElementById('sbLogo').innerHTML = `<img src="${b.logoUrl}" alt="">`;
+      const el = document.getElementById('sbLogo');
+      if (el) el.innerHTML = `<img src="${b.logoUrl}" alt="">`;
     } else if (b.logoIcon) {
-      document.getElementById('sbLogo').innerHTML = `<i class="${b.logoIcon}"></i>`;
+      const el = document.getElementById('sbLogo');
+      if (el) el.innerHTML = `<i class="${b.logoIcon}"></i>`;
     }
     if (b.primaryColor) document.documentElement.style.setProperty('--teal', b.primaryColor);
     if (b.accentColor) document.documentElement.style.setProperty('--indigo', b.accentColor);
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    warn('Branding error:', e.message);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SIDEBAR TOGGLE
+   SIDEBAR TOGGLE — GLOBAL
    ═══════════════════════════════════════════════════════════════ */
 window.toggleSidebar = function() {
+  log('🔄 Toggle sidebar');
   const sb = document.getElementById('sidebar');
   const bd = document.getElementById('sbBackdrop');
+  if (!sb || !bd) return;
+
   const isOpen = sb.classList.contains('open');
   if (isOpen) {
     sb.classList.remove('open');
@@ -154,47 +236,55 @@ window.toggleSidebar = function() {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   LOGOUT
+   LOGOUT — GLOBAL
    ═══════════════════════════════════════════════════════════════ */
 window.logout = function() {
-  localStorage.removeItem(SESSION_KEY);
-  sessionStorage.removeItem(SESSION_KEY);
+  log('👋 Logging out');
+  try {
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
+  } catch (e) {}
   window.location.href = 'login.html';
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   REFRESH
+   REFRESH ALL — GLOBAL
    ═══════════════════════════════════════════════════════════════ */
 window.refreshAll = async function() {
+  log('🔄 Refresh all');
   const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
+  if (btn) btn.classList.add('spinning');
+
   try {
-    await Promise.all([
+    await Promise.allSettled([
       loadScheduleSettings(),
-      loadBlockedDates(),
-      reloadAppointmentsOnce()
+      loadBlockedDates()
     ]);
+    renderPanels();
     showToast('Berjaya', 'Data telah dikemas kini.', 'success', 2500);
-  } catch (err) {
-    showToast('Ralat', 'Gagal refresh: ' + err.message, 'error');
+  } catch (e) {
+    showToast('Ralat', 'Gagal refresh: ' + e.message, 'error');
   } finally {
-    setTimeout(() => btn.classList.remove('spinning'), 600);
+    setTimeout(() => { if (btn) btn.classList.remove('spinning'); }, 600);
   }
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   TAB SWITCHER
+   TAB SWITCHER — GLOBAL
    ═══════════════════════════════════════════════════════════════ */
 window.switchTab = function(tabName) {
+  log('📑 Switch tab:', tabName);
   currentTab = tabName;
 
-  // Update active tab class
+  // Update tab buttons
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab' + capitalize(tabName) + 'Btn')?.classList.add('active');
+  const tabBtn = document.getElementById('tab' + capitalize(tabName) + 'Btn');
+  if (tabBtn) tabBtn.classList.add('active');
 
-  // Update panel visible
+  // Update panels
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('partisi' + capitalize(tabName))?.classList.add('active');
+  const panel = document.getElementById('partisi' + capitalize(tabName));
+  if (panel) panel.classList.add('active');
 
   renderPanels();
 };
@@ -207,26 +297,54 @@ function capitalize(str) {
    BIND EVENTS
    ═══════════════════════════════════════════════════════════════ */
 function bindEvents() {
-  document.getElementById('formBlockDate').addEventListener('submit', handleAddBlockDate);
-  document.getElementById('formScheduleSettings').addEventListener('submit', handleSaveSchedule);
+  log('🔗 Binding events...');
 
-  // Close modal when clicking backdrop
-  document.getElementById('actionModal').addEventListener('click', (e) => {
-    if (e.target.id === 'actionModal') closeActionModal();
-  });
+  // Form: Block Date
+  const formBlock = document.getElementById('formBlockDate');
+  if (formBlock) {
+    formBlock.addEventListener('submit', handleAddBlockDate);
+    log('  ✅ formBlockDate bound');
+  } else {
+    warn('  ⚠️ formBlockDate NOT FOUND');
+  }
 
-  // ESC closes modal
+  // Form: Schedule
+  const formSched = document.getElementById('formScheduleSettings');
+  if (formSched) {
+    formSched.addEventListener('submit', handleSaveSchedule);
+    log('  ✅ formScheduleSettings bound');
+  } else {
+    warn('  ⚠️ formScheduleSettings NOT FOUND');
+  }
+
+  // Modal backdrop
+  const modal = document.getElementById('actionModal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target.id === 'actionModal') closeActionModal();
+    });
+    log('  ✅ modal bound');
+  }
+
+  // ESC to close modal
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeActionModal();
   });
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   DAY CHIPS
+   ═══════════════════════════════════════════════════════════════ */
 function bindDayChips() {
   const chips = document.querySelectorAll('#workDaysGrid .day-chip');
+  log(`🔘 Binding ${chips.length} day chips`);
   chips.forEach(chip => {
     const d = parseInt(chip.dataset.day);
-    if (scheduleSettings.days.includes(d)) chip.classList.add('selected');
-    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    chip.classList.toggle('selected', scheduleSettings.days.includes(d));
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('selected');
+      log(`  Day ${d} toggled:`, chip.classList.contains('selected'));
+    });
   });
 }
 
@@ -234,37 +352,44 @@ function bindDayChips() {
    BLOCKED DATES
    ═══════════════════════════════════════════════════════════════ */
 function initBlockDateDefault() {
+  const input = document.getElementById('blockDateInput');
+  if (!input) return;
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  document.getElementById('blockDateInput').value = toDateStr(tomorrow);
+  input.value = toDateStr(tomorrow);
 }
 
 async function loadBlockedDates() {
+  log('📥 Loading blocked dates...');
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const snap = await fs.getDocs(fs.collection(db, BLOCKED_COLLECTION));
     blockedDates = [];
     snap.forEach(d => blockedDates.push({ id: d.id, ...d.data() }));
     blockedDates.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     renderBlockedDates();
-  } catch (err) {
-    console.warn('Blocked dates error:', err);
+    log(`✅ Loaded ${blockedDates.length} blocked dates`);
+  } catch (e) {
+    warn('Blocked dates error:', e.message);
   }
 }
 
 async function handleAddBlockDate(e) {
   e.preventDefault();
+  log('➕ Adding block date');
+
   const date = document.getElementById('blockDateInput').value;
   const type = document.getElementById('blockTypeSelect').value;
   const note = document.getElementById('blockReasonInput').value.trim();
 
   if (!date || !note) {
-    return showToast('Ralat', 'Sila isi semua medan.', 'error');
+    showToast('Ralat', 'Sila isi semua medan.', 'error');
+    return;
   }
 
-  // Check duplicate
   if (blockedDates.some(b => b.date === date)) {
-    return showToast('Ralat', 'Tarikh ini sudah di-block.', 'warning');
+    showToast('Ralat', 'Tarikh ini sudah di-block.', 'warning');
+    return;
   }
 
   const btn = document.getElementById('saveBlockBtn');
@@ -273,10 +398,12 @@ async function handleAddBlockDate(e) {
   btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
 
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const ref = fs.doc(fs.collection(db, BLOCKED_COLLECTION));
     await fs.setDoc(ref, {
-      date, type, note,
+      date,
+      type,
+      note,
       createdBy: currentUser?.fullName || 'unknown',
       createdAt: fs.serverTimestamp()
     });
@@ -287,9 +414,11 @@ async function handleAddBlockDate(e) {
 
     document.getElementById('blockReasonInput').value = '';
     showToast('Berjaya', 'Tarikh block telah disimpan.', 'success');
-  } catch (err) {
-    console.error(err);
-    showToast('Ralat', 'Gagal simpan: ' + err.message, 'error');
+    log('✅ Block date added:', date);
+
+  } catch (e) {
+    err('Add block error:', e);
+    showToast('Ralat', 'Gagal simpan: ' + e.message, 'error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = orig;
@@ -299,7 +428,9 @@ async function handleAddBlockDate(e) {
 function renderBlockedDates() {
   const list = document.getElementById('blockedDatesList');
   const count = document.getElementById('blockedCount');
-  count.textContent = blockedDates.length;
+  if (!list) return;
+
+  if (count) count.textContent = blockedDates.length;
 
   if (blockedDates.length === 0) {
     list.innerHTML = `<div class="blocked-empty"><i class="fas fa-inbox"></i> Belum ada tarikh block</div>`;
@@ -312,7 +443,7 @@ function renderBlockedDates() {
         <div class="blocked-item-date">${formatDateFull(b.date)}</div>
         <div class="blocked-item-note">${escapeHtml(b.note || '')}</div>
       </div>
-      <button class="blocked-item-delete" onclick="deleteBlockedDate('${b.id}')" title="Padam">
+      <button type="button" class="blocked-item-delete" onclick="deleteBlockedDate('${b.id}')" title="Padam">
         <i class="fas fa-trash"></i>
       </button>
     </div>
@@ -320,15 +451,18 @@ function renderBlockedDates() {
 }
 
 window.deleteBlockedDate = async function(id) {
+  log('🗑️ Delete block date:', id);
   if (!confirm('Padam tarikh block ini?')) return;
+
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     await fs.deleteDoc(fs.doc(db, BLOCKED_COLLECTION, id));
     blockedDates = blockedDates.filter(b => b.id !== id);
     renderBlockedDates();
     showToast('Berjaya', 'Tarikh block telah dipadam.', 'success');
-  } catch (err) {
-    showToast('Ralat', 'Gagal padam: ' + err.message, 'error');
+  } catch (e) {
+    err('Delete block error:', e);
+    showToast('Ralat', 'Gagal padam: ' + e.message, 'error');
   }
 };
 
@@ -336,22 +470,28 @@ window.deleteBlockedDate = async function(id) {
    SCHEDULE SETTINGS
    ═══════════════════════════════════════════════════════════════ */
 async function loadScheduleSettings() {
+  log('📥 Loading schedule settings...');
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const snap = await fs.getDoc(fs.doc(db, SCHEDULE_COLLECTION, SCHEDULE_DOC_ID));
     if (snap.exists()) {
       scheduleSettings = { ...scheduleSettings, ...snap.data() };
     }
     applyScheduleToForm();
-  } catch (err) {
-    console.warn('Schedule error:', err);
+    log('✅ Schedule loaded:', scheduleSettings);
+  } catch (e) {
+    warn('Schedule error:', e.message);
   }
 }
 
 function applyScheduleToForm() {
-  document.getElementById('startTimeInput').value = scheduleSettings.startTime || '08:00';
-  document.getElementById('endTimeInput').value = scheduleSettings.endTime || '14:00';
-  document.getElementById('slotIntervalSelect').value = scheduleSettings.slotMinutes || 30;
+  const startEl = document.getElementById('startTimeInput');
+  const endEl = document.getElementById('endTimeInput');
+  const slotEl = document.getElementById('slotIntervalSelect');
+
+  if (startEl) startEl.value = scheduleSettings.startTime || '08:00';
+  if (endEl) endEl.value = scheduleSettings.endTime || '14:00';
+  if (slotEl) slotEl.value = scheduleSettings.slotMinutes || 30;
 
   document.querySelectorAll('#workDaysGrid .day-chip').forEach(chip => {
     const d = parseInt(chip.dataset.day);
@@ -361,6 +501,8 @@ function applyScheduleToForm() {
 
 async function handleSaveSchedule(e) {
   e.preventDefault();
+  log('💾 Saving schedule settings');
+
   const startTime = document.getElementById('startTimeInput').value;
   const endTime = document.getElementById('endTimeInput').value;
   const slotMinutes = parseInt(document.getElementById('slotIntervalSelect').value);
@@ -368,10 +510,12 @@ async function handleSaveSchedule(e) {
     .map(c => parseInt(c.dataset.day));
 
   if (startTime >= endTime) {
-    return showToast('Ralat', 'Masa tamat mesti selepas masa mula.', 'error');
+    showToast('Ralat', 'Masa tamat mesti selepas masa mula.', 'error');
+    return;
   }
   if (!days.length) {
-    return showToast('Ralat', 'Pilih sekurang-kurangnya satu hari.', 'error');
+    showToast('Ralat', 'Pilih sekurang-kurangnya satu hari.', 'error');
+    return;
   }
 
   const btn = document.getElementById('saveScheduleBtn');
@@ -380,17 +524,21 @@ async function handleSaveSchedule(e) {
   btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
 
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     await fs.setDoc(fs.doc(db, SCHEDULE_COLLECTION, SCHEDULE_DOC_ID), {
-      startTime, endTime, slotMinutes, days,
+      startTime,
+      endTime,
+      slotMinutes,
+      days,
       updatedAt: fs.serverTimestamp(),
       updatedBy: currentUser?.fullName || 'kaunselor'
     });
     scheduleSettings = { startTime, endTime, slotMinutes, days };
     showToast('Berjaya', 'Tetapan operasi telah disimpan.', 'success');
-  } catch (err) {
-    console.error(err);
-    showToast('Ralat', 'Gagal simpan tetapan: ' + err.message, 'error');
+    log('✅ Schedule saved');
+  } catch (e) {
+    err('Save schedule error:', e);
+    showToast('Ralat', 'Gagal simpan tetapan: ' + e.message, 'error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = orig;
@@ -401,39 +549,48 @@ async function handleSaveSchedule(e) {
    REAL-TIME APPOINTMENTS LISTENER
    ═══════════════════════════════════════════════════════════════ */
 function setupAppointmentsListener() {
-  const { db, fs } = window.EMindCare;
-  if (unsubAppointments) unsubAppointments();
+  log('👂 Setting up appointments listener...');
 
-  unsubAppointments = fs.onSnapshot(
-    fs.collection(db, APPOINTMENTS_COLLECTION),
-    (snapshot) => {
-      const all = [];
-      snapshot.forEach(d => all.push({ id: d.id, ...d.data() }));
+  try {
+    const { db, fs } = emindcare;
+    if (unsubAppointments) unsubAppointments();
 
-      // Sort by createdAt desc
-      all.sort((a, b) => {
-        const at = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-        const bt = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
-        return bt - at;
-      });
+    unsubAppointments = fs.onSnapshot(
+      fs.collection(db, APPOINTMENTS_COLLECTION),
+      (snapshot) => {
+        log(`📥 Received ${snapshot.size} appointments`);
+        const all = [];
+        snapshot.forEach(d => all.push({ id: d.id, ...d.data() }));
 
-      appointments.pending = all.filter(a => a.status === 'pending');
-      appointments.active = all.filter(a => ['approved', 'deferred'].includes(a.status));
-      appointments.history = all.filter(a => ['completed', 'cancelled', 'rejected'].includes(a.status));
+        all.sort((a, b) => {
+          const at = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+          const bt = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+          return bt - at;
+        });
 
-      updateBadges();
-      renderPanels();
-    },
-    (err) => {
-      console.error('Snapshot error:', err);
-      showToast('Ralat', 'Gagal memantau data: ' + err.message, 'error');
-    }
-  );
-}
+        appointments.pending = all.filter(a => a.status === 'pending');
+        appointments.active = all.filter(a => ['approved', 'deferred'].includes(a.status));
+        appointments.history = all.filter(a => ['completed', 'cancelled', 'rejected'].includes(a.status));
 
-async function reloadAppointmentsOnce() {
-  // Snapshot already live — paksa re-render
-  renderPanels();
+        log('Status counts:', {
+          pending: appointments.pending.length,
+          active: appointments.active.length,
+          history: appointments.history.length
+        });
+
+        updateBadges();
+        renderPanels();
+      },
+      (e) => {
+        err('Snapshot error:', e);
+        showToast('Ralat', 'Gagal memantau data: ' + e.message, 'error');
+      }
+    );
+
+    log('✅ Listener active');
+  } catch (e) {
+    err('Setup listener failed:', e);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -441,13 +598,20 @@ async function reloadAppointmentsOnce() {
    ═══════════════════════════════════════════════════════════════ */
 function updateBadges() {
   const pending = appointments.pending.length;
-  document.getElementById('tabBadgePending').textContent = pending;
-  document.getElementById('tabBadgeActive').textContent = appointments.active.length;
-  document.getElementById('tabBadgeHistory').textContent = appointments.history.length;
+
+  const tabP = document.getElementById('tabBadgePending');
+  const tabA = document.getElementById('tabBadgeActive');
+  const tabH = document.getElementById('tabBadgeHistory');
+
+  if (tabP) tabP.textContent = pending;
+  if (tabA) tabA.textContent = appointments.active.length;
+  if (tabH) tabH.textContent = appointments.history.length;
 
   const sbBadge = document.getElementById('pendingBadge');
-  sbBadge.textContent = pending;
-  sbBadge.classList.toggle('hidden', pending === 0);
+  if (sbBadge) {
+    sbBadge.textContent = pending;
+    sbBadge.classList.toggle('hidden', pending === 0);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -459,13 +623,11 @@ function renderPanels() {
   renderHistoryList();
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RENDER PENDING CARDS
-   ═══════════════════════════════════════════════════════════════ */
 function renderPendingList() {
   const list = document.getElementById('pendingList');
-  const items = appointments.pending;
+  if (!list) return;
 
+  const items = appointments.pending;
   if (!items.length) {
     list.innerHTML = `
       <div class="panel-empty" style="grid-column:1/-1;">
@@ -475,17 +637,14 @@ function renderPendingList() {
       </div>`;
     return;
   }
-
   list.innerHTML = items.map((a, i) => renderApptCard(a, i, 'pending')).join('');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RENDER ACTIVE CARDS
-   ═══════════════════════════════════════════════════════════════ */
 function renderActiveList() {
   const list = document.getElementById('activeList');
-  const items = appointments.active;
+  if (!list) return;
 
+  const items = appointments.active;
   if (!items.length) {
     list.innerHTML = `
       <div class="panel-empty" style="grid-column:1/-1;">
@@ -495,17 +654,14 @@ function renderActiveList() {
       </div>`;
     return;
   }
-
   list.innerHTML = items.map((a, i) => renderApptCard(a, i, 'active')).join('');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RENDER HISTORY CARDS
-   ═══════════════════════════════════════════════════════════════ */
 function renderHistoryList() {
   const list = document.getElementById('historyList');
-  const items = appointments.history;
+  if (!list) return;
 
+  const items = appointments.history;
   if (!items.length) {
     list.innerHTML = `
       <div class="panel-empty" style="grid-column:1/-1;">
@@ -515,12 +671,11 @@ function renderHistoryList() {
       </div>`;
     return;
   }
-
   list.innerHTML = items.map((a, i) => renderApptCard(a, i, 'history')).join('');
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RENDER SINGLE APPOINTMENT CARD
+   RENDER SINGLE CARD
    ═══════════════════════════════════════════════════════════════ */
 function renderApptCard(a, index, panelType) {
   const initials = (a.studentName || 'M')
@@ -556,30 +711,26 @@ function renderApptCard(a, index, panelType) {
   };
   const urg = urgencyMap[a.urgencyLevel] || urgencyMap.low;
 
-  // Actions per panel
   let actionsHTML = '';
   if (panelType === 'pending') {
     actionsHTML = `
-      <button class="btn btn-success btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(a.studentName)}','approve')">
+      <button type="button" class="btn btn-success btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(a.studentName)}','approve')">
         <i class="fas fa-check"></i> Luluskan
       </button>
-      <button class="btn btn-warning btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(a.studentName)}','defer')">
+      <button type="button" class="btn btn-warning btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(a.studentName)}','defer')">
         <i class="fas fa-clock"></i> Tangguh
       </button>
-      <button class="btn btn-danger btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(a.studentName)}','reject')">
+      <button type="button" class="btn btn-danger btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(a.studentName)}','reject')">
         <i class="fas fa-times"></i> Tolak
       </button>`;
   } else if (panelType === 'active') {
     actionsHTML = `
-      <button class="btn btn-primary btn-sm" onclick="markCompleted('${a.id}')">
+      <button type="button" class="btn btn-primary btn-sm" onclick="markCompleted('${a.id}')">
         <i class="fas fa-check-double"></i> Tanda Selesai
       </button>
-      <button class="btn btn-danger btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(a.studentName)}','reject')">
+      <button type="button" class="btn btn-danger btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(a.studentName)}','reject')">
         <i class="fas fa-ban"></i> Batal
       </button>`;
-  } else {
-    // history — no actions, just info
-    actionsHTML = '';
   }
 
   const extraNote = a.counselorNotes
@@ -603,7 +754,7 @@ function renderApptCard(a, index, panelType) {
     : '';
 
   return `
-    <div class="appt-card" style="--status-color:${statusColors[a.status]};animation-delay:${index * 0.05}s;">
+    <div class="appt-card" style="--status-color:${statusColors[a.status] || '#4F46E5'};animation-delay:${index * 0.05}s;">
       <div class="appt-card-head">
         <div class="appt-avatar">${initials}</div>
         <div class="appt-name-block">
@@ -643,9 +794,7 @@ function renderApptCard(a, index, panelType) {
         ${extraNote}
       </div>
 
-      ${a.feelingNotes ? `
-        <div class="appt-note">${escapeHtml(a.feelingNotes)}</div>
-      ` : ''}
+      ${a.feelingNotes ? `<div class="appt-note">${escapeHtml(a.feelingNotes)}</div>` : ''}
 
       ${a.proposedDate ? `
         <div class="appt-note" style="border-left-color:var(--indigo);background:rgba(99,102,241,0.06);">
@@ -671,6 +820,8 @@ function renderApptCard(a, index, panelType) {
    ACTION MODAL
    ═══════════════════════════════════════════════════════════════ */
 window.openActionModal = function(id, studentName, action) {
+  log('🎬 Open action modal:', { id, studentName, action });
+
   const modal = document.getElementById('actionModal');
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
@@ -679,6 +830,11 @@ window.openActionModal = function(id, studentName, action) {
   const notesLabel = document.getElementById('notesLabel');
   const notesInput = document.getElementById('modalCounselorNotes');
   const confirmBtn = document.getElementById('modalConfirmBtn');
+
+  if (!modal) {
+    err('Modal not found!');
+    return;
+  }
 
   document.getElementById('modalAppointmentId').value = id;
   document.getElementById('modalActionType').value = action;
@@ -710,7 +866,6 @@ window.openActionModal = function(id, studentName, action) {
     confirmBtn.className = 'btn btn-warning';
     confirmBtn.innerHTML = '<i class="fas fa-clock"></i> <span>Tangguh</span>';
 
-    // Fill default new date with same as original
     const appt = [...appointments.pending, ...appointments.active].find(x => x.id === id);
     if (appt) {
       document.getElementById('modalNewDate').value = appt.date || '';
@@ -732,7 +887,8 @@ window.openActionModal = function(id, studentName, action) {
 };
 
 window.closeActionModal = function() {
-  document.getElementById('actionModal').classList.remove('active');
+  const modal = document.getElementById('actionModal');
+  if (modal) modal.classList.remove('active');
 };
 
 window.submitModalAction = async function() {
@@ -740,21 +896,26 @@ window.submitModalAction = async function() {
   const action = document.getElementById('modalActionType').value;
   const notes = document.getElementById('modalCounselorNotes').value.trim();
 
+  log('📤 Submit modal action:', { id, action });
+
   if (!id || !action) return;
 
   if (action === 'defer') {
     const newDate = document.getElementById('modalNewDate').value;
     const newTime = document.getElementById('modalNewTime').value.trim();
     if (!newDate || !newTime) {
-      return showToast('Ralat', 'Sila isi tarikh dan masa baharu.', 'error');
+      showToast('Ralat', 'Sila isi tarikh dan masa baharu.', 'error');
+      return;
     }
     if (!notes) {
-      return showToast('Ralat', 'Sila berikan sebab penangguhan.', 'error');
+      showToast('Ralat', 'Sila berikan sebab penangguhan.', 'error');
+      return;
     }
   }
 
-  if ((action === 'reject') && !notes) {
-    return showToast('Ralat', 'Sila berikan sebab penolakan.', 'error');
+  if (action === 'reject' && !notes) {
+    showToast('Ralat', 'Sila berikan sebab penolakan.', 'error');
+    return;
   }
 
   const btn = document.getElementById('modalConfirmBtn');
@@ -763,7 +924,7 @@ window.submitModalAction = async function() {
   btn.innerHTML = '<span class="spinner"></span> Memproses...';
 
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     const ref = fs.doc(db, APPOINTMENTS_COLLECTION, id);
 
     let updateData = {
@@ -773,15 +934,15 @@ window.submitModalAction = async function() {
 
     if (action === 'approve') {
       updateData.status = 'approved';
-      if (notes) updateData.counselorNotes = notes;
-      if (notes) updateData.location = notes;
-
+      if (notes) {
+        updateData.counselorNotes = notes;
+        updateData.location = notes;
+      }
     } else if (action === 'defer') {
       updateData.status = 'deferred';
       updateData.counselorNotes = notes;
       updateData.proposedDate = document.getElementById('modalNewDate').value;
       updateData.proposedTime = document.getElementById('modalNewTime').value.trim();
-
     } else if (action === 'reject') {
       updateData.status = 'cancelled';
       updateData.counselorNotes = notes;
@@ -797,10 +958,11 @@ window.submitModalAction = async function() {
       'Permohonan telah ditolak.',
       'success'
     );
+    log('✅ Action completed:', action);
 
-  } catch (err) {
-    console.error(err);
-    showToast('Ralat', 'Gagal memproses: ' + err.message, 'error');
+  } catch (e) {
+    err('Submit modal error:', e);
+    showToast('Ralat', 'Gagal memproses: ' + e.message, 'error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = orig;
@@ -811,19 +973,20 @@ window.submitModalAction = async function() {
    MARK COMPLETED
    ═══════════════════════════════════════════════════════════════ */
 window.markCompleted = async function(id) {
+  log('✔️ Mark completed:', id);
   if (!confirm('Tandakan sesi ini sebagai SELESAI?')) return;
 
   try {
-    const { db, fs } = window.EMindCare;
+    const { db, fs } = emindcare;
     await fs.updateDoc(fs.doc(db, APPOINTMENTS_COLLECTION, id), {
       status: 'completed',
       completedAt: fs.serverTimestamp(),
       completedBy: currentUser?.fullName || 'kaunselor'
     });
     showToast('Berjaya', 'Sesi telah ditandakan selesai.', 'success');
-  } catch (err) {
-    console.error(err);
-    showToast('Ralat', 'Gagal kemas kini: ' + err.message, 'error');
+  } catch (e) {
+    err('Mark completed error:', e);
+    showToast('Ralat', 'Gagal kemas kini: ' + e.message, 'error');
   }
 };
 
@@ -832,6 +995,8 @@ window.markCompleted = async function(id) {
    ═══════════════════════════════════════════════════════════════ */
 function showToast(title, message, type = 'success', duration = 4000) {
   const container = document.getElementById('toastContainer');
+  if (!container) return;
+
   const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
@@ -897,8 +1062,17 @@ function escapeAttr(str) {
   return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   CLEANUP
+   ═══════════════════════════════════════════════════════════════ */
+window.addEventListener('beforeunload', () => {
+  if (unsubAppointments) {
+    try { unsubAppointments(); } catch (e) {}
+  }
+});
+
 console.log(
-  "%c 📋 Dashboard Appointments ",
+  "%c 📋 Dashboard Appointments v2.1 FIXED ",
   "background:linear-gradient(135deg,#0F172A,#0F766E,#4F46E5);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
 );
-console.log("Ready · Kaunselor v2.0");
+log('🎯 Ready — check console for debug logs');
