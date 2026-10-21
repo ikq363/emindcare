@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
-   e-MindCare · Galeri UBK Public Script (v2)
-   1 kad = 1 album dengan slideshow auto-rotate
+   e-MindCare · Galeri UBK Public Script (v3)
+   + Preloader animation
+   + Announcement bar (running text)
    ═══════════════════════════════════════════════════════════════ */
 
 import './config.js';
@@ -9,6 +10,9 @@ import './config.js';
    CONSTANTS
    ═══════════════════════════════════════════════════════════════ */
 const COLLECTION = 'gallery';
+const ANNOUNCEMENTS_COLLECTION = 'announcements';
+const MIN_PRELOADER_TIME = 1800; // ms minimum tunjuk preloader
+
 const CATEGORY_CLASS = {
   'Program UBK': 'cat-program-ubk',
   'Lawatan Kerjaya': 'cat-lawatan-kerjaya',
@@ -33,19 +37,30 @@ let activeCategory = 'all';
 let searchTerm = '';
 let slideshowTimers = [];
 
-// Lightbox state
 let lightboxImages = [];
 let lightboxImageIndex = 0;
 let lightboxCurrentAlbum = null;
+
+let preloaderStartTime = Date.now();
 
 /* ═══════════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('load', async () => {
-  await waitForEMindCare();
+  initPreloader();
+
+  try {
+    await waitForEMindCare();
+  } catch (e) {
+    console.warn('EMindCare not available:', e.message);
+  }
+
   initUI();
   applyBranding();
+  loadAnnouncements();
   await loadGallery();
+
+  hidePreloaderWhenReady();
 });
 
 function waitForEMindCare() {
@@ -61,9 +76,104 @@ function waitForEMindCare() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   🎬 PRELOADER
+   ═══════════════════════════════════════════════════════════════ */
+function initPreloader() {
+  preloaderStartTime = Date.now();
+  animatePreloaderPercent();
+}
+
+function animatePreloaderPercent() {
+  const el = document.getElementById('preloaderPercent');
+  if (!el) return;
+
+  const duration = MIN_PRELOADER_TIME;
+  const start = performance.now();
+
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(eased * 100) + '%';
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function hidePreloaderWhenReady() {
+  const elapsed = Date.now() - preloaderStartTime;
+  const remaining = Math.max(0, MIN_PRELOADER_TIME - elapsed);
+
+  setTimeout(() => {
+    const preloader = document.getElementById('preloader');
+    if (preloader) preloader.classList.add('hidden');
+    document.body.style.overflow = '';
+
+    // Remove from DOM after transition
+    setTimeout(() => {
+      if (preloader && preloader.parentNode) {
+        preloader.remove();
+      }
+    }, 800);
+  }, remaining);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📢 ANNOUNCEMENTS
+   ═══════════════════════════════════════════════════════════════ */
+async function loadAnnouncements() {
+  try {
+    if (!window.EMindCare?.getActiveAnnouncements) {
+      console.log('No announcement helper available');
+      return;
+    }
+
+    const all = await window.EMindCare.getActiveAnnouncements();
+    const textItems = all.filter(i => !i.mediaUrl || !i.mediaType);
+
+    renderAnnouncementBar(textItems);
+  } catch (err) {
+    console.warn('Load announcements error:', err.message);
+  }
+}
+
+function renderAnnouncementBar(items) {
+  const bar = document.getElementById('announcementBar');
+  const marquee = document.getElementById('announcementMarquee');
+  if (!bar || !marquee) return;
+
+  if (!items.length) {
+    bar.classList.remove('active');
+    return;
+  }
+
+  const html = items.map(d => {
+    const badge = d.badge ? `<span class="announcement-badge">${escapeHtml(d.badge)}</span>` : '';
+    return `
+      <span class="announcement-item">
+        <i class="fas ${d.icon || 'fa-bullhorn'}"></i>
+        ${badge}
+        <span>${escapeHtml(d.text || '')}</span>
+      </span>
+    `;
+  }).join('<span class="announcement-divider">✦</span>');
+
+  const sep = '<span class="announcement-divider">✦</span>';
+  marquee.innerHTML = html + sep + html + sep;
+
+  // Adjust speed based on content
+  const duration = Math.max(30, marquee.scrollWidth / 50);
+  marquee.style.animationDuration = duration + 's';
+
+  bar.classList.add('active');
+  console.log(`✅ ${items.length} pengumuman rendered`);
+}
+
+/* ═══════════════════════════════════════════════════════════════
    INIT UI
    ═══════════════════════════════════════════════════════════════ */
 function initUI() {
+  document.body.style.overflow = 'hidden'; // Lock scroll while preloader
+
   window.addEventListener('scroll', () => {
     document.getElementById('navbar')?.classList.toggle('scrolled', window.scrollY > 30);
   });
@@ -117,6 +227,8 @@ window.closeMobileMenu = function(e) {
    ═══════════════════════════════════════════════════════════════ */
 async function applyBranding() {
   try {
+    if (!window.EMindCare?.getSiteConfig) return;
+
     const cfg = await window.EMindCare.getSiteConfig();
     if (!cfg?.branding) return;
     const b = cfg.branding;
@@ -133,9 +245,17 @@ async function applyBranding() {
     if (b.logoUrl) {
       document.getElementById('navLogo').innerHTML = `<img src="${b.logoUrl}" alt="">`;
       document.getElementById('footerLogo').innerHTML = `<img src="${b.logoUrl}" alt="">`;
+      const preloaderLogo = document.getElementById('preloaderLogo');
+      if (preloaderLogo) {
+        preloaderLogo.innerHTML = `<div class="preloader-rings"></div><img src="${b.logoUrl}" alt="">`;
+      }
     } else if (b.logoIcon) {
       document.getElementById('navLogo').innerHTML = `<i class="${b.logoIcon}"></i>`;
       document.getElementById('footerLogo').innerHTML = `<i class="${b.logoIcon}"></i>`;
+      const preloaderLogo = document.getElementById('preloaderLogo');
+      if (preloaderLogo) {
+        preloaderLogo.innerHTML = `<div class="preloader-rings"></div><i class="${b.logoIcon}"></i>`;
+      }
     }
     if (b.primaryColor) document.documentElement.style.setProperty('--teal', b.primaryColor);
     if (b.accentColor) document.documentElement.style.setProperty('--indigo', b.accentColor);
@@ -243,7 +363,7 @@ function applyFilters() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RENDER GALLERY (dengan SLIDESHOW dalam setiap kad)
+   RENDER GALLERY
    ═══════════════════════════════════════════════════════════════ */
 function renderGallery() {
   const grid = document.getElementById('galleryGrid');
@@ -322,7 +442,6 @@ function renderGallery() {
    SLIDESHOW AUTO-ROTATE
    ═══════════════════════════════════════════════════════════════ */
 function startAllSlideshows() {
-  // Clear timer lama
   slideshowTimers.forEach(t => clearInterval(t));
   slideshowTimers = [];
 
@@ -337,11 +456,9 @@ function startAllSlideshows() {
     let current = 0;
     let paused = false;
 
-    // Pause bila hover
     card.addEventListener('mouseenter', () => { paused = true; });
     card.addEventListener('mouseleave', () => { paused = false; });
 
-    // Pause bila dokumen tidak aktif (tab lain)
     document.addEventListener('visibilitychange', () => {
       paused = document.hidden;
     });
@@ -351,7 +468,7 @@ function startAllSlideshows() {
       current = (current + 1) % slides.length;
       slides.forEach((s, i) => s.classList.toggle('active', i === current));
       dots.forEach((d, i) => d.classList.toggle('active', i === current));
-    }, 3000); // 3 detik per gambar
+    }, 3000);
 
     slideshowTimers.push(timer);
   });
@@ -378,7 +495,6 @@ window.openLightbox = function(albumId) {
   document.getElementById('lightbox').classList.add('active');
   document.body.style.overflow = 'hidden';
 
-  // Pause slideshow bila lightbox open
   stopAllSlideshows();
 };
 
@@ -389,7 +505,6 @@ window.closeLightbox = function(e) {
   document.getElementById('lightbox').classList.remove('active');
   document.body.style.overflow = '';
 
-  // Restart slideshows
   startAllSlideshows();
 };
 
@@ -478,7 +593,7 @@ function formatDateLong(dateStr) {
 }
 
 console.log(
-  "%c 🖼️ Galeri UBK v2 ",
+  "%c 🖼️ Galeri UBK v3 ",
   "background:linear-gradient(135deg,#06B6D4,#4F46E5,#8B5CF6);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
 );
-console.log("Slideshow auto-rotate · Ready");
+console.log("Preloader + Announcement bar ready");
