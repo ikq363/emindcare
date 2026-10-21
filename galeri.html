@@ -58,6 +58,295 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
 
+/* ═══════════════════════════════════════════════════════════════
+   🎬 PRELOADER / LOADING SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  background: linear-gradient(135deg, #0F172A 0%, #4C1D95 50%, #0E7490 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
+}
+#preloader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.preloader-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.preloader-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: preloaderOrbFloat 8s ease-in-out infinite;
+}
+.preloader-orb.p1 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.4), transparent 70%);
+  top: -100px; left: -100px;
+}
+.preloader-orb.p2 {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent 70%);
+  bottom: -100px; right: -100px;
+  animation-delay: 2s;
+}
+@keyframes preloaderOrbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -30px) scale(1.1); }
+}
+
+.preloader-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.preloader-logo {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, var(--teal-light), var(--indigo));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  color: #fff;
+  box-shadow:
+    0 24px 60px rgba(20, 184, 166, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  animation: preloaderPulse 2s ease-in-out infinite;
+  overflow: hidden;
+}
+.preloader-logo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.4) 40deg,
+    transparent 80deg
+  );
+  animation: preloaderShine 2.5s linear infinite;
+}
+.preloader-logo i,
+.preloader-logo img {
+  position: relative;
+  z-index: 1;
+}
+.preloader-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@keyframes preloaderPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes preloaderShine {
+  to { transform: rotate(360deg); }
+}
+
+.preloader-rings {
+  position: absolute;
+  inset: -30px;
+  pointer-events: none;
+  z-index: -1;
+}
+.preloader-rings::before,
+.preloader-rings::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(34, 211, 238, 0.3);
+  animation: preloaderRingExpand 2.5s ease-out infinite;
+}
+.preloader-rings::after {
+  animation-delay: 1.25s;
+}
+@keyframes preloaderRingExpand {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.preloader-text {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+.preloader-text span {
+  background: linear-gradient(120deg, var(--cyan-soft), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+}
+
+.preloader-sub {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+.preloader-bar {
+  width: 220px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 0.5rem;
+}
+.preloader-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--cyan-soft), #fff, var(--purple));
+  border-radius: 50px;
+  animation: preloaderLoad 2.2s ease-in-out forwards;
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.6);
+}
+@keyframes preloaderLoad {
+  0% { width: 0; }
+  40% { width: 45%; }
+  70% { width: 80%; }
+  100% { width: 100%; }
+}
+
+.preloader-percent {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--cyan-soft);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: -0.5rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📢 ANNOUNCEMENT BAR — Running text
+   ═══════════════════════════════════════════════════════════════ */
+.announcement-bar {
+  position: relative;
+  z-index: 95;
+  background: linear-gradient(90deg, #0F172A 0%, #1E1B4B 40%, #0E7490 100%);
+  color: #fff;
+  overflow: hidden;
+  height: 42px;
+  display: none;
+  align-items: center;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.25);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.2);
+}
+.announcement-bar.active { display: flex; }
+
+.announcement-label {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.15rem 0 1.4rem;
+  height: 100%;
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
+  color: #0F172A;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  padding-right: 1.8rem;
+  position: relative;
+  z-index: 3;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);
+}
+.announcement-label i {
+  font-size: 0.78rem;
+  animation: bellRing 2.5s ease-in-out infinite;
+}
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0); }
+  15%, 35% { transform: rotate(-14deg); }
+  25%, 45% { transform: rotate(14deg); }
+}
+
+.announcement-track {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+}
+.announcement-marquee {
+  display: flex;
+  gap: 3.5rem;
+  animation: marqueeScroll 42s linear infinite;
+  white-space: nowrap;
+  padding-left: 2rem;
+  will-change: transform;
+}
+.announcement-marquee:hover { animation-play-state: paused; }
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.announcement-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #fff;
+  flex-shrink: 0;
+}
+.announcement-item i {
+  color: var(--cyan-soft);
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+.announcement-badge {
+  background: rgba(34, 211, 238, 0.18);
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  color: var(--cyan-soft);
+  padding: 0.1rem 0.5rem;
+  border-radius: 50px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.announcement-divider {
+  color: var(--cyan-soft);
+  opacity: 0.45;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
 /* ═══════════════════════════════════════════════════
    NAVBAR
    ═══════════════════════════════════════════════════ */
@@ -480,7 +769,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════
-   GALLERY GRID (Public)
+   GALLERY GRID
    ═══════════════════════════════════════════════════ */
 .gallery-grid {
   display: grid;
@@ -578,7 +867,6 @@ body {
 .gallery-badge.cat-aktiviti-kelab { background: rgba(236, 72, 153, 0.95); }
 .gallery-badge.cat-lain { background: rgba(100, 116, 139, 0.95); }
 
-/* Count badge (jumlah gambar dalam album) */
 .gallery-count-badge {
   position: absolute;
   top: 0.85rem;
@@ -599,7 +887,6 @@ body {
 }
 .gallery-count-badge i { color: var(--cyan-soft); font-size: 0.7rem; }
 
-/* ⚡ SLIDESHOW DALAM KAD */
 .gallery-slideshow {
   position: relative;
   width: 100%;
@@ -620,7 +907,6 @@ body {
   z-index: 1;
 }
 
-/* Dots indicator */
 .gallery-slideshow-dots {
   position: absolute;
   bottom: 0.75rem;
@@ -1084,6 +1370,8 @@ body {
   .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .footer-grid > div:first-child { grid-column: 1 / -1; }
+  .announcement-label { padding: 0 0.9rem; padding-right: 1.5rem; font-size: 0.6rem; }
+  .announcement-item { font-size: 0.78rem; }
 }
 @media (max-width: 600px) {
   .navbar-inner { padding: 0.45rem 0.45rem 0.45rem 0.8rem; }
@@ -1123,6 +1411,13 @@ body {
   .footer { padding: 3rem 1rem 1.5rem; }
   .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
   .footer-bottom { flex-direction: column; text-align: center; }
+  .announcement-label { padding: 0 0.7rem; padding-right: 1.2rem; }
+  .announcement-label span { display: none; }
+  .announcement-item { font-size: 0.74rem; }
+  .announcement-badge { font-size: 0.55rem; }
+  .preloader-logo { width: 80px; height: 80px; font-size: 2rem; }
+  .preloader-text { font-size: 1.3rem; }
+  .preloader-bar { width: 180px; }
 }
 @media (max-width: 380px) {
   .gallery-grid { grid-template-columns: 1fr; }
@@ -1130,6 +1425,47 @@ body {
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     🎬 PRELOADER / LOADING SCREEN
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="preloader">
+  <div class="preloader-bg">
+    <div class="preloader-orb p1"></div>
+    <div class="preloader-orb p2"></div>
+  </div>
+
+  <div class="preloader-inner">
+    <div class="preloader-logo" id="preloaderLogo">
+      <div class="preloader-rings"></div>
+      <i class="fas fa-brain"></i>
+    </div>
+    <div class="preloader-text">
+      e-<span>MindCare</span>
+    </div>
+    <div class="preloader-sub">Memuatkan Galeri</div>
+    <div class="preloader-bar"></div>
+    <div class="preloader-percent" id="preloaderPercent">0%</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     📢 ANNOUNCEMENT BAR — Running text
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="announcement-bar" id="announcementBar">
+  <div class="announcement-label">
+    <i class="fas fa-bullhorn"></i>
+    <span>Info</span>
+  </div>
+  <div class="announcement-track">
+    <div class="announcement-marquee" id="announcementMarquee">
+      <span class="announcement-item">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Memuatkan pengumuman...</span>
+      </span>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════ NAVBAR ═══════ -->
 <nav class="navbar" id="navbar">
@@ -1264,7 +1600,6 @@ body {
 
   <!-- Gallery Grid -->
   <div class="gallery-grid" id="galleryGrid">
-    <!-- Skeleton loading (JS akan replace) -->
     <div class="skeleton-card">
       <div class="skeleton-image"></div>
       <div class="skeleton-body">
