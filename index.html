@@ -794,7 +794,7 @@ body {
   transform: rotate(-45deg);
 }
 
-/* ═══════ EMPTY STATE (untuk kaunselor yang takda) ═══════ */
+/* ═══════ EMPTY STATE ═══════ */
 .empty-counselor {
   grid-column: 1 / -1;
   background: #fff;
@@ -1339,10 +1339,12 @@ body {
       <div id="navKolabIcons" style="display:flex;gap:0.35rem;"></div>
     </div>
 
+    <!-- ✅ TAMBAH TEROKA DALAM NAVBAR -->
     <div class="nav-links">
       <a href="index.html" class="nav-link active">Home</a>
       <a href="kenali.html" class="nav-link">Kenali UBK</a>
       <a href="galeri.html" class="nav-link">Galeri</a>
+      <a href="teroka.html" class="nav-link">Teroka</a>
       <a href="perkhidmatan.html" class="nav-link">Perkhidmatan</a>
       <a href="hubungi.html" class="nav-link">Hubungi</a>
     </div>
@@ -1367,10 +1369,12 @@ body {
         <i class="fas fa-times"></i>
       </button>
     </div>
+    <!-- ✅ TAMBAH TEROKA DALAM MOBILE MENU -->
     <div class="mobile-menu-links">
       <a href="index.html" class="mobile-menu-link"><i class="fas fa-home"></i> Home</a>
       <a href="kenali.html" class="mobile-menu-link"><i class="fas fa-users"></i> Kenali UBK</a>
       <a href="galeri.html" class="mobile-menu-link"><i class="fas fa-images"></i> Galeri</a>
+      <a href="teroka.html" class="mobile-menu-link"><i class="fas fa-compass"></i> Teroka</a>
       <a href="perkhidmatan.html" class="mobile-menu-link"><i class="fas fa-hand-holding-heart"></i> Perkhidmatan</a>
       <a href="hubungi.html" class="mobile-menu-link"><i class="fas fa-envelope"></i> Hubungi Kami</a>
       <a href="login.html" class="mobile-menu-link"><i class="fas fa-sign-in-alt"></i> Log Masuk</a>
@@ -1395,7 +1399,8 @@ body {
     </p>
 
     <div class="hero-actions">
-      <a href="#perkhidmatan" class="btn btn-teal btn-lg" id="heroCtaBtn">
+      <!-- ✅ BUTTON MULAI TEROKA → teroka.html -->
+      <a href="teroka.html" class="btn btn-teal btn-lg" id="heroCtaBtn">
         <i class="fas fa-compass"></i> Mulai Teroka
       </a>
       <a href="kenali.html" class="btn btn-outline btn-lg">
@@ -1440,7 +1445,7 @@ body {
 <!-- ═══════ MAIN CONTENT ═══════ -->
 <div class="main">
 
-  <!-- ═══ VISI & MISI (show kalau ada data) ═══ -->
+  <!-- ═══ VISI & MISI ═══ -->
   <section class="section" id="visimisi" style="display:none;">
     <div class="section-head reveal">
       <div class="section-eyebrow">Hala Tuju Kami</div>
@@ -1495,8 +1500,8 @@ body {
         Kami di sini untuk anda. Hubungi kaunselor kami atau mulakan perjalanan kesejahteraan minda anda hari ini.
       </p>
       <div class="cta-actions">
-        <a href="perkhidmatan.html" class="btn btn-dark btn-lg">
-          <i class="fas fa-calendar-check"></i> Buat Temujanji
+        <a href="teroka.html" class="btn btn-dark btn-lg">
+          <i class="fas fa-compass"></i> Mulai Teroka
         </a>
         <a href="hubungi.html" class="btn btn-ghost btn-lg">
           <i class="fas fa-comments"></i> Hubungi Kami
@@ -1534,6 +1539,8 @@ body {
           <li><a href="index.html">Home</a></li>
           <li><a href="kenali.html">Kenali UBK</a></li>
           <li><a href="galeri.html">Galeri</a></li>
+          <!-- ✅ TAMBAH TEROKA DALAM FOOTER -->
+          <li><a href="teroka.html">Teroka</a></li>
           <li><a href="perkhidmatan.html">Perkhidmatan</a></li>
         </ul>
       </div>
@@ -1575,8 +1582,7 @@ body {
   import './config.js';
 
   /* ═══════════════════════════════════════════════════
-     FALLBACK — untuk pengumuman dan branding sahaja
-     (TIADA fallback kaunselor — biar kosong kalau takda)
+     FALLBACK
      ═══════════════════════════════════════════════════ */
   const FALLBACK = {
     branding: {
@@ -1748,7 +1754,6 @@ body {
       const items = [];
       snap.forEach(d => items.push({ id: d.id, ...d.data() }));
 
-      // Sort: Kaunselor Utama dulu, kemudian yang lain
       items.sort((a, b) => {
         const aTitle = (a.title || '').toLowerCase();
         const bTitle = (b.title || '').toLowerCase();
@@ -1794,9 +1799,14 @@ body {
     if (h.heroBadge) document.getElementById('heroBadge').textContent = h.heroBadge;
     if (h.heroTitle) document.getElementById('heroTitle').innerHTML = h.heroTitle;
     if (h.heroSubtitle) document.getElementById('heroSub').innerHTML = h.heroSubtitle;
-    if (h.heroCtaText) {
+
+    // ✅ SUPPORT DYNAMIC URL DARI FIRESTORE
+    if (h.heroCtaText || h.heroCtaUrl) {
       const btn = document.getElementById('heroCtaBtn');
-      btn.innerHTML = `<i class="fas fa-compass"></i> ${h.heroCtaText}`;
+      const btnText = h.heroCtaText || 'Mulai Teroka';
+      const btnUrl = h.heroCtaUrl || 'teroka.html';
+      btn.innerHTML = `<i class="fas fa-compass"></i> ${btnText}`;
+      btn.href = btnUrl;
     }
 
     if (landing?.faviconUrl) {
@@ -1888,12 +1898,11 @@ body {
   }
 
   /* ═══════════════════════════════════════════════════
-     RENDER KAUNSELOR — HANYA yang berdaftar di Firestore
+     RENDER KAUNSELOR
      ═══════════════════════════════════════════════════ */
   function renderKaunselor(users) {
     const grid = document.getElementById('kaunselorGrid');
 
-    // ⚡ KALAU TIADA KAUNSELOR BERDAFTAR → tunjuk empty state
     if (!users.length) {
       grid.innerHTML = `
         <div class="empty-counselor">
@@ -2181,7 +2190,7 @@ body {
     "%c 🏠 e-MindCare Landing ",
     "background:linear-gradient(135deg,#0F766E,#4F46E5,#06B6D4);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
   );
-  console.log("Data dari Firestore · Kaunselor dari users collection");
+  console.log("✅ Mulai Teroka → teroka.html");
 </script>
 
 </body>
