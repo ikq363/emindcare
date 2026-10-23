@@ -11,6 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+<!-- ⭐ SIDEBAR CSS - centralized -->
+<link rel="stylesheet" href="sidebar.css">
+
 <style>
 /* ═══════════════════════════════════════════════════
    ROOT
@@ -51,7 +54,6 @@ body {
   color: var(--ink);
   line-height: 1.6;
   min-height: 100vh;
-  min-height: 100dvh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -60,243 +62,10 @@ body {
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.25); }
 
-/* ═══════════════════════════════════════════════════
-   LAYOUT
-   ═══════════════════════════════════════════════════ */
-.app { display: flex; min-height: 100vh; min-height: 100dvh; }
+/* ═══════ LAYOUT ═══════ */
+.app { display: flex; min-height: 100vh; }
 
-/* ═══════════════════════════════════════════════════
-   SIDEBAR
-   ═══════════════════════════════════════════════════ */
-.sidebar {
-  width: var(--sidebar-w);
-  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
-  color: #cbd5e1;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 60;
-  transition: transform 0.4s var(--ease-out);
-  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
-  overflow-y: auto;
-}
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-
-.sb-brand {
-  padding: 1.5rem 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  flex-shrink: 0;
-}
-.sb-brand-logo {
-  width: 42px; height: 42px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1.15rem;
-  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-.sb-brand-logo::before {
-  content: "";
-  position: absolute;
-  inset: -50%;
-  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
-  animation: shineSweep 4s linear infinite;
-}
-.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
-.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
-@keyframes shineSweep { to { transform: rotate(360deg); } }
-.sb-brand-text strong {
-  display: block;
-  font-family: 'Fraunces', serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.sb-brand-text span {
-  font-size: 0.65rem;
-  color: #94a3b8;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-}
-
-.sb-profile {
-  margin: 1rem 1rem 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  color: inherit;
-}
-.sb-profile:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-}
-.sb-avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  font-weight: 800;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sb-avatar::after {
-  content: "";
-  position: absolute;
-  bottom: -2px; right: -2px;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: var(--emerald);
-  border: 2px solid #1E293B;
-}
-.sb-profile-info { min-width: 0; flex: 1; }
-.sb-profile-info strong {
-  display: block;
-  font-size: 0.85rem;
-  color: #fff;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sb-profile-info span {
-  font-size: 0.68rem;
-  color: var(--teal-glow);
-  font-weight: 600;
-}
-
-.sb-menu {
-  flex: 1;
-  padding: 0.5rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.sb-section-label {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 1rem 0.6rem 0.4rem;
-}
-.sb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 0.84rem;
-  font-weight: 600;
-  transition: all 0.3s var(--ease-out);
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
-  position: relative;
-}
-.sb-item i:first-child {
-  width: 32px; height: 32px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.82rem;
-  flex-shrink: 0;
-  transition: all 0.3s;
-}
-.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.sb-item:hover i:first-child {
-  background: rgba(20, 184, 166, 0.15);
-  color: var(--teal-glow);
-}
-.sb-item.active {
-  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
-  color: #fff;
-}
-.sb-item.active i:first-child {
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
-}
-.sb-item.active::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 20%; bottom: 20%;
-  width: 3px;
-  background: var(--teal-glow);
-  border-radius: 0 4px 4px 0;
-}
-.sb-badge {
-  margin-left: auto;
-  padding: 0.1rem 0.5rem;
-  background: var(--rose);
-  color: #fff;
-  border-radius: 50px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  min-width: 22px;
-  text-align: center;
-}
-
-.sb-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  flex-shrink: 0;
-}
-.sb-footer-btn {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #FCA5A5;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.sb-footer-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-/* ═══════════════════════════════════════════════════
-   MAIN
-   ═══════════════════════════════════════════════════ */
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
@@ -304,7 +73,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: 100dvh;
 }
 
 .topbar {
@@ -363,7 +131,6 @@ body {
   justify-content: center;
   transition: all 0.3s;
   text-decoration: none;
-  position: relative;
 }
 .tb-icon-btn:hover {
   background: var(--pearl);
@@ -379,11 +146,10 @@ body {
   padding: 1.5rem;
   max-width: 1400px;
   width: 100%;
+  margin: 0 auto;
 }
 
-/* ═══════════════════════════════════════════════════
-   SECTION TITLE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ SECTION TITLE ═══════ */
 .section-head {
   display: flex;
   align-items: center;
@@ -416,9 +182,7 @@ body {
   color: var(--ink-soft);
 }
 
-/* ═══════════════════════════════════════════════════
-   SETTINGS GRID
-   ═══════════════════════════════════════════════════ */
+/* ═══════ SETTINGS GRID ═══════ */
 .settings-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -427,9 +191,7 @@ body {
 }
 @media (max-width: 980px) { .settings-grid { grid-template-columns: 1fr; } }
 
-/* ═══════════════════════════════════════════════════
-   CARD
-   ═══════════════════════════════════════════════════ */
+/* ═══════ CARD ═══════ */
 .card {
   background: #fff;
   border: 1px solid var(--line);
@@ -439,7 +201,6 @@ body {
   transition: box-shadow 0.3s;
 }
 .card:hover { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06); }
-
 .card-header {
   display: flex;
   align-items: center;
@@ -473,9 +234,7 @@ body {
   margin-top: 0.2rem;
 }
 
-/* ═══════════════════════════════════════════════════
-   FORM
-   ═══════════════════════════════════════════════════ */
+/* ═══════ FORM ═══════ */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -563,9 +322,7 @@ body {
   box-shadow: 0 6px 16px -4px rgba(15, 118, 110, 0.4);
 }
 
-/* ═══════════════════════════════════════════════════
-   BUTTONS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ BUTTONS ═══════ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -633,9 +390,7 @@ body {
   animation: spin 0.7s linear infinite;
 }
 
-/* ═══════════════════════════════════════════════════
-   BLOCKED LIST
-   ═══════════════════════════════════════════════════ */
+/* ═══════ BLOCKED LIST ═══════ */
 .blocked-wrap {
   margin-top: 1rem;
   padding-top: 1rem;
@@ -735,9 +490,7 @@ body {
   opacity: 0.4;
 }
 
-/* ═══════════════════════════════════════════════════
-   TABS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TABS ═══════ */
 .tabs-card {
   background: #fff;
   border: 1px solid var(--line);
@@ -798,7 +551,6 @@ body {
 }
 
 .tab-panels { padding: 1.4rem; }
-
 .panel { display: none; }
 .panel.active { display: block; }
 
@@ -809,9 +561,7 @@ body {
 }
 @media (max-width: 420px) { .appt-cards-grid { grid-template-columns: 1fr; } }
 
-/* ═══════════════════════════════════════════════════
-   APPOINTMENT CARD
-   ═══════════════════════════════════════════════════ */
+/* ═══════ APPOINTMENT CARD ═══════ */
 .appt-card {
   position: relative;
   background: #fff;
@@ -995,9 +745,7 @@ body {
 }
 .appt-actions .btn { flex: 1; min-width: 0; padding: 0.55rem 0.7rem; font-size: 0.72rem; }
 
-/* ═══════════════════════════════════════════════════
-   EMPTY / SKELETON
-   ═══════════════════════════════════════════════════ */
+/* ═══════ EMPTY / SKELETON ═══════ */
 .panel-empty {
   grid-column: 1 / -1;
   text-align: center;
@@ -1054,9 +802,7 @@ body {
   100% { background-position: -200% 0; }
 }
 
-/* ═══════════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TOAST ═══════ */
 .toast-container {
   position: fixed;
   top: 1.5rem;
@@ -1105,9 +851,7 @@ body {
 .toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
 .toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
 
-/* ═══════════════════════════════════════════════════
-   MODAL
-   ═══════════════════════════════════════════════════ */
+/* ═══════ MODAL ═══════ */
 .modal {
   position: fixed;
   inset: 0;
@@ -1174,9 +918,7 @@ body {
 }
 #rescheduleFields.active { display: block; }
 
-/* ═══════════════════════════════════════════════════
-   LOADING OVERLAY
-   ═══════════════════════════════════════════════════ */
+/* ═══════ LOADING OVERLAY ═══════ */
 .loading-overlay {
   position: fixed;
   inset: 0;
@@ -1205,31 +947,12 @@ body {
 }
 .loading-text { font-size: 0.88rem; font-weight: 700; color: var(--ink); }
 
-/* ═══════════════════════════════════════════════════
-   BACKDROP
-   ═══════════════════════════════════════════════════ */
-.sb-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 55;
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.sb-backdrop.active { display: block; opacity: 1; }
-
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ RESPONSIVE ═══════ */
 @media (max-width: 1024px) {
   :root { --sidebar-w: 240px; }
   .content { padding: 1.25rem; }
 }
 @media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
   .main { margin-left: 0; }
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
@@ -1256,101 +979,10 @@ body {
 
 <div class="app">
 
-  <!-- ═══════════════════════════════════════════════════
-       SIDEBAR — SAMA 100% dengan dashboard-kaunselor.html
-       ═══════════════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
-      <div class="sb-brand-text">
-        <strong id="sbBrandName">e-MindCare</strong>
-        <span>Dashboard Kaunselor</span>
-      </div>
-    </div>
+  <!-- ⭐ SIDEBAR — auto-inject dari sidebar.js -->
+  <div id="sidebar-root"></div>
 
-    <a href="dashboard-profile.html" class="sb-profile">
-      <div class="sb-avatar" id="sbAvatar">K</div>
-      <div class="sb-profile-info">
-        <strong id="sbProfileName">Kaunselor</strong>
-        <span>Kaunselor UBK</span>
-      </div>
-    </a>
-
-    <nav class="sb-menu">
-      <div class="sb-section-label">Utama</div>
-      <a href="dashboard-kaunselor.html" class="sb-item">
-        <i class="fas fa-chart-pie"></i>
-        <span>Overview</span>
-      </a>
-      <a href="dashboard-profile.html" class="sb-item">
-        <i class="fas fa-user-circle"></i>
-        <span>Profil Kaunselor</span>
-      </a>
-
-      <div class="sb-section-label">Kandungan Laman</div>
-      <a href="dashboard-announcements.html" class="sb-item">
-        <i class="fas fa-bullhorn"></i>
-        <span>Pengumuman</span>
-      </a>
-      <a href="dashboard-banners.html" class="sb-item">
-        <i class="fas fa-images"></i>
-        <span>Banner Iklan</span>
-      </a>
-      <a href="dashboard-collaborations.html" class="sb-item">
-        <i class="fas fa-handshake"></i>
-        <span>Kolaborasi</span>
-      </a>
-      <a href="dashboard-landing.html" class="sb-item">
-        <i class="fas fa-paint-brush"></i>
-        <span>Sunting Laman</span>
-      </a>
-      <a href="dashboard-gallery.html" class="sb-item">
-        <i class="fas fa-photo-video"></i>
-        <span>Galeri UBK</span>
-      </a>
-      <a href="dashboard-contact.html" class="sb-item">
-        <i class="fas fa-address-book"></i>
-        <span>Hubungi & Lokasi</span>
-      </a>
-
-      <div class="sb-section-label">Pengurusan</div>
-      <a href="dashboard-inventories.html" class="sb-item">
-        <i class="fas fa-clipboard-list"></i>
-        <span>Ujian Inventori</span>
-      </a>
-      <a href="dashboard-users.html" class="sb-item">
-        <i class="fas fa-users"></i>
-        <span>Urus Pengguna</span>
-      </a>
-      <a href="dashboard-appointments.html" class="sb-item active">
-        <i class="fas fa-calendar-check"></i>
-        <span>Tempahan Kaunseling</span>
-        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
-      </a>
-      <a href="dashboard-diaries.html" class="sb-item">
-        <i class="fas fa-book"></i>
-        <span>Diari & Catatan</span>
-      </a>
-
-      <div class="sb-section-label">Analitik</div>
-      <a href="dashboard-analytics.html" class="sb-item">
-        <i class="fas fa-chart-line"></i>
-        <span>Data & Laporan</span>
-      </a>
-    </nav>
-
-    <div class="sb-footer">
-      <button class="sb-footer-btn" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Log Keluar</span>
-      </button>
-    </div>
-  </aside>
-  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
-
-  <!-- ═══════════════════════════════════════════════════
-       MAIN
-       ═══════════════════════════════════════════════════ -->
+  <!-- ═══════ MAIN ═══════ -->
   <div class="main">
 
     <header class="topbar">
@@ -1634,10 +1266,789 @@ body {
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ═══════ TOAST ═══════ -->
 <div class="toast-container" id="toastContainer"></div>
 
-<script type="module" src="dashboard-appointments.js"></script>
+<!-- ⭐ SIDEBAR JS — auto-inject (mesti SEBELUM page JS) -->
+<script type="module" src="sidebar.js"></script>
+
+<!-- ⭐ PAGE JS -->
+<script type="module">
+  import './config.js';
+
+  /* ═══════════════════════════════════════════════════════════
+     CONSTANTS
+     ═══════════════════════════════════════════════════════════ */
+  const SESSION_KEY = 'emindcare_session';
+  const BLOCKED_COLLECTION = 'blocked_dates';
+  const SCHEDULE_COLLECTION = 'schedule_settings';
+  const SCHEDULE_DOC_ID = 'main';
+  const APPOINTMENTS_COLLECTION = 'appointments';
+
+  const MONTHS_SHORT = ['JAN','FEB','MAC','APR','MEI','JUN','JUL','OGO','SEP','OKT','NOV','DIS'];
+  const MONTHS_FULL = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+
+  /* ═══════════════════════════════════════════════════════════
+     STATE
+     ═══════════════════════════════════════════════════════════ */
+  let currentUser = null;
+  let blockedDates = [];
+  let scheduleSettings = { startTime: '08:00', endTime: '14:00', slotMinutes: 30, days: [1,2,3,4,5] };
+  let appointments = { pending: [], active: [], history: [] };
+  let currentTab = 'pending';
+  let unsubAppointments = null;
+  let emindcare = null;
+
+  /* ═══════════════════════════════════════════════════════════
+     INIT
+     ═══════════════════════════════════════════════════════════ */
+  window.addEventListener('load', async () => {
+    try {
+      emindcare = await waitForEMindCare();
+      if (!authGuard()) return;
+
+      // ⭐ Tunggu sidebar siap inject
+      await waitForSidebar();
+
+      loadProfile();
+      applyBranding();
+
+      initBlockDateDefault();
+      bindEvents();
+      bindDayChips();
+
+      await Promise.allSettled([loadScheduleSettings(), loadBlockedDates()]);
+      setupAppointmentsListener();
+
+    } catch (e) {
+      console.error('Init error:', e);
+      showToast('Ralat Sistem', e.message, 'error');
+    }
+  });
+
+  function waitForEMindCare() {
+    return new Promise((resolve, reject) => {
+      if (window.EMindCare) return resolve(window.EMindCare);
+      let tries = 0;
+      const t = setInterval(() => {
+        if (window.EMindCare) { clearInterval(t); resolve(window.EMindCare); }
+        else if (++tries > 100) { clearInterval(t); reject(new Error('SDK timeout')); }
+      }, 50);
+    });
+  }
+
+  function waitForSidebar() {
+    return new Promise(resolve => {
+      if (document.getElementById('sbProfileName')) return resolve();
+      const obs = new MutationObserver(() => {
+        if (document.getElementById('sbProfileName')) {
+          obs.disconnect();
+          resolve();
+        }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => { obs.disconnect(); resolve(); }, 3000);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     AUTH GUARD
+     ═══════════════════════════════════════════════════════════ */
+  function authGuard() {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) { window.location.href = 'login.html'; return false; }
+    try {
+      const session = JSON.parse(raw);
+      if (session.role !== 'kaunselor') {
+        const redirects = { guru: 'dashboard-guru.html', murid: 'dashboard-murid.html' };
+        window.location.href = redirects[session.role] || 'login.html';
+        return false;
+      }
+      currentUser = session;
+      return true;
+    } catch (e) {
+      localStorage.removeItem(SESSION_KEY);
+      window.location.href = 'login.html';
+      return false;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LOAD PROFILE
+     ═══════════════════════════════════════════════════════════ */
+  function loadProfile() {
+    const nameEl = document.getElementById('sbProfileName');
+    const avatarEl = document.getElementById('sbAvatar');
+    if (nameEl) nameEl.textContent = currentUser.fullName || 'Kaunselor';
+    if (avatarEl) {
+      if (currentUser.avatarUrl) {
+        avatarEl.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
+      } else {
+        avatarEl.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
+      }
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     APPLY BRANDING
+     ═══════════════════════════════════════════════════════════ */
+  async function applyBranding() {
+    try {
+      const cfg = await emindcare.getSiteConfig();
+      if (!cfg?.branding) return;
+      const b = cfg.branding;
+      const brandNameEl = document.getElementById('sbBrandName');
+      const logoEl = document.getElementById('sbLogo');
+      if (b.name && brandNameEl) brandNameEl.textContent = b.name;
+      if (logoEl) {
+        if (b.logoUrl) logoEl.innerHTML = `<img src="${b.logoUrl}" alt="">`;
+        else if (b.logoIcon) logoEl.innerHTML = `<i class="${b.logoIcon}"></i>`;
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     BIND EVENTS
+     ═══════════════════════════════════════════════════════════ */
+  function bindEvents() {
+    const formBlock = document.getElementById('formBlockDate');
+    if (formBlock) formBlock.addEventListener('submit', handleAddBlockDate);
+
+    const formSched = document.getElementById('formScheduleSettings');
+    if (formSched) formSched.addEventListener('submit', handleSaveSchedule);
+
+    const modal = document.getElementById('actionModal');
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target.id === 'actionModal') closeActionModal();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeActionModal();
+    });
+  }
+
+  function bindDayChips() {
+    document.querySelectorAll('#workDaysGrid .day-chip').forEach(chip => {
+      const d = parseInt(chip.dataset.day);
+      chip.classList.toggle('selected', scheduleSettings.days.includes(d));
+      chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     BLOCKED DATES
+     ═══════════════════════════════════════════════════════════ */
+  function initBlockDateDefault() {
+    const input = document.getElementById('blockDateInput');
+    if (!input) return;
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    input.value = toDateStr(tomorrow);
+  }
+
+  async function loadBlockedDates() {
+    try {
+      const { db, fs } = emindcare;
+      const snap = await fs.getDocs(fs.collection(db, BLOCKED_COLLECTION));
+      blockedDates = [];
+      snap.forEach(d => blockedDates.push({ id: d.id, ...d.data() }));
+      blockedDates.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+      renderBlockedDates();
+    } catch (e) {
+      console.warn('Blocked dates:', e.message);
+    }
+  }
+
+  async function handleAddBlockDate(e) {
+    e.preventDefault();
+    const date = document.getElementById('blockDateInput').value;
+    const type = document.getElementById('blockTypeSelect').value;
+    const note = document.getElementById('blockReasonInput').value.trim();
+
+    if (!date || !note) return showToast('Ralat', 'Sila isi semua medan.', 'error');
+    if (blockedDates.some(b => b.date === date)) return showToast('Ralat', 'Tarikh sudah di-block.', 'warning');
+
+    const btn = document.getElementById('saveBlockBtn');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
+
+    try {
+      const { db, fs } = emindcare;
+      const ref = fs.doc(fs.collection(db, BLOCKED_COLLECTION));
+      await fs.setDoc(ref, {
+        date, type, note,
+        createdBy: currentUser?.fullName || 'unknown',
+        createdAt: fs.serverTimestamp()
+      });
+      blockedDates.push({ id: ref.id, date, type, note });
+      blockedDates.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+      renderBlockedDates();
+      document.getElementById('blockReasonInput').value = '';
+      showToast('Berjaya', 'Tarikh block telah disimpan.', 'success');
+    } catch (e) {
+      showToast('Ralat', 'Gagal simpan: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    }
+  }
+
+  function renderBlockedDates() {
+    const list = document.getElementById('blockedDatesList');
+    const count = document.getElementById('blockedCount');
+    if (!list) return;
+    if (count) count.textContent = blockedDates.length;
+
+    if (!blockedDates.length) {
+      list.innerHTML = `<div class="blocked-empty"><i class="fas fa-inbox"></i> Belum ada tarikh block</div>`;
+      return;
+    }
+
+    list.innerHTML = blockedDates.map(b => `
+      <div class="blocked-item ${b.type === 'amber' ? 'amber' : ''}">
+        <div class="blocked-item-info">
+          <div class="blocked-item-date">${formatDateFull(b.date)}</div>
+          <div class="blocked-item-note">${escapeHtml(b.note || '')}</div>
+        </div>
+        <button type="button" class="blocked-item-delete" onclick="deleteBlockedDate('${b.id}')" title="Padam">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    `).join('');
+  }
+
+  window.deleteBlockedDate = async function(id) {
+    if (!confirm('Padam tarikh block ini?')) return;
+    try {
+      const { db, fs } = emindcare;
+      await fs.deleteDoc(fs.doc(db, BLOCKED_COLLECTION, id));
+      blockedDates = blockedDates.filter(b => b.id !== id);
+      renderBlockedDates();
+      showToast('Berjaya', 'Tarikh block dipadam.', 'success');
+    } catch (e) {
+      showToast('Ralat', 'Gagal padam: ' + e.message, 'error');
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     SCHEDULE
+     ═══════════════════════════════════════════════════════════ */
+  async function loadScheduleSettings() {
+    try {
+      const { db, fs } = emindcare;
+      const snap = await fs.getDoc(fs.doc(db, SCHEDULE_COLLECTION, SCHEDULE_DOC_ID));
+      if (snap.exists()) scheduleSettings = { ...scheduleSettings, ...snap.data() };
+      applyScheduleToForm();
+    } catch (e) { console.warn('Schedule:', e.message); }
+  }
+
+  function applyScheduleToForm() {
+    const s = document.getElementById('startTimeInput');
+    const e = document.getElementById('endTimeInput');
+    const sl = document.getElementById('slotIntervalSelect');
+    if (s) s.value = scheduleSettings.startTime || '08:00';
+    if (e) e.value = scheduleSettings.endTime || '14:00';
+    if (sl) sl.value = scheduleSettings.slotMinutes || 30;
+    document.querySelectorAll('#workDaysGrid .day-chip').forEach(chip => {
+      const d = parseInt(chip.dataset.day);
+      chip.classList.toggle('selected', scheduleSettings.days?.includes(d));
+    });
+  }
+
+  async function handleSaveSchedule(e) {
+    e.preventDefault();
+    const startTime = document.getElementById('startTimeInput').value;
+    const endTime = document.getElementById('endTimeInput').value;
+    const slotMinutes = parseInt(document.getElementById('slotIntervalSelect').value);
+    const days = Array.from(document.querySelectorAll('#workDaysGrid .day-chip.selected')).map(c => parseInt(c.dataset.day));
+
+    if (startTime >= endTime) return showToast('Ralat', 'Masa tamat mesti selepas mula.', 'error');
+    if (!days.length) return showToast('Ralat', 'Pilih sekurang-kurangnya satu hari.', 'error');
+
+    const btn = document.getElementById('saveScheduleBtn');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
+
+    try {
+      const { db, fs } = emindcare;
+      await fs.setDoc(fs.doc(db, SCHEDULE_COLLECTION, SCHEDULE_DOC_ID), {
+        startTime, endTime, slotMinutes, days,
+        updatedAt: fs.serverTimestamp(),
+        updatedBy: currentUser?.fullName || 'kaunselor'
+      });
+      scheduleSettings = { startTime, endTime, slotMinutes, days };
+      showToast('Berjaya', 'Tetapan operasi disimpan.', 'success');
+    } catch (e) {
+      showToast('Ralat', 'Gagal simpan: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     REAL-TIME APPOINTMENTS LISTENER
+     ═══════════════════════════════════════════════════════════ */
+  function setupAppointmentsListener() {
+    try {
+      const { db, fs } = emindcare;
+      if (unsubAppointments) unsubAppointments();
+
+      unsubAppointments = fs.onSnapshot(
+        fs.collection(db, APPOINTMENTS_COLLECTION),
+        (snapshot) => {
+          const all = [];
+          snapshot.forEach(d => all.push({ id: d.id, ...d.data() }));
+          all.sort((a, b) => {
+            const at = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+            const bt = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+            return bt - at;
+          });
+          appointments.pending = all.filter(a => a.status === 'pending');
+          appointments.active = all.filter(a => ['approved','deferred'].includes(a.status));
+          appointments.history = all.filter(a => ['completed','cancelled','rejected'].includes(a.status));
+          updateBadges();
+          renderPanels();
+        },
+        (e) => {
+          console.error('Snapshot error:', e);
+          showToast('Ralat', 'Gagal pantau data: ' + e.message, 'error');
+        }
+      );
+    } catch (e) {
+      console.error('Setup listener:', e);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     BADGES
+     ═══════════════════════════════════════════════════════════ */
+  function updateBadges() {
+    const p = appointments.pending.length;
+    const tp = document.getElementById('tabBadgePending');
+    const ta = document.getElementById('tabBadgeActive');
+    const th = document.getElementById('tabBadgeHistory');
+    if (tp) tp.textContent = p;
+    if (ta) ta.textContent = appointments.active.length;
+    if (th) th.textContent = appointments.history.length;
+    const sb = document.getElementById('pendingBadge');
+    if (sb) {
+      sb.textContent = p;
+      sb.style.display = p > 0 ? 'inline-block' : 'none';
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     RENDER PANELS
+     ═══════════════════════════════════════════════════════════ */
+  function renderPanels() {
+    renderList('pendingList', appointments.pending, 'pending');
+    renderList('activeList', appointments.active, 'active');
+    renderList('historyList', appointments.history, 'history');
+  }
+
+  function renderList(elementId, items, type) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    if (!items.length) {
+      const msgs = {
+        pending: { icon: 'fa-check-circle', title: 'Tiada Permohonan Baru', sub: 'Semua permohonan telah diuruskan.' },
+        active: { icon: 'fa-calendar', title: 'Tiada Sesi Aktif', sub: 'Tiada temujanji diluluskan.' },
+        history: { icon: 'fa-history', title: 'Tiada Rekod', sub: 'Belum ada sejarah temujanji.' }
+      };
+      const m = msgs[type];
+      el.innerHTML = `
+        <div class="panel-empty">
+          <i class="fas ${m.icon}"></i>
+          <h4>${m.title}</h4>
+          <p>${m.sub}</p>
+        </div>`;
+      return;
+    }
+    el.innerHTML = items.map((a, i) => renderCard(a, i, type)).join('');
+  }
+
+  function renderCard(a, index, type) {
+    const name = a.studentName || 'Murid';
+    const initials = name.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+
+    const statusColors = {
+      pending: '#F59E0B', approved: '#10B981', deferred: '#6366F1',
+      completed: '#0F766E', cancelled: '#EF4444', rejected: '#EF4444'
+    };
+    const statusLabels = {
+      pending: 'Menunggu', approved: 'Diluluskan', deferred: 'Ditangguh',
+      completed: 'Selesai', cancelled: 'Dibatalkan', rejected: 'Ditolak'
+    };
+    const urgencyMap = {
+      high: { cls: 'high', label: '🔴 URGENT' },
+      medium: { cls: 'medium', label: '🟡 MODERATE' },
+      low: { cls: 'low', label: '🔵 LOW' }
+    };
+    const urg = urgencyMap[a.urgencyLevel] || urgencyMap.low;
+
+    let actionsHTML = '';
+    if (type === 'pending') {
+      actionsHTML = `
+        <button type="button" class="btn btn-success btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(name)}','approve')">
+          <i class="fas fa-check"></i> Lulus
+        </button>
+        <button type="button" class="btn btn-warning btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(name)}','defer')">
+          <i class="fas fa-clock"></i> Tangguh
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(name)}','reject')">
+          <i class="fas fa-times"></i> Tolak
+        </button>`;
+    } else if (type === 'active') {
+      actionsHTML = `
+        <button type="button" class="btn btn-primary btn-sm" onclick="markCompleted('${a.id}')">
+          <i class="fas fa-check-double"></i> Tanda Selesai
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="openActionModal('${a.id}','${escapeAttr(name)}','reject')">
+          <i class="fas fa-ban"></i> Batal
+        </button>`;
+    }
+
+    const noteHTML = a.counselorNotes
+      ? `<div class="appt-info-item full">
+           <div class="appt-info-icon"><i class="fas fa-comment-dots"></i></div>
+           <div class="appt-info-text">
+             <div class="appt-info-label">Nota Kaunselor</div>
+             <div class="appt-info-value">${escapeHtml(a.counselorNotes)}</div>
+           </div>
+         </div>` : '';
+
+    const locationHTML = a.location
+      ? `<div class="appt-info-item full">
+           <div class="appt-info-icon"><i class="fas fa-map-marker-alt"></i></div>
+           <div class="appt-info-text">
+             <div class="appt-info-label">Lokasi</div>
+             <div class="appt-info-value">${escapeHtml(a.location)}</div>
+           </div>
+         </div>` : '';
+
+    return `
+      <div class="appt-card" style="--status-color:${statusColors[a.status] || '#4F46E5'};animation-delay:${index * 0.04}s;">
+        <div class="appt-card-head">
+          <div class="appt-avatar">${initials}</div>
+          <div class="appt-name-block">
+            <div class="appt-name">${escapeHtml(name)}</div>
+            <div class="appt-meta-line">
+              <i class="fas fa-graduation-cap"></i> ${escapeHtml(a.studentClass || '-')}
+              · <i class="fas fa-id-card"></i> ${escapeHtml(a.studentIc || '-')}
+            </div>
+          </div>
+          <span class="urgency-pill ${urg.cls}">${urg.label}</span>
+        </div>
+
+        <div class="appt-info">
+          <div class="appt-info-item">
+            <div class="appt-info-icon"><i class="fas fa-calendar"></i></div>
+            <div class="appt-info-text">
+              <div class="appt-info-label">Tarikh</div>
+              <div class="appt-info-value mono">${formatDateShort(a.date || a.appointmentDate)}</div>
+            </div>
+          </div>
+          <div class="appt-info-item">
+            <div class="appt-info-icon"><i class="fas fa-clock"></i></div>
+            <div class="appt-info-text">
+              <div class="appt-info-label">Masa</div>
+              <div class="appt-info-value mono">${escapeHtml(a.timeSlot || a.appointmentTime || '-')}</div>
+            </div>
+          </div>
+          ${a.counselorName ? `
+            <div class="appt-info-item full">
+              <div class="appt-info-icon"><i class="fas fa-user-tie"></i></div>
+              <div class="appt-info-text">
+                <div class="appt-info-label">Kaunselor</div>
+                <div class="appt-info-value">${escapeHtml(a.counselorName)}</div>
+              </div>
+            </div>` : ''}
+          ${locationHTML}
+          ${noteHTML}
+        </div>
+
+        ${a.feelingNotes ? `<div class="appt-note">${escapeHtml(a.feelingNotes)}</div>` : ''}
+        ${a.proposedDate ? `
+          <div class="appt-note" style="border-left-color:var(--indigo);background:rgba(99,102,241,0.06);">
+            <strong style="font-style:normal;">Cadangan Baharu:</strong>
+            ${formatDateShort(a.proposedDate)} ${escapeHtml(a.proposedTime || '')}
+          </div>` : ''}
+
+        <div class="appt-card-foot">
+          <span class="status-badge ${a.status}">
+            <i class="fas fa-circle" style="font-size:0.4rem;"></i>
+            ${statusLabels[a.status] || a.status}
+          </span>
+          <span class="appt-time-ago">${formatTimeAgo(a.createdAt)}</span>
+        </div>
+
+        ${actionsHTML ? `<div class="appt-actions">${actionsHTML}</div>` : ''}
+      </div>
+    `;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     ACTION MODAL
+     ═══════════════════════════════════════════════════════════ */
+  window.openActionModal = function(id, studentName, action) {
+    const modal = document.getElementById('actionModal');
+    const icon = document.getElementById('modalIcon');
+    const title = document.getElementById('modalTitle');
+    const desc = document.getElementById('modalDesc');
+    const resched = document.getElementById('rescheduleFields');
+    const notesLabel = document.getElementById('notesLabel');
+    const notesInput = document.getElementById('modalCounselorNotes');
+    const confirmBtn = document.getElementById('modalConfirmBtn');
+
+    if (!modal) return;
+
+    document.getElementById('modalAppointmentId').value = id;
+    document.getElementById('modalActionType').value = action;
+
+    resched.classList.remove('active');
+    document.getElementById('modalNewDate').value = '';
+    document.getElementById('modalNewTime').value = '';
+    notesInput.value = '';
+
+    if (action === 'approve') {
+      icon.className = 'modal-icon success';
+      icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+      title.textContent = 'Luluskan Temujanji?';
+      desc.innerHTML = `Luluskan permohonan <strong>${escapeHtml(studentName)}</strong>?`;
+      notesLabel.textContent = 'Nota / Lokasi Sesi (Optional)';
+      notesInput.placeholder = 'Cth: Bilik Kaunseling 1';
+      confirmBtn.className = 'btn btn-success';
+      confirmBtn.innerHTML = '<i class="fas fa-check"></i> <span>Luluskan</span>';
+    } else if (action === 'defer') {
+      icon.className = 'modal-icon warning';
+      icon.innerHTML = '<i class="fas fa-clock"></i>';
+      title.textContent = 'Tangguhkan Temujanji';
+      desc.innerHTML = `Cadangkan masa baharu untuk <strong>${escapeHtml(studentName)}</strong>.`;
+      notesLabel.textContent = 'Sebab Penangguhan';
+      notesInput.placeholder = 'Cth: Saya ada taklimat pada masa tersebut';
+      resched.classList.add('active');
+      confirmBtn.className = 'btn btn-warning';
+      confirmBtn.innerHTML = '<i class="fas fa-clock"></i> <span>Tangguh</span>';
+
+      const appt = [...appointments.pending, ...appointments.active].find(x => x.id === id);
+      if (appt) {
+        document.getElementById('modalNewDate').value = appt.date || appt.appointmentDate || '';
+        document.getElementById('modalNewTime').value = appt.timeSlot || appt.appointmentTime || '';
+      }
+    } else if (action === 'reject') {
+      icon.className = 'modal-icon';
+      icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+      title.textContent = 'Tolak Permohonan?';
+      desc.innerHTML = `Tolak permohonan <strong>${escapeHtml(studentName)}</strong>?`;
+      notesLabel.textContent = 'Sebab Penolakan';
+      notesInput.placeholder = 'Cth: Sila walk-in pada waktu rehat';
+      confirmBtn.className = 'btn btn-danger';
+      confirmBtn.innerHTML = '<i class="fas fa-times"></i> <span>Tolak</span>';
+    }
+
+    modal.classList.add('active');
+  };
+
+  window.closeActionModal = function() {
+    const modal = document.getElementById('actionModal');
+    if (modal) modal.classList.remove('active');
+  };
+
+  window.submitModalAction = async function() {
+    const id = document.getElementById('modalAppointmentId').value;
+    const action = document.getElementById('modalActionType').value;
+    const notes = document.getElementById('modalCounselorNotes').value.trim();
+
+    if (!id || !action) return;
+
+    if (action === 'defer') {
+      const d = document.getElementById('modalNewDate').value;
+      const t = document.getElementById('modalNewTime').value.trim();
+      if (!d || !t) return showToast('Ralat', 'Isi tarikh & masa baharu.', 'error');
+      if (!notes) return showToast('Ralat', 'Beri sebab penangguhan.', 'error');
+    }
+    if (action === 'reject' && !notes) {
+      return showToast('Ralat', 'Beri sebab penolakan.', 'error');
+    }
+
+    const btn = document.getElementById('modalConfirmBtn');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Memproses...';
+
+    try {
+      const { db, fs } = emindcare;
+      const ref = fs.doc(db, APPOINTMENTS_COLLECTION, id);
+      const data = {
+        updatedAt: fs.serverTimestamp(),
+        updatedBy: currentUser?.fullName || 'kaunselor'
+      };
+
+      if (action === 'approve') {
+        data.status = 'approved';
+        if (notes) { data.counselorNotes = notes; data.location = notes; }
+      } else if (action === 'defer') {
+        data.status = 'deferred';
+        data.counselorNotes = notes;
+        data.proposedDate = document.getElementById('modalNewDate').value;
+        data.proposedTime = document.getElementById('modalNewTime').value.trim();
+      } else if (action === 'reject') {
+        data.status = 'cancelled';
+        data.counselorNotes = notes;
+      }
+
+      await fs.updateDoc(ref, data);
+      closeActionModal();
+      showToast('Berjaya',
+        action === 'approve' ? 'Permohonan diluluskan.' :
+        action === 'defer' ? 'Penangguhan dihantar.' : 'Permohonan ditolak.',
+        'success'
+      );
+    } catch (e) {
+      showToast('Ralat', 'Gagal: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     MARK COMPLETED
+     ═══════════════════════════════════════════════════════════ */
+  window.markCompleted = async function(id) {
+    if (!confirm('Tandakan sesi ini sebagai SELESAI?')) return;
+    try {
+      const { db, fs } = emindcare;
+      await fs.updateDoc(fs.doc(db, APPOINTMENTS_COLLECTION, id), {
+        status: 'completed',
+        completedAt: fs.serverTimestamp(),
+        completedBy: currentUser?.fullName || 'kaunselor'
+      });
+      showToast('Berjaya', 'Sesi ditandakan selesai.', 'success');
+    } catch (e) {
+      showToast('Ralat', 'Gagal: ' + e.message, 'error');
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     SWITCH TAB
+     ═══════════════════════════════════════════════════════════ */
+  window.switchTab = function(tabName) {
+    currentTab = tabName;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const btn = document.getElementById('tab' + capitalize(tabName) + 'Btn');
+    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('partisi' + capitalize(tabName));
+    if (panel) panel.classList.add('active');
+    renderPanels();
+  };
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  /* ═══════════════════════════════════════════════════════════
+     REFRESH
+     ═══════════════════════════════════════════════════════════ */
+  window.refreshAll = async function() {
+    const btn = document.getElementById('refreshBtn');
+    if (btn) btn.classList.add('spinning');
+    try {
+      await Promise.allSettled([loadScheduleSettings(), loadBlockedDates()]);
+      renderPanels();
+      showToast('Berjaya', 'Data telah dikemas kini.', 'success', 2500);
+    } catch (e) {
+      showToast('Ralat', 'Gagal refresh: ' + e.message, 'error');
+    } finally {
+      setTimeout(() => btn && btn.classList.remove('spinning'), 600);
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     HELPERS
+     ═══════════════════════════════════════════════════════════ */
+  function toDateStr(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function formatDateFull(dateStr) {
+    if (!dateStr) return '—';
+    try {
+      const d = new Date(dateStr + 'T00:00:00');
+      return `${d.getDate()} ${MONTHS_FULL[d.getMonth()]} ${d.getFullYear()}`;
+    } catch { return dateStr; }
+  }
+
+  function formatDateShort(dateStr) {
+    if (!dateStr) return '—';
+    try {
+      const d = new Date(dateStr + 'T00:00:00');
+      return `${String(d.getDate()).padStart(2,'0')} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+    } catch { return dateStr; }
+  }
+
+  function formatTimeAgo(ts) {
+    if (!ts) return '';
+    try {
+      const date = ts.toDate ? ts.toDate() : new Date(ts);
+      const sec = Math.floor((Date.now() - date.getTime()) / 1000);
+      if (sec < 60) return 'baru sahaja';
+      if (sec < 3600) return Math.floor(sec / 60) + ' min lalu';
+      if (sec < 86400) return Math.floor(sec / 3600) + ' jam lalu';
+      if (sec < 604800) return Math.floor(sec / 86400) + ' hari lalu';
+      return date.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' });
+    } catch { return ''; }
+  }
+
+  function escapeHtml(str) {
+    if (str == null) return '';
+    const d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+  function escapeAttr(str) {
+    if (str == null) return '';
+    return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOAST
+     ═══════════════════════════════════════════════════════════ */
+  function showToast(title, message, type = 'success', duration = 4000) {
+    const c = document.getElementById('toastContainer');
+    if (!c) return;
+    const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `
+      <div class="toast-icon"><i class="fas ${icons[type] || 'fa-info'}"></i></div>
+      <div class="toast-content"><strong>${title}</strong><span>${message}</span></div>
+    `;
+    c.appendChild(t);
+    setTimeout(() => {
+      t.classList.add('removing');
+      setTimeout(() => t.remove(), 300);
+    }, duration);
+  }
+
+  /* Cleanup */
+  window.addEventListener('beforeunload', () => {
+    if (unsubAppointments) {
+      try { unsubAppointments(); } catch (e) {}
+    }
+  });
+
+  console.log(
+    "%c 📋 Dashboard Appointments ",
+    "background:linear-gradient(135deg,#0F172A,#0F766E,#4F46E5);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
+  );
+</script>
 
 </body>
 </html>
