@@ -11,6 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+<!-- ⭐ SIDEBAR CSS -->
+<link rel="stylesheet" href="sidebar.css">
+
 <style>
 /* ═══════════════════════════════════════════════════
    ROOT
@@ -59,239 +62,11 @@ body {
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.25); }
 
 /* ═══════════════════════════════════════════════════
    LAYOUT
    ═══════════════════════════════════════════════════ */
 .app { display: flex; min-height: 100vh; min-height: 100dvh; }
-
-/* ═══════════════════════════════════════════════════
-   SIDEBAR
-   ═══════════════════════════════════════════════════ */
-.sidebar {
-  width: var(--sidebar-w);
-  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
-  color: #cbd5e1;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 60;
-  transition: transform 0.4s var(--ease-out);
-  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
-  overflow-y: auto;
-}
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-
-.sb-brand {
-  padding: 1.5rem 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  flex-shrink: 0;
-}
-.sb-brand-logo {
-  width: 42px; height: 42px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1.15rem;
-  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-.sb-brand-logo::before {
-  content: "";
-  position: absolute;
-  inset: -50%;
-  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
-  animation: shineSweep 4s linear infinite;
-}
-.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
-.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
-@keyframes shineSweep { to { transform: rotate(360deg); } }
-.sb-brand-text strong {
-  display: block;
-  font-family: 'Fraunces', serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.sb-brand-text span {
-  font-size: 0.65rem;
-  color: #94a3b8;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-}
-
-.sb-profile {
-  margin: 1rem 1rem 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  color: inherit;
-}
-.sb-profile:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-}
-.sb-avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  font-weight: 800;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sb-avatar::after {
-  content: "";
-  position: absolute;
-  bottom: -2px; right: -2px;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: var(--emerald);
-  border: 2px solid #1E293B;
-}
-.sb-profile-info { min-width: 0; flex: 1; }
-.sb-profile-info strong {
-  display: block;
-  font-size: 0.85rem;
-  color: #fff;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sb-profile-info span {
-  font-size: 0.68rem;
-  color: var(--teal-glow);
-  font-weight: 600;
-}
-
-.sb-menu {
-  flex: 1;
-  padding: 0.5rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.sb-section-label {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 1rem 0.6rem 0.4rem;
-}
-.sb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 0.84rem;
-  font-weight: 600;
-  transition: all 0.3s var(--ease-out);
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
-  position: relative;
-}
-.sb-item i:first-child {
-  width: 32px; height: 32px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.82rem;
-  flex-shrink: 0;
-  transition: all 0.3s;
-}
-.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.sb-item:hover i:first-child {
-  background: rgba(20, 184, 166, 0.15);
-  color: var(--teal-glow);
-}
-.sb-item.active {
-  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
-  color: #fff;
-}
-.sb-item.active i:first-child {
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
-}
-.sb-item.active::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 20%; bottom: 20%;
-  width: 3px;
-  background: var(--teal-glow);
-  border-radius: 0 4px 4px 0;
-}
-.sb-badge {
-  margin-left: auto;
-  padding: 0.1rem 0.5rem;
-  background: var(--rose);
-  color: #fff;
-  border-radius: 50px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  min-width: 22px;
-  text-align: center;
-}
-
-.sb-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  flex-shrink: 0;
-}
-.sb-footer-btn {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #FCA5A5;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.sb-footer-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fff;
-  transform: translateY(-1px);
-}
 
 /* ═══════════════════════════════════════════════════
    MAIN
@@ -390,7 +165,6 @@ body {
   box-shadow: 0 12px 40px -12px rgba(15, 23, 42, 0.12);
   margin-bottom: 1.5rem;
 }
-
 .profile-cover {
   position: relative;
   height: 180px;
@@ -440,7 +214,6 @@ body {
   margin-bottom: 1.2rem;
   width: fit-content;
 }
-
 .profile-avatar {
   width: 140px;
   height: 140px;
@@ -557,12 +330,6 @@ body {
 .profile-meta i {
   color: var(--teal);
   font-size: 0.78rem;
-}
-
-.profile-info-right {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -894,7 +661,6 @@ textarea.input-field {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.2); }
 }
-
 .action-buttons {
   display: flex;
   gap: 0.6rem;
@@ -976,47 +742,6 @@ textarea.input-field {
 .btn.loading .btn-text { display: none; }
 .btn.loading .btn-loading { display: inline-flex; align-items: center; gap: 0.5rem; }
 .btn .btn-loading { display: none; }
-
-/* ═══════════════════════════════════════════════════
-   DANGER ZONE
-   ═══════════════════════════════════════════════════ */
-.danger-zone {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.04), rgba(239, 68, 68, 0.02));
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 20px;
-  padding: 1.5rem;
-  margin-bottom: 1.25rem;
-}
-.danger-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.85rem;
-  margin-bottom: 1rem;
-}
-.danger-icon {
-  width: 40px; height: 40px;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.15);
-  color: var(--rose);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-.danger-header-text strong {
-  display: block;
-  font-family: 'Fraunces', serif;
-  font-size: 1rem;
-  font-weight: 900;
-  color: var(--ink);
-  margin-bottom: 0.2rem;
-}
-.danger-header-text span {
-  font-size: 0.8rem;
-  color: var(--ink-soft);
-  line-height: 1.5;
-}
 
 /* ═══════════════════════════════════════════════════
    TOAST
@@ -1108,7 +833,6 @@ textarea.input-field {
 }
 .modal-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
 .modal-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
-.modal-icon.info { background: rgba(99, 102, 241, 0.1); color: var(--indigo); }
 .modal-title {
   font-family: 'Fraunces', serif;
   font-size: 1.25rem;
@@ -1128,35 +852,6 @@ textarea.input-field {
 .modal-actions .btn { flex: 1; }
 
 /* ═══════════════════════════════════════════════════
-   LOADING SKELETON
-   ═══════════════════════════════════════════════════ */
-.skeleton {
-  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-  background-size: 200% 100%;
-  animation: skeleton 1.5s ease-in-out infinite;
-  border-radius: 8px;
-}
-@keyframes skeleton {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* ═══════════════════════════════════════════════════
-   BACKDROP
-   ═══════════════════════════════════════════════════ */
-.sb-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 55;
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.sb-backdrop.active { display: block; opacity: 1; }
-
-/* ═══════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
@@ -1164,8 +859,6 @@ textarea.input-field {
   .content { padding: 1.25rem; }
 }
 @media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
   .main { margin-left: 0; }
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
@@ -1207,101 +900,10 @@ textarea.input-field {
 
 <div class="app">
 
-  <!-- ═══════════════════════════════════════════════════
-       SIDEBAR
-       ═══════════════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
-      <div class="sb-brand-text">
-        <strong id="sbBrandName">e-MindCare</strong>
-        <span>Dashboard Kaunselor</span>
-      </div>
-    </div>
+  <!-- ⭐ SIDEBAR — auto-inject dari sidebar.js -->
+  <div id="sidebar-root"></div>
 
-    <a href="dashboard-profile.html" class="sb-profile">
-      <div class="sb-avatar" id="sbAvatar">K</div>
-      <div class="sb-profile-info">
-        <strong id="sbProfileName">Kaunselor</strong>
-        <span>Kaunselor UBK</span>
-      </div>
-    </a>
-
-    <nav class="sb-menu">
-      <div class="sb-section-label">Utama</div>
-      <a href="dashboard-kaunselor.html" class="sb-item">
-        <i class="fas fa-chart-pie"></i>
-        <span>Overview</span>
-      </a>
-      <a href="dashboard-profile.html" class="sb-item active">
-        <i class="fas fa-user-circle"></i>
-        <span>Profil Kaunselor</span>
-      </a>
-
-      <div class="sb-section-label">Kandungan Laman</div>
-      <a href="dashboard-announcements.html" class="sb-item">
-        <i class="fas fa-bullhorn"></i>
-        <span>Pengumuman</span>
-      </a>
-      <a href="dashboard-banners.html" class="sb-item">
-        <i class="fas fa-images"></i>
-        <span>Banner Iklan</span>
-      </a>
-      <a href="dashboard-collaborations.html" class="sb-item">
-        <i class="fas fa-handshake"></i>
-        <span>Kolaborasi</span>
-      </a>
-      <a href="dashboard-landing.html" class="sb-item">
-        <i class="fas fa-paint-brush"></i>
-        <span>Sunting Laman</span>
-      </a>
-      <a href="dashboard-gallery.html" class="sb-item">
-        <i class="fas fa-photo-video"></i>
-        <span>Galeri UBK</span>
-      </a>
-      <a href="dashboard-contact.html" class="sb-item">
-        <i class="fas fa-address-book"></i>
-        <span>Hubungi & Lokasi</span>
-      </a>
-
-      <div class="sb-section-label">Pengurusan</div>
-      <a href="dashboard-inventories.html" class="sb-item">
-        <i class="fas fa-clipboard-list"></i>
-        <span>Ujian Inventori</span>
-      </a>
-      <a href="dashboard-users.html" class="sb-item">
-        <i class="fas fa-users"></i>
-        <span>Urus Pengguna</span>
-      </a>
-      <a href="dashboard-appointments.html" class="sb-item">
-        <i class="fas fa-calendar-check"></i>
-        <span>Tempahan Kaunseling</span>
-        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
-      </a>
-      <a href="dashboard-diaries.html" class="sb-item">
-        <i class="fas fa-book"></i>
-        <span>Diari & Catatan</span>
-      </a>
-
-      <div class="sb-section-label">Analitik</div>
-      <a href="dashboard-analytics.html" class="sb-item">
-        <i class="fas fa-chart-line"></i>
-        <span>Data & Laporan</span>
-      </a>
-    </nav>
-
-    <div class="sb-footer">
-      <button class="sb-footer-btn" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Log Keluar</span>
-      </button>
-    </div>
-  </aside>
-  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
-
-  <!-- ═══════════════════════════════════════════════════
-       MAIN
-       ═══════════════════════════════════════════════════ -->
+  <!-- ═══════ MAIN ═══════ -->
   <div class="main">
 
     <header class="topbar">
@@ -1528,7 +1130,7 @@ textarea.input-field {
           </div>
         </div>
 
-        <!-- ═══════ ACTION BAR (Sticky) ═══════ -->
+        <!-- ═══════ ACTION BAR ═══════ -->
         <div class="action-bar">
           <div class="action-bar-status">
             <span class="status-dot" id="statusDot"></span>
@@ -1574,6 +1176,10 @@ textarea.input-field {
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ⭐ SIDEBAR JS -->
+<script type="module" src="sidebar.js"></script>
+
+<!-- ⭐ PAGE JS -->
 <script type="module" src="dashboard-profile.js"></script>
 
 </body>
