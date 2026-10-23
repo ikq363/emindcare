@@ -11,6 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+<!-- ⭐ SIDEBAR CSS - centralized -->
+<link rel="stylesheet" href="sidebar.css">
+
 <style>
 /* ═══════════════════════════════════════════════════
    ROOT
@@ -66,233 +69,6 @@ body {
    LAYOUT
    ═══════════════════════════════════════════════════ */
 .app { display: flex; min-height: 100vh; min-height: 100dvh; }
-
-/* ═══════════════════════════════════════════════════
-   SIDEBAR
-   ═══════════════════════════════════════════════════ */
-.sidebar {
-  width: var(--sidebar-w);
-  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
-  color: #cbd5e1;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 60;
-  transition: transform 0.4s var(--ease-out);
-  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
-  overflow-y: auto;
-}
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-
-.sb-brand {
-  padding: 1.5rem 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  flex-shrink: 0;
-}
-.sb-brand-logo {
-  width: 42px; height: 42px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1.15rem;
-  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-.sb-brand-logo::before {
-  content: "";
-  position: absolute;
-  inset: -50%;
-  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
-  animation: shineSweep 4s linear infinite;
-}
-.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
-.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
-@keyframes shineSweep { to { transform: rotate(360deg); } }
-.sb-brand-text strong {
-  display: block;
-  font-family: 'Fraunces', serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.sb-brand-text span {
-  font-size: 0.65rem;
-  color: #94a3b8;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-}
-
-.sb-profile {
-  margin: 1rem 1rem 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  color: inherit;
-}
-.sb-profile:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-}
-.sb-avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  font-weight: 800;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sb-avatar::after {
-  content: "";
-  position: absolute;
-  bottom: -2px; right: -2px;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: var(--emerald);
-  border: 2px solid #1E293B;
-}
-.sb-profile-info { min-width: 0; flex: 1; }
-.sb-profile-info strong {
-  display: block;
-  font-size: 0.85rem;
-  color: #fff;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sb-profile-info span {
-  font-size: 0.68rem;
-  color: var(--teal-glow);
-  font-weight: 600;
-}
-
-.sb-menu {
-  flex: 1;
-  padding: 0.5rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.sb-section-label {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 1rem 0.6rem 0.4rem;
-}
-.sb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 0.84rem;
-  font-weight: 600;
-  transition: all 0.3s var(--ease-out);
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
-  position: relative;
-}
-.sb-item i:first-child {
-  width: 32px; height: 32px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.82rem;
-  flex-shrink: 0;
-  transition: all 0.3s;
-}
-.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.sb-item:hover i:first-child {
-  background: rgba(20, 184, 166, 0.15);
-  color: var(--teal-glow);
-}
-.sb-item.active {
-  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
-  color: #fff;
-}
-.sb-item.active i:first-child {
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
-}
-.sb-item.active::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 20%; bottom: 20%;
-  width: 3px;
-  background: var(--teal-glow);
-  border-radius: 0 4px 4px 0;
-}
-.sb-badge {
-  margin-left: auto;
-  padding: 0.1rem 0.5rem;
-  background: var(--rose);
-  color: #fff;
-  border-radius: 50px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  min-width: 22px;
-  text-align: center;
-}
-
-.sb-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  flex-shrink: 0;
-}
-.sb-footer-btn {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #FCA5A5;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.sb-footer-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fff;
-  transform: translateY(-1px);
-}
 
 /* ═══════════════════════════════════════════════════
    MAIN
@@ -543,7 +319,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════
-   STAT CARDS (ENHANCED)
+   STAT CARDS
    ═══════════════════════════════════════════════════ */
 .stats-grid {
   display: grid;
@@ -589,7 +365,6 @@ body {
   opacity: 0.06;
   pointer-events: none;
 }
-
 .stat-header {
   display: flex;
   align-items: flex-start;
@@ -621,10 +396,8 @@ body {
   font-weight: 800;
   letter-spacing: 0.3px;
 }
-.stat-trend-badge.down { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
 .stat-trend-badge.neutral { background: rgba(100, 116, 139, 0.1); color: var(--ink-soft); }
 .stat-trend-badge i { font-size: 0.65rem; }
-
 .stat-label {
   font-size: 0.7rem;
   font-weight: 800;
@@ -646,12 +419,6 @@ body {
   position: relative;
   z-index: 1;
 }
-.stat-value .stat-unit {
-  font-size: 1rem;
-  color: var(--ink-soft);
-  font-weight: 700;
-  margin-left: 0.2rem;
-}
 .stat-desc {
   font-size: 0.75rem;
   color: var(--ink-soft);
@@ -660,19 +427,6 @@ body {
   z-index: 1;
 }
 .stat-desc strong { color: var(--ink); font-weight: 700; }
-
-/* Sparkline */
-.sparkline {
-  height: 28px;
-  width: 100%;
-  margin-top: 0.7rem;
-  position: relative;
-  z-index: 1;
-  opacity: 0.6;
-  transition: opacity 0.3s;
-}
-.stat-card:hover .sparkline { opacity: 1; }
-.sparkline svg { width: 100%; height: 100%; }
 
 /* ═══════════════════════════════════════════════════
    ATTENTION BANNER
@@ -764,7 +518,6 @@ body {
   transition: box-shadow 0.3s;
 }
 .card:hover { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06); }
-
 .card-header {
   display: flex;
   align-items: center;
@@ -872,7 +625,6 @@ body {
   letter-spacing: 0.3px;
 }
 
-/* Status badges */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -992,7 +744,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════
-   QUICK ACTIONS (Enriched)
+   QUICK ACTIONS
    ═══════════════════════════════════════════════════ */
 .quick-grid {
   display: grid;
@@ -1033,7 +785,6 @@ body {
 }
 .quick-btn:hover::before { opacity: 1; }
 .quick-btn > * { position: relative; z-index: 1; }
-
 .quick-btn-icon {
   width: 46px; height: 46px;
   border-radius: 13px;
@@ -1065,9 +816,7 @@ body {
   display: block;
   line-height: 1.4;
 }
-.quick-btn:hover .quick-btn-text span {
-  color: rgba(255,255,255,0.85);
-}
+.quick-btn:hover .quick-btn-text span { color: rgba(255,255,255,0.85); }
 .quick-btn-arrow {
   width: 28px; height: 28px;
   border-radius: 50%;
@@ -1338,21 +1087,6 @@ body {
 .btn-danger:hover { background: var(--rose); color: #fff; }
 
 /* ═══════════════════════════════════════════════════
-   BACKDROP
-   ═══════════════════════════════════════════════════ */
-.sb-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 55;
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.sb-backdrop.active { display: block; opacity: 1; }
-
-/* ═══════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
@@ -1360,8 +1094,6 @@ body {
   .content { padding: 1.25rem; }
 }
 @media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
   .main { margin-left: 0; }
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
@@ -1402,101 +1134,10 @@ body {
 
 <div class="app">
 
-  <!-- ═══════════════════════════════════════════════════
-       SIDEBAR
-       ═══════════════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
-      <div class="sb-brand-text">
-        <strong id="sbBrandName">e-MindCare</strong>
-        <span>Dashboard Kaunselor</span>
-      </div>
-    </div>
+  <!-- ⭐ SIDEBAR — auto-inject dari sidebar.js -->
+  <div id="sidebar-root"></div>
 
-    <a href="dashboard-profile.html" class="sb-profile">
-      <div class="sb-avatar" id="sbAvatar">K</div>
-      <div class="sb-profile-info">
-        <strong id="sbProfileName">Kaunselor</strong>
-        <span>Kaunselor UBK</span>
-      </div>
-    </a>
-
-    <nav class="sb-menu">
-      <div class="sb-section-label">Utama</div>
-      <a href="dashboard-kaunselor.html" class="sb-item active">
-        <i class="fas fa-chart-pie"></i>
-        <span>Overview</span>
-      </a>
-      <a href="dashboard-profile.html" class="sb-item">
-        <i class="fas fa-user-circle"></i>
-        <span>Profil Kaunselor</span>
-      </a>
-
-      <div class="sb-section-label">Kandungan Laman</div>
-      <a href="dashboard-announcements.html" class="sb-item">
-        <i class="fas fa-bullhorn"></i>
-        <span>Pengumuman</span>
-      </a>
-      <a href="dashboard-banners.html" class="sb-item">
-        <i class="fas fa-images"></i>
-        <span>Banner Iklan</span>
-      </a>
-      <a href="dashboard-collaborations.html" class="sb-item">
-        <i class="fas fa-handshake"></i>
-        <span>Kolaborasi</span>
-      </a>
-      <a href="dashboard-landing.html" class="sb-item">
-        <i class="fas fa-paint-brush"></i>
-        <span>Sunting Laman</span>
-      </a>
-      <a href="dashboard-gallery.html" class="sb-item">
-        <i class="fas fa-photo-video"></i>
-        <span>Galeri UBK</span>
-      </a>
-      <a href="dashboard-contact.html" class="sb-item">
-        <i class="fas fa-address-book"></i>
-        <span>Hubungi & Lokasi</span>
-      </a>
-
-      <div class="sb-section-label">Pengurusan</div>
-      <a href="dashboard-inventories.html" class="sb-item">
-        <i class="fas fa-clipboard-list"></i>
-        <span>Ujian Inventori</span>
-      </a>
-      <a href="dashboard-users.html" class="sb-item">
-        <i class="fas fa-users"></i>
-        <span>Urus Pengguna</span>
-      </a>
-      <a href="dashboard-appointments.html" class="sb-item">
-        <i class="fas fa-calendar-check"></i>
-        <span>Tempahan Kaunseling</span>
-        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
-      </a>
-      <a href="dashboard-diaries.html" class="sb-item">
-        <i class="fas fa-book"></i>
-        <span>Diari & Catatan</span>
-      </a>
-
-      <div class="sb-section-label">Analitik</div>
-      <a href="dashboard-analytics.html" class="sb-item">
-        <i class="fas fa-chart-line"></i>
-        <span>Data & Laporan</span>
-      </a>
-    </nav>
-
-    <div class="sb-footer">
-      <button class="sb-footer-btn" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Log Keluar</span>
-      </button>
-    </div>
-  </aside>
-  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
-
-  <!-- ═══════════════════════════════════════════════════
-       MAIN
-       ═══════════════════════════════════════════════════ -->
+  <!-- ═══════ MAIN ═══════ -->
   <div class="main">
 
     <header class="topbar">
@@ -1543,13 +1184,13 @@ body {
             </div>
             <div class="welcome-chip">
               <i class="fas fa-list-check"></i>
-              <span><strong id="welcomeTaskCount">3</strong> tugasan belum selesai</span>
+              <span><strong id="welcomeTaskCount">0</strong> tugasan belum selesai</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ═══════ ATTENTION BANNER (show kalau ada pending) ═══════ -->
+      <!-- ═══════ ATTENTION BANNER ═══════ -->
       <a href="dashboard-appointments.html?status=pending" class="attention-banner" id="attentionBanner" style="display:none;">
         <div class="attention-icon"><i class="fas fa-bell"></i></div>
         <div class="attention-content">
@@ -1568,7 +1209,6 @@ body {
       </div>
 
       <div class="stats-grid">
-        <!-- Murid -->
         <a href="dashboard-users.html?role=murid" class="stat-card" style="--stat-c1:#0F766E; --stat-c2:#14B8A6;">
           <div class="stat-header">
             <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
@@ -1577,21 +1217,8 @@ body {
           <div class="stat-label">Jumlah Murid</div>
           <div class="stat-value" id="statMurid">0</div>
           <div class="stat-desc">Berdaftar dalam sistem <strong>e-MindCare</strong></div>
-          <div class="sparkline">
-            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-              <path d="M0,25 Q20,10 40,18 T80,8 T100,12" fill="none" stroke="#14B8A6" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M0,25 Q20,10 40,18 T80,8 T100,12 L100,30 L0,30 Z" fill="url(#gradTeal)" opacity="0.25"/>
-              <defs>
-                <linearGradient id="gradTeal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#14B8A6"/>
-                  <stop offset="100%" stop-color="#14B8A6" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
         </a>
 
-        <!-- Guru -->
         <a href="dashboard-users.html?role=guru" class="stat-card" style="--stat-c1:#4F46E5; --stat-c2:#6366F1;">
           <div class="stat-header">
             <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -1600,45 +1227,19 @@ body {
           <div class="stat-label">Jumlah Guru</div>
           <div class="stat-value" id="statGuru">0</div>
           <div class="stat-desc">Terlibat dengan program UBK</div>
-          <div class="sparkline">
-            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-              <path d="M0,20 Q25,15 50,20 T100,10" fill="none" stroke="#6366F1" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M0,20 Q25,15 50,20 T100,10 L100,30 L0,30 Z" fill="url(#gradIndigo)" opacity="0.25"/>
-              <defs>
-                <linearGradient id="gradIndigo" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#6366F1"/>
-                  <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
         </a>
 
-        <!-- Pending -->
         <a href="dashboard-appointments.html?status=pending" class="stat-card" style="--stat-c1:#F59E0B; --stat-c2:#FBBF24;">
           <div class="stat-header">
             <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
-            <span class="stat-trend-badge" id="pendingTrendBadge"><i class="fas fa-exclamation"></i> Perlu Tindakan</span>
+            <span class="stat-trend-badge"><i class="fas fa-exclamation"></i> Perlu Tindakan</span>
           </div>
           <div class="stat-label">Temujanji Pending</div>
           <div class="stat-value" id="statPending">0</div>
           <div class="stat-desc">Menunggu kelulusan & tindakan</div>
-          <div class="sparkline">
-            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-              <path d="M0,15 Q25,22 50,12 T100,18" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M0,15 Q25,22 50,12 T100,18 L100,30 L0,30 Z" fill="url(#gradAmber)" opacity="0.25"/>
-              <defs>
-                <linearGradient id="gradAmber" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#FBBF24"/>
-                  <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
         </a>
 
-        <!-- Gallery -->
-        <a href="dashboard-gallery.html" class="stat-card" style="--stat-c1:#06B6D4; --stat-c2:#22D3EE;">
+        <a href="dashboard-galeri.html" class="stat-card" style="--stat-c1:#06B6D4; --stat-c2:#22D3EE;">
           <div class="stat-header">
             <div class="stat-icon"><i class="fas fa-photo-video"></i></div>
             <span class="stat-trend-badge neutral"><i class="fas fa-image"></i> Album</span>
@@ -1646,18 +1247,6 @@ body {
           <div class="stat-label">Foto Galeri</div>
           <div class="stat-value" id="statGallery">0</div>
           <div class="stat-desc">Dokumentasi aktiviti UBK</div>
-          <div class="sparkline">
-            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-              <path d="M0,22 Q30,8 60,15 T100,5" fill="none" stroke="#22D3EE" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M0,22 Q30,8 60,15 T100,5 L100,30 L0,30 Z" fill="url(#gradCyan)" opacity="0.25"/>
-              <defs>
-                <linearGradient id="gradCyan" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#22D3EE"/>
-                  <stop offset="100%" stop-color="#22D3EE" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
         </a>
       </div>
 
@@ -1722,7 +1311,7 @@ body {
           <div class="quick-btn-arrow"><i class="fas fa-arrow-right"></i></div>
         </a>
 
-        <a href="dashboard-users.html" class="quick-btn" style="--qc1:#0F766E;--qc2:#14B8A6;">
+        <a href="dashboard-user.html" class="quick-btn" style="--qc1:#0F766E;--qc2:#14B8A6;">
           <div class="quick-btn-icon"><i class="fas fa-user-plus"></i></div>
           <div class="quick-btn-text">
             <strong>Daftar Pengguna</strong>
@@ -1740,7 +1329,7 @@ body {
           <div class="quick-btn-arrow"><i class="fas fa-arrow-right"></i></div>
         </a>
 
-        <a href="dashboard-banners.html" class="quick-btn" style="--qc1:#F59E0B;--qc2:#FBBF24;">
+        <a href="dashboard-iklan.html?tab=banners" class="quick-btn" style="--qc1:#F59E0B;--qc2:#FBBF24;">
           <div class="quick-btn-icon"><i class="fas fa-upload"></i></div>
           <div class="quick-btn-text">
             <strong>Upload Banner</strong>
@@ -1749,7 +1338,7 @@ body {
           <div class="quick-btn-arrow"><i class="fas fa-arrow-right"></i></div>
         </a>
 
-        <a href="dashboard-announcements.html" class="quick-btn" style="--qc1:#EF4444;--qc2:#F87171;">
+        <a href="dashboard-iklan.html?tab=announcements" class="quick-btn" style="--qc1:#EF4444;--qc2:#F87171;">
           <div class="quick-btn-icon"><i class="fas fa-bullhorn"></i></div>
           <div class="quick-btn-text">
             <strong>Pengumuman</strong>
@@ -1810,6 +1399,10 @@ body {
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ⭐ SIDEBAR JS - Auto-inject sidebar HTML -->
+<script type="module" src="sidebar.js"></script>
+
+<!-- ⭐ PAGE JS - Load data & logic -->
 <script type="module">
   import './config.js';
 
@@ -1841,6 +1434,10 @@ body {
   window.addEventListener('load', async () => {
     await waitForEMindCare();
     if (!authGuard()) return;
+
+    // ⭐ Tunggu sidebar siap inject dulu
+    await waitForSidebar();
+
     loadProfile();
     applyBranding();
     initWelcomeBanner();
@@ -1857,6 +1454,22 @@ body {
         if (window.EMindCare) { clearInterval(timer); resolve(); }
         else if (tries > 100) { clearInterval(timer); reject(new Error('SDK timeout')); }
       }, 50);
+    });
+  }
+
+  /* ⭐ Tunggu sidebar.js siap inject ke DOM */
+  function waitForSidebar() {
+    return new Promise(resolve => {
+      if (document.getElementById('sbProfileName')) return resolve();
+      const obs = new MutationObserver(() => {
+        if (document.getElementById('sbProfileName')) {
+          obs.disconnect();
+          resolve();
+        }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+      // Timeout fallback 3s
+      setTimeout(() => { obs.disconnect(); resolve(); }, 3000);
     });
   }
 
@@ -1883,15 +1496,20 @@ body {
   }
 
   /* ═══════════════════════════════════════════════════════════
-     LOAD PROFILE
+     LOAD PROFILE (ke sidebar elements)
      ═══════════════════════════════════════════════════════════ */
   function loadProfile() {
-    document.getElementById('sbProfileName').textContent = currentUser.fullName || 'Kaunselor';
-    const avatar = document.getElementById('sbAvatar');
-    if (currentUser.avatarUrl) {
-      avatar.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
-    } else {
-      avatar.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
+    const nameEl = document.getElementById('sbProfileName');
+    const avatarEl = document.getElementById('sbAvatar');
+
+    if (nameEl) nameEl.textContent = currentUser.fullName || 'Kaunselor';
+
+    if (avatarEl) {
+      if (currentUser.avatarUrl) {
+        avatarEl.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
+      } else {
+        avatarEl.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
+      }
     }
   }
 
@@ -1903,12 +1521,20 @@ body {
       const cfg = await window.EMindCare.getSiteConfig();
       if (!cfg?.branding) return;
       const b = cfg.branding;
-      if (b.name) document.getElementById('sbBrandName').textContent = b.name;
-      if (b.logoUrl) {
-        document.getElementById('sbLogo').innerHTML = `<img src="${b.logoUrl}" alt="">`;
-      } else if (b.logoIcon) {
-        document.getElementById('sbLogo').innerHTML = `<i class="${b.logoIcon}"></i>`;
+
+      const brandNameEl = document.getElementById('sbBrandName');
+      const logoEl = document.getElementById('sbLogo');
+
+      if (b.name && brandNameEl) brandNameEl.textContent = b.name;
+
+      if (logoEl) {
+        if (b.logoUrl) {
+          logoEl.innerHTML = `<img src="${b.logoUrl}" alt="">`;
+        } else if (b.logoIcon) {
+          logoEl.innerHTML = `<i class="${b.logoIcon}"></i>`;
+        }
       }
+
       if (b.primaryColor) document.documentElement.style.setProperty('--teal', b.primaryColor);
       if (b.accentColor) document.documentElement.style.setProperty('--indigo', b.accentColor);
     } catch (e) { /* ignore */ }
@@ -1922,33 +1548,22 @@ body {
     const hour = now.getHours();
 
     let greeting = 'Selamat Pagi';
-    let sub = 'Mari kita mulakan hari ini dengan senyuman. Ada beberapa perkara yang memerlukan perhatian anda.';
-    if (hour >= 12 && hour < 15) {
-      greeting = 'Selamat Tengah Hari';
-      sub = 'Semoga hari anda berjalan lancar. Ini ringkasan aktiviti UBK setakat ini.';
-    } else if (hour >= 15 && hour < 19) {
-      greeting = 'Selamat Petang';
-      sub = 'Akhir hari yang produktif. Semak ringkasan aktiviti terkini di sini.';
-    } else if (hour >= 19 || hour < 5) {
-      greeting = 'Selamat Malam';
-      sub = 'Terima kasih atas dedikasi anda hari ini. Ini ringkasan aktiviti UBK.';
-    }
+    if (hour >= 12 && hour < 15) greeting = 'Selamat Tengah Hari';
+    else if (hour >= 15 && hour < 19) greeting = 'Selamat Petang';
+    else if (hour >= 19 || hour < 5) greeting = 'Selamat Malam';
 
     document.getElementById('welcomeGreeting').textContent = greeting;
 
-    // Nama (capitalize properly)
     const fullName = currentUser.fullName || 'Kaunselor';
     const firstName = fullName.split(' ').slice(0, 2).join(' ');
     const cleanName = firstName.split(' ').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
     document.getElementById('welcomeName').textContent = cleanName;
 
-    // Date
     const days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
     const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
     const dateStr = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
     document.getElementById('welcomeDate').textContent = dateStr;
 
-    // Time (live update)
     const updateTime = () => {
       const t = new Date();
       const h = t.getHours();
@@ -1994,17 +1609,18 @@ body {
       animateNumber('statPending', pending);
       animateNumber('statGallery', gallery.length);
 
-      // Update welcome task count
       document.getElementById('welcomeTaskCount').textContent = pending;
 
-      // Pending badge
       const badge = document.getElementById('pendingBadge');
-      if (pending > 0) {
-        badge.textContent = pending;
-        badge.style.display = 'inline-block';
+      if (badge) {
+        if (pending > 0) {
+          badge.textContent = pending;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
       }
 
-      // Attention banner
       if (pending > 0) {
         document.getElementById('attentionBanner').style.display = 'flex';
         document.getElementById('attentionTitle').textContent =
@@ -2013,7 +1629,6 @@ body {
         document.getElementById('attentionBanner').style.display = 'none';
       }
 
-      // Sort appointments by date (newest first)
       appointments.sort((a, b) => {
         const at = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
         const bt = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
@@ -2103,12 +1718,10 @@ body {
     const now = new Date();
     const today = now.getDay();
     const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - (today === 0 ? 6 : today - 1)); // Monday start
+    startOfWeek.setDate(now.getDate() - (today === 0 ? 6 : today - 1));
 
-    const dayNames = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad'];
     const dayShort = ['Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab', 'Ahd'];
 
-    // Build week days
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(startOfWeek);
@@ -2116,7 +1729,6 @@ body {
       weekDays.push(d);
     }
 
-    // Check which days have events
     const eventsByDate = {};
     appointments.forEach(a => {
       if (!a.appointmentDate) return;
@@ -2144,7 +1756,6 @@ body {
         </div>`;
     }).join('');
 
-    // Today's events
     const todayKey = dateKey(now);
     const todayEvents = (eventsByDate[todayKey] || []).sort((a, b) => {
       const at = a.appointmentTime || '';
@@ -2155,7 +1766,6 @@ body {
     const weekEventsEl = document.getElementById('weekEvents');
 
     if (!todayEvents.length) {
-      // Look for future events this week
       let futureEvents = [];
       for (let i = 0; i < 7; i++) {
         const d = weekDays[i];
@@ -2241,14 +1851,6 @@ body {
     d.textContent = str;
     return d.innerHTML;
   }
-
-  /* ═══════════════════════════════════════════════════════════
-     SIDEBAR TOGGLE
-     ═══════════════════════════════════════════════════════════ */
-  window.toggleSidebar = function() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sbBackdrop').classList.toggle('active');
-  };
 
   /* ═══════════════════════════════════════════════════════════
      REFRESH
