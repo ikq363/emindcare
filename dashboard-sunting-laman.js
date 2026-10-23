@@ -1,26 +1,64 @@
 /* ═══════════════════════════════════════════════════════════════
-   e-MindCare · Sunting Laman (Landing)
+   e-MindCare · Sunting Laman (Landing) — v2.0 FIXED
+   Fix: sidebar race condition, data mapping, debug logs
    ═══════════════════════════════════════════════════════════════ */
 
 import './config.js';
+
+const DEBUG = true;
+const log = (...a) => DEBUG && console.log('[Landing]', ...a);
+const warn = (...a) => DEBUG && console.warn('[Landing]', ...a);
+const err = (...a) => console.error('[Landing]', ...a);
+
+log('✅ dashboard-landing.js LOADED');
 
 const SESSION_KEY = 'emindcare_session';
 const SITE_CONFIG_DOC = ['siteConfig', 'main'];
 
 let currentUser = null;
 let originalData = {};
-let pendingConfirmAction = null;
 
-/* INIT */
+/* ═══════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════ */
 window.addEventListener('load', async () => {
-  await waitForEMindCare();
-  if (!authGuard()) return;
-  await waitForSidebar();
-  populateSidebarProfile();
-  await loadLandingData();
-  bindEvents();
+  log('📄 Window loaded');
+
+  try {
+    await waitForEMindCare();
+    log('✅ EMindCare available');
+
+    if (!authGuard()) {
+      log('❌ Auth guard failed');
+      return;
+    }
+    log('✅ Auth OK:', currentUser.fullName);
+
+    // ⭐ KUNCI UTAMA: Tunggu sidebar siap INJECT dulu
+    await waitForSidebar();
+    log('✅ Sidebar injected');
+
+    // Populate profile ke sidebar
+    populateSidebarProfile();
+
+    // Load data dari Firestore
+    await loadLandingData();
+
+    // Bind events
+    bindEvents();
+    log('✅ Events bound');
+
+    log('🎉 INIT COMPLETE');
+
+  } catch (e) {
+    err('💥 INIT FAILED:', e);
+    showToast('Ralat Sistem', e.message, 'error');
+  }
 });
 
+/* ═══════════════════════════════════════════════════
+   WAIT HELPERS
+   ═══════════════════════════════════════════════════ */
 function waitForEMindCare() {
   return new Promise((resolve, reject) => {
     if (window.EMindCare) return resolve();
@@ -34,136 +72,263 @@ function waitForEMindCare() {
 
 function waitForSidebar() {
   return new Promise(resolve => {
-    if (document.getElementById('sbProfileName')) return resolve();
-    const obs = new MutationObserver(() => {
+    if (document.getElementById('sbProfileName')) {
+      log('Sidebar already injected');
+      return resolve();
+    }
+    log('⏳ Waiting for sidebar inject...');
+    let tries = 0;
+    const t = setInterval(() => {
+      tries++;
       if (document.getElementById('sbProfileName')) {
-        obs.disconnect();
+        clearInterval(t);
+        log(`Sidebar ready after ${tries} tries`);
+        resolve();
+      } else if (tries > 60) {
+        clearInterval(t);
+        warn('Sidebar timeout — continuing anyway');
         resolve();
       }
-    });
-    obs.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => { obs.disconnect(); resolve(); }, 3000);
+    }, 50);
   });
 }
 
+/* ═══════════════════════════════════════════════════
+   AUTH GUARD
+   ═══════════════════════════════════════════════════ */
 function authGuard() {
   const raw = localStorage.getItem(SESSION_KEY);
   if (!raw) { window.location.href = 'login.html'; return false; }
   try {
     const session = JSON.parse(raw);
     if (session.role !== 'kaunselor') {
-      window.location.href = 'login.html';
+      const redirects = { murid: 'dashboard-murid.html', guru: 'dashboard-guru.html' };
+      window.location.href = redirects[session.role] || 'login.html';
       return false;
     }
     currentUser = session;
     return true;
-  } catch {
+  } catch (e) {
+    localStorage.removeItem(SESSION_KEY);
     window.location.href = 'login.html';
     return false;
   }
 }
 
+/* ═══════════════════════════════════════════════════
+   POPULATE SIDEBAR PROFILE
+   ═══════════════════════════════════════════════════ */
 function populateSidebarProfile() {
+  if (!currentUser) {
+    warn('No currentUser to populate sidebar');
+    return;
+  }
+
   const nameEl = document.getElementById('sbProfileName');
   const avatarEl = document.getElementById('sbAvatar');
-  if (nameEl) nameEl.textContent = currentUser.fullName || 'Kaunselor';
+  const brandEl = document.getElementById('sbBrandName');
+  const logoEl = document.getElementById('sbLogo');
+
+  if (nameEl) {
+    nameEl.textContent = currentUser.fullName || 'Kaunselor';
+    log('✅ Sidebar name:', nameEl.textContent);
+  } else {
+    warn('❌ #sbProfileName not found');
+  }
+
   if (avatarEl) {
     if (currentUser.avatarUrl) {
       avatarEl.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
     } else {
       avatarEl.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
     }
+    log('✅ Sidebar avatar populated');
+  } else {
+    warn('❌ #sbAvatar not found');
+  }
+
+  // Try apply branding ke sidebar
+  applyBrandingToSidebar();
+}
+
+async function applyBrandingToSidebar() {
+  try {
+    const cfg = await window.EMindCare.getSiteConfig();
+    if (!cfg?.branding) return;
+
+    const b = cfg.branding;
+    const brandEl = document.getElementById('sbBrandName');
+    const logoEl = document.getElementById('sbLogo');
+
+    if (b.name && brandEl) brandEl.textContent = b.name;
+
+    if (logoEl) {
+      if (b.logoUrl) {
+        logoEl.innerHTML = `<img src="${b.logoUrl}" alt="">`;
+      } else if (b.logoIcon) {
+        logoEl.innerHTML = `<i class="${b.logoIcon}"></i>`;
+      }
+    }
+  } catch (e) {
+    warn('Branding error:', e.message);
   }
 }
 
-/* LOAD DATA */
+/* ═══════════════════════════════════════════════════
+   LOAD DATA DARI FIRESTORE
+   ═══════════════════════════════════════════════════ */
 async function loadLandingData() {
+  log('📥 Loading landing data...');
+
   try {
     const { db, fs } = window.EMindCare;
     const snap = await fs.getDoc(fs.doc(db, SITE_CONFIG_DOC[0], SITE_CONFIG_DOC[1]));
 
-    if (snap.exists()) {
-      const data = snap.data();
-      originalData = JSON.parse(JSON.stringify(data));
-
-      if (data.branding) {
-        document.getElementById('siteName').value = data.branding.name || '';
-        document.getElementById('siteTagline').value = data.branding.tagline || '';
-        if (data.branding.logoUrl) {
-          document.getElementById('logoPreviewBox').innerHTML =
-            `<img src="${data.branding.logoUrl}" alt="">`;
-          document.getElementById('logoPreviewBox').dataset.url = data.branding.logoUrl;
-        }
-        if (data.branding.faviconUrl) {
-          document.getElementById('faviconPreviewBox').innerHTML =
-            `<img src="${data.branding.faviconUrl}" alt="">`;
-          document.getElementById('faviconPreviewBox').dataset.url = data.branding.faviconUrl;
-        }
-      }
-
-      if (data.hero) {
-        document.getElementById('heroTitle').value = data.hero.title || '';
-        document.getElementById('heroSubtitle').value = data.hero.subtitle || '';
-        document.getElementById('heroCtaText').value = data.hero.cta1Text || '';
-        document.getElementById('heroBadge').value = data.hero.badge || '';
-      }
-
-      if (data.visiMisi) {
-        document.getElementById('visi').value = data.visiMisi.visi || '';
-        document.getElementById('misi').value = data.visiMisi.misi || '';
-      }
-
-      if (data.contact) {
-        const c = data.contact;
-        document.getElementById('contactPhone').value = c.phone || '';
-        document.getElementById('contactEmail').value = c.email || '';
-        document.getElementById('contactAddress').value = c.address || '';
-        document.getElementById('contactHours').value = c.hours || '';
-        document.getElementById('contactMapUrl').value = c.mapUrl || '';
-        document.getElementById('socialFacebook').value = c.facebook || '';
-        document.getElementById('socialInstagram').value = c.instagram || '';
-        document.getElementById('socialTiktok').value = c.tiktok || '';
-        document.getElementById('socialYoutube').value = c.youtube || '';
-      }
-
-      updateCounters();
+    if (!snap.exists()) {
+      warn('⚠️ siteConfig/main does not exist — form will be empty');
+      return;
     }
-  } catch (err) {
-    console.error('Load error:', err);
-    showToast('Ralat', 'Gagal memuat: ' + err.message, 'error');
+
+    const data = snap.data();
+    originalData = JSON.parse(JSON.stringify(data));
+    log('📦 Data loaded:', Object.keys(data));
+
+    // ─── BRANDING ───
+    if (data.branding) {
+      const b = data.branding;
+      setValue('siteName', b.name);
+      setValue('siteTagline', b.tagline);
+
+      if (b.logoUrl) {
+        const box = document.getElementById('logoPreviewBox');
+        if (box) {
+          box.innerHTML = `<img src="${b.logoUrl}" alt="Logo">`;
+          box.dataset.url = b.logoUrl;
+        }
+      }
+      if (b.faviconUrl) {
+        const box = document.getElementById('faviconPreviewBox');
+        if (box) {
+          box.innerHTML = `<img src="${b.faviconUrl}" alt="Favicon">`;
+          box.dataset.url = b.faviconUrl;
+        }
+      }
+      log('✅ Branding loaded');
+    } else {
+      warn('⚠️ No branding data');
+    }
+
+    // ─── HERO ───
+    if (data.hero) {
+      const h = data.hero;
+      setValue('heroTitle', h.title);
+      setValue('heroSubtitle', h.subtitle);
+      setValue('heroCtaText', h.cta1Text);
+      setValue('heroBadge', h.badge);
+      log('✅ Hero loaded');
+    } else {
+      warn('⚠️ No hero data');
+    }
+
+    // ─── VISI & MISI ───
+    if (data.visiMisi) {
+      setValue('visi', data.visiMisi.visi);
+      setValue('misi', data.visiMisi.misi);
+      log('✅ Visi/Misi loaded');
+    } else {
+      warn('⚠️ No visiMisi data');
+    }
+
+    // ─── CONTACT & SOCIAL ───
+    if (data.contact) {
+      const c = data.contact;
+      setValue('contactPhone', c.phone);
+      setValue('contactEmail', c.email);
+      setValue('contactAddress', c.address);
+      setValue('contactHours', c.hours);
+      setValue('contactMapUrl', c.mapUrl);
+      setValue('socialFacebook', c.facebook);
+      setValue('socialInstagram', c.instagram);
+      setValue('socialTiktok', c.tiktok);
+      setValue('socialYoutube', c.youtube);
+      log('✅ Contact loaded');
+    } else {
+      warn('⚠️ No contact data');
+    }
+
+    // Update counters
+    updateAllCounters();
+
+    // Reset dirty status (data baru load)
+    document.getElementById('statusDot')?.classList.remove('dirty');
+    const statusText = document.getElementById('statusText');
+    if (statusText) statusText.textContent = 'Semua perubahan disimpan';
+    const saveBtn = document.getElementById('saveBtn');
+    if (saveBtn) saveBtn.disabled = true;
+
+    log('✅ LOAD COMPLETE');
+
+  } catch (e) {
+    err('💥 Load error:', e);
+    showToast('Ralat', 'Gagal memuat data: ' + e.message, 'error');
   }
 }
 
-/* BIND EVENTS */
+/* ─── Helper: set value ke input/textarea ─── */
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (!el) {
+    warn(`⚠️ #${id} not found`);
+    return;
+  }
+  el.value = value || '';
+}
+
+/* ═══════════════════════════════════════════════════
+   BIND EVENTS
+   ═══════════════════════════════════════════════════ */
 function bindEvents() {
+  // Character counters
   ['heroSubtitle', 'visi', 'misi'].forEach(id => {
     const el = document.getElementById(id);
-    const counterId = id === 'heroSubtitle' ? 'heroSubCounter' : id + 'Counter';
-    const counter = document.getElementById(counterId);
-    if (el && counter) {
-      el.addEventListener('input', () => updateCounter(el, counter));
+    if (el) {
+      el.addEventListener('input', () => updateCounter(el));
     }
   });
 
-  document.getElementById('landingForm').addEventListener('input', markDirty);
-  document.getElementById('landingForm').addEventListener('submit', handleSave);
+  // Mark dirty on any input/change
+  const form = document.getElementById('landingForm');
+  if (form) {
+    form.addEventListener('input', markDirty);
+    form.addEventListener('change', markDirty);
+    form.addEventListener('submit', handleSave);
+  }
 
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    if (confirm('Reset semua perubahan? Semua perubahan yang belum disimpan akan hilang.')) {
-      location.reload();
-    }
-  });
+  // Reset
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Reset semua perubahan? Perubahan yang belum disimpan akan hilang.')) {
+        location.reload();
+      }
+    });
+  }
 
+  // Side nav section jumper
   document.querySelectorAll('.side-nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
-      const target = document.getElementById(item.dataset.target);
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const targetId = item.dataset.target;
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
       document.querySelectorAll('.side-nav-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
     });
   });
 
+  // Scroll spy
   const sections = document.querySelectorAll('.form-section');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -177,24 +342,39 @@ function bindEvents() {
   }, { threshold: 0.3 });
   sections.forEach(s => observer.observe(s));
 
-  document.getElementById('logoInput').addEventListener('change', (e) => {
-    handleImageUpload(e.target.files[0], 'logo');
-  });
-  document.getElementById('faviconInput').addEventListener('change', (e) => {
-    handleImageUpload(e.target.files[0], 'favicon');
-  });
+  // Logo upload
+  const logoInput = document.getElementById('logoInput');
+  if (logoInput) {
+    logoInput.addEventListener('change', (e) => {
+      handleImageUpload(e.target.files[0], 'logo');
+    });
+  }
+
+  // Favicon upload
+  const faviconInput = document.getElementById('faviconInput');
+  if (faviconInput) {
+    faviconInput.addEventListener('change', (e) => {
+      handleImageUpload(e.target.files[0], 'favicon');
+    });
+  }
 }
 
-function updateCounters() {
+/* ═══════════════════════════════════════════════════
+   COUNTERS
+   ═══════════════════════════════════════════════════ */
+function updateAllCounters() {
   ['heroSubtitle', 'visi', 'misi'].forEach(id => {
     const el = document.getElementById(id);
-    const counterId = id === 'heroSubtitle' ? 'heroSubCounter' : id + 'Counter';
-    const counter = document.getElementById(counterId);
-    if (el && counter) updateCounter(el, counter);
+    if (el) updateCounter(el);
   });
 }
 
-function updateCounter(el, counter) {
+function updateCounter(el) {
+  const id = el.id;
+  const counterId = id === 'heroSubtitle' ? 'heroSubCounter' : id + 'Counter';
+  const counter = document.getElementById(counterId);
+  if (!counter) return;
+
   const len = el.value.length;
   const max = parseInt(el.getAttribute('maxlength')) || 500;
   counter.textContent = `${len} / ${max}`;
@@ -203,15 +383,25 @@ function updateCounter(el, counter) {
   else if (len >= max * 0.85) counter.classList.add('warn');
 }
 
+/* ═══════════════════════════════════════════════════
+   DIRTY STATE
+   ═══════════════════════════════════════════════════ */
 function markDirty() {
-  document.getElementById('saveBtn').disabled = false;
-  document.getElementById('statusDot').classList.add('dirty');
-  document.getElementById('statusText').textContent = 'Ada perubahan belum disimpan';
+  const saveBtn = document.getElementById('saveBtn');
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+
+  if (saveBtn) saveBtn.disabled = false;
+  if (statusDot) statusDot.classList.add('dirty');
+  if (statusText) statusText.textContent = 'Ada perubahan belum disimpan';
 }
 
-/* IMAGE UPLOAD */
+/* ═══════════════════════════════════════════════════
+   IMAGE UPLOAD
+   ═══════════════════════════════════════════════════ */
 async function handleImageUpload(file, type) {
   if (!file) return;
+
   if (!file.type.startsWith('image/')) {
     showToast('Ralat', 'Sila pilih fail gambar sahaja.', 'error');
     return;
@@ -222,12 +412,24 @@ async function handleImageUpload(file, type) {
   }
 
   const previewBox = document.getElementById(type === 'logo' ? 'logoPreviewBox' : 'faviconPreviewBox');
+  if (!previewBox) return;
+
+  // Optimistic preview
   const reader = new FileReader();
-  reader.onload = (e) => { previewBox.innerHTML = `<img src="${e.target.result}" alt="">`; };
+  reader.onload = (e) => {
+    previewBox.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+  };
   reader.readAsDataURL(file);
 
   const progressEl = document.getElementById('uploadProgress1');
-  progressEl.classList.add('active');
+  const fillEl = document.getElementById('uploadFill1');
+  const pctEl = document.getElementById('uploadPct1');
+  const labelEl = document.getElementById('uploadLabel1');
+
+  if (progressEl) progressEl.classList.add('active');
+  if (fillEl) fillEl.style.width = '0%';
+  if (pctEl) pctEl.textContent = '0%';
+  if (labelEl) labelEl.textContent = `Memuat naik ${type}...`;
 
   try {
     const { CLOUDINARY_CONFIG } = window.EMindCare;
@@ -242,9 +444,8 @@ async function handleImageUpload(file, type) {
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
         const pct = Math.round((e.loaded / e.total) * 100);
-        document.getElementById('uploadFill1').style.width = pct + '%';
-        document.getElementById('uploadPct1').textContent = pct + '%';
-        document.getElementById('uploadLabel1').textContent = `Memuat naik ${type}...`;
+        if (fillEl) fillEl.style.width = pct + '%';
+        if (pctEl) pctEl.textContent = pct + '%';
       }
     };
 
@@ -253,71 +454,88 @@ async function handleImageUpload(file, type) {
         const res = JSON.parse(xhr.responseText);
         previewBox.dataset.url = res.secure_url;
         markDirty();
-        setTimeout(() => progressEl.classList.remove('active'), 1000);
+        if (labelEl) labelEl.textContent = '✓ Selesai!';
+        if (pctEl) pctEl.textContent = '100%';
+        if (fillEl) fillEl.style.width = '100%';
+        setTimeout(() => progressEl?.classList.remove('active'), 1200);
         showToast('Berjaya', `${type === 'logo' ? 'Logo' : 'Favicon'} dimuat naik. Klik Simpan untuk kekalkan.`, 'success');
+        log(`✅ ${type} uploaded:`, res.secure_url);
       } else {
-        progressEl.classList.remove('active');
+        progressEl?.classList.remove('active');
         showToast('Ralat', 'Gagal upload.', 'error');
+        err('Upload failed:', xhr.status);
       }
     };
+
     xhr.onerror = () => {
-      progressEl.classList.remove('active');
-      showToast('Ralat', 'Gagal upload.', 'error');
+      progressEl?.classList.remove('active');
+      showToast('Ralat', 'Rangkaian gagal.', 'error');
     };
+
     xhr.send(formData);
-  } catch (err) {
-    progressEl.classList.remove('active');
-    showToast('Ralat', err.message, 'error');
+  } catch (e) {
+    progressEl?.classList.remove('active');
+    showToast('Ralat', e.message, 'error');
+    err('Upload error:', e);
   }
 }
 
 window.clearImage = function(type) {
-  const box = document.getElementById(type === 'logo' ? 'logoPreviewBox' : 'faviconPreviewBox');
-  box.innerHTML = `<span class="placeholder-icon"><i class="fas fa-image"></i></span>`;
+  const previewId = type === 'logo' ? 'logoPreviewBox' : 'faviconPreviewBox';
+  const box = document.getElementById(previewId);
+  if (!box) return;
+
+  box.innerHTML = `<span class="placeholder-icon"><i class="fas fa-${type === 'logo' ? 'image' : 'star'}"></i></span>`;
   delete box.dataset.url;
   markDirty();
 };
 
-/* SAVE */
+/* ═══════════════════════════════════════════════════
+   SAVE
+   ═══════════════════════════════════════════════════ */
 async function handleSave(e) {
   e.preventDefault();
+  log('💾 Saving...');
+
   const btn = document.getElementById('saveBtn');
+  const origHTML = btn.innerHTML;
   btn.classList.add('loading');
   btn.disabled = true;
 
   try {
     const { db, fs } = window.EMindCare;
+
     const logoBox = document.getElementById('logoPreviewBox');
     const faviconBox = document.getElementById('faviconPreviewBox');
 
     const data = {
       branding: {
-        name: document.getElementById('siteName').value.trim(),
-        tagline: document.getElementById('siteTagline').value.trim(),
-        logoUrl: logoBox.dataset.url || (logoBox.querySelector('img')?.src || ''),
-        faviconUrl: faviconBox.dataset.url || (faviconBox.querySelector('img')?.src || ''),
+        name: getValue('siteName'),
+        tagline: getValue('siteTagline'),
+        logoUrl: logoBox?.dataset.url || logoBox?.querySelector('img')?.src || '',
+        faviconUrl: faviconBox?.dataset.url || faviconBox?.querySelector('img')?.src || '',
         updatedAt: fs.serverTimestamp()
       },
       hero: {
-        title: document.getElementById('heroTitle').value.trim(),
-        subtitle: document.getElementById('heroSubtitle').value.trim(),
-        cta1Text: document.getElementById('heroCtaText').value.trim(),
-        badge: document.getElementById('heroBadge').value.trim()
+        title: getValue('heroTitle'),
+        subtitle: getValue('heroSubtitle'),
+        cta1Text: getValue('heroCtaText'),
+        badge: getValue('heroBadge')
       },
       visiMisi: {
-        visi: document.getElementById('visi').value.trim(),
-        misi: document.getElementById('misi').value.trim()
+        visi: getValue('visi'),
+        misi: getValue('misi')
       },
       contact: {
-        phone: document.getElementById('contactPhone').value.trim(),
-        email: document.getElementById('contactEmail').value.trim(),
-        address: document.getElementById('contactAddress').value.trim(),
-        hours: document.getElementById('contactHours').value.trim(),
-        mapUrl: document.getElementById('contactMapUrl').value.trim(),
-        facebook: document.getElementById('socialFacebook').value.trim(),
-        instagram: document.getElementById('socialInstagram').value.trim(),
-        tiktok: document.getElementById('socialTiktok').value.trim(),
-        youtube: document.getElementById('socialYoutube').value.trim()
+        phone: getValue('contactPhone'),
+        email: getValue('contactEmail'),
+        address: getValue('contactAddress'),
+        hours: getValue('contactHours'),
+        mapUrl: getValue('contactMapUrl'),
+        facebook: getValue('socialFacebook'),
+        instagram: getValue('socialInstagram'),
+        tiktok: getValue('socialTiktok'),
+        youtube: getValue('socialYoutube')
       },
       lastUpdated: fs.serverTimestamp(),
       updatedBy: currentUser.fullName || 'kaunselor'
@@ -330,27 +548,36 @@ async function handleSave(e) {
     );
 
     originalData = JSON.parse(JSON.stringify(data));
-    document.getElementById('statusDot').classList.remove('dirty');
-    document.getElementById('statusText').textContent = 'Semua perubahan disimpan';
+
+    document.getElementById('statusDot')?.classList.remove('dirty');
+    const statusText = document.getElementById('statusText');
+    if (statusText) statusText.textContent = 'Semua perubahan disimpan';
+
     showToast('Berjaya', 'Perubahan disimpan. Laman utama akan dikemas kini.', 'success');
-  } catch (err) {
-    console.error('Save error:', err);
-    showToast('Ralat', 'Gagal simpan: ' + err.message, 'error');
+    log('✅ Saved successfully');
+
+  } catch (e) {
+    err('💥 Save error:', e);
+    showToast('Ralat', 'Gagal simpan: ' + e.message, 'error');
     btn.disabled = false;
   } finally {
     btn.classList.remove('loading');
+    btn.innerHTML = origHTML;
   }
 }
 
-/* MODAL */
-window.closeConfirmModal = function() {
-  document.getElementById('confirmModal').classList.remove('active');
-  pendingConfirmAction = null;
-};
+function getValue(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
 
-/* TOAST */
+/* ═══════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════ */
 function showToast(title, message, type = 'success', duration = 4000) {
   const container = document.getElementById('toastContainer');
+  if (!container) return;
+
   const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
@@ -365,7 +592,4 @@ function showToast(title, message, type = 'success', duration = 4000) {
   }, duration);
 }
 
-console.log(
-  "%c 🎨 Sunting Laman ",
-  "background:linear-gradient(135deg,#0F766E,#4F46E5,#06B6D4);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
-);
+log('🎯 Ready — debug enabled');
