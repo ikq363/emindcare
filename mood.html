@@ -87,6 +87,80 @@ body {
   50% { transform: translate(60px, -60px) scale(1.15); }
 }
 
+/* ═══════ ANNOUNCEMENT BAR ═══════ */
+.announcement-bar {
+  position: relative; z-index: 91;
+  background: linear-gradient(90deg, #0F172A 0%, #1E1B4B 40%, #0D9488 100%);
+  color: #fff;
+  overflow: hidden;
+  display: none;
+  align-items: center;
+  height: 42px;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.3);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.2);
+}
+.announcement-bar.active { display: flex; }
+
+.announce-label {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0 1.2rem 0 1.5rem;
+  height: 100%;
+  background: linear-gradient(135deg, var(--cyan-soft), var(--teal-glow));
+  color: #0F172A;
+  font-size: 0.65rem; font-weight: 800;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  padding-right: 1.7rem;
+  position: relative; z-index: 3;
+}
+.announce-label i { font-size: 0.78rem; animation: bellRing 2.5s ease-in-out infinite; }
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0); }
+  15%, 35% { transform: rotate(-14deg); }
+  25%, 45% { transform: rotate(14deg); }
+}
+
+.announce-track {
+  flex: 1; height: 100%;
+  display: flex; align-items: center;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+}
+.announce-marquee {
+  display: flex; gap: 3.5rem;
+  animation: marquee 42s linear infinite;
+  white-space: nowrap; padding-left: 2rem;
+  will-change: transform;
+}
+.announce-marquee:hover { animation-play-state: paused; }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.announce-item {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  font-size: 0.8rem; font-weight: 500;
+  flex-shrink: 0;
+}
+.announce-item i { color: var(--cyan-soft); font-size: 0.75rem; }
+.announce-item .badge {
+  background: rgba(34, 211, 238, 0.2);
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  color: var(--cyan-soft);
+  padding: 0.1rem 0.5rem; border-radius: 50px;
+  font-size: 0.6rem; font-weight: 800;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.announce-divider { color: var(--cyan-soft); opacity: 0.4; font-size: 0.65rem; }
+
+@media (max-width: 520px) {
+  .announce-label span { display: none; }
+  .announce-label { padding: 0 0.7rem 0 0.9rem; padding-right: 1.2rem; }
+  .announce-item { font-size: 0.74rem; }
+}
+
 /* ═══════ NAVBAR ═══════ */
 .navbar {
   position: sticky; top: 0; z-index: 90;
@@ -130,6 +204,57 @@ body {
   font-weight: 600; letter-spacing: 0.3px;
   text-transform: uppercase;
 }
+
+/* Live Clock in Navbar */
+.live-clock {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.08), rgba(139, 92, 246, 0.08));
+  border: 1px solid rgba(13, 148, 136, 0.2);
+  border-radius: 50px;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.live-clock:hover {
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.12), rgba(139, 92, 246, 0.12));
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.15);
+}
+.clock-icon {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+  animation: clockPulse 2s ease-in-out infinite;
+}
+@keyframes clockPulse {
+  0%, 100% { box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3); }
+  50% { box-shadow: 0 4px 18px rgba(13, 148, 136, 0.55), 0 0 0 4px rgba(13, 148, 136, 0.1); }
+}
+.clock-text { display: flex; flex-direction: column; line-height: 1.1; }
+.clock-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.5px;
+}
+.clock-date {
+  font-size: 0.6rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
 .nav-actions { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
 .nav-btn {
   padding: 0.5rem 1rem;
@@ -159,9 +284,24 @@ body {
 .nav-btn.primary:hover {
   box-shadow: 0 10px 24px rgba(13, 148, 136, 0.4);
 }
-@media (max-width: 600px) {
+
+@media (max-width: 900px) {
+  .live-clock { padding: 0.4rem 0.8rem; gap: 0.5rem; }
+  .clock-icon { width: 26px; height: 26px; font-size: 0.7rem; }
+  .clock-time { font-size: 0.78rem; }
+  .clock-date { font-size: 0.55rem; }
+}
+@media (max-width: 700px) {
+  .live-clock { padding: 0.35rem 0.65rem; gap: 0.4rem; }
+  .clock-icon { width: 24px; height: 24px; font-size: 0.65rem; }
+  .clock-date { display: none; }
+}
+@media (max-width: 520px) {
   .nav-btn span { display: none; }
   .nav-btn { padding: 0.5rem 0.7rem; }
+  .nav-brand-text strong { font-size: 0.95rem; }
+  .nav-brand-text span { display: none; }
+  .live-clock { display: none; }
 }
 
 /* ═══════ MAIN ═══════ */
@@ -208,7 +348,31 @@ body {
   background: radial-gradient(circle, rgba(244, 63, 94, 0.35), transparent 70%);
   border-radius: 50%; pointer-events: none;
 }
-.hero-content { position: relative; z-index: 2; max-width: 720px; margin: 0 auto; }
+
+/* Floating sparkles */
+.sparkles {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.sparkle {
+  position: absolute;
+  width: 4px; height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 12px currentColor;
+  animation: sparkleFloat linear infinite;
+  opacity: 0;
+}
+@keyframes sparkleFloat {
+  0% { transform: translateY(100%) scale(0); opacity: 0; }
+  10% { opacity: 1; transform: translateY(90%) scale(1); }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100%) scale(0); opacity: 0; }
+}
+
+.hero-content { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 0.5rem;
   padding: 0.5rem 1.1rem;
@@ -220,8 +384,18 @@ body {
   letter-spacing: 1.2px; text-transform: uppercase;
   color: var(--cyan-soft);
   margin-bottom: 1.3rem;
+  animation: badgePop 0.8s var(--ease-elastic);
 }
-.hero-badge i { font-size: 0.75rem; }
+@keyframes badgePop {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.hero-badge i { font-size: 0.75rem; animation: pulseIcon 2s ease-in-out infinite; }
+@keyframes pulseIcon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
 .hero-title {
   font-family: 'Fraunces', serif;
   font-size: clamp(1.75rem, 4.5vw, 2.8rem);
@@ -251,6 +425,98 @@ body {
   margin: 0 auto 1.8rem;
 }
 
+/* ═══════ QUOTE OF THE DAY ═══════ */
+.quote-card {
+  position: relative;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 1.4rem 1.6rem 1.5rem;
+  max-width: 640px;
+  margin: 0 auto 1.5rem;
+  text-align: left;
+  overflow: hidden;
+  animation: quoteFade 1s var(--ease-out);
+}
+@keyframes quoteFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.quote-card::before {
+  content: "\f10d";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  top: -10px; left: 8px;
+  font-size: 3.5rem;
+  color: rgba(34, 211, 238, 0.15);
+  z-index: 0;
+}
+.quote-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--cyan-soft);
+  margin-bottom: 0.7rem;
+  position: relative;
+  z-index: 1;
+}
+.quote-head i { font-size: 0.72rem; }
+.quote-text {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.5;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0.6rem;
+  transition: opacity 0.4s ease;
+}
+.quote-author {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.quote-author::before {
+  content: "—";
+  color: var(--cyan-soft);
+  font-weight: 700;
+}
+
+.quote-nav {
+  position: absolute;
+  bottom: 1rem; right: 1.2rem;
+  display: flex;
+  gap: 0.35rem;
+  z-index: 2;
+}
+.quote-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s;
+}
+.quote-dot.active {
+  background: var(--cyan-soft);
+  width: 20px;
+  border-radius: 3px;
+}
+
 /* Mood meter */
 .mood-meter {
   background: rgba(255,255,255,0.08);
@@ -258,7 +524,7 @@ body {
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 20px;
   padding: 1.3rem 1.5rem;
-  max-width: 640px;
+  max-width: 720px;
   margin: 0 auto;
 }
 .mood-meter-title {
@@ -288,8 +554,12 @@ body {
   text-align: center;
   transition: all 0.3s;
 }
-.mood-bar:hover { background: rgba(255,255,255,0.18); }
-.mood-bar .emoji { font-size: 1.4rem; line-height: 1; }
+.mood-bar:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+}
+.mood-bar .emoji { font-size: 1.4rem; line-height: 1; display: inline-block; transition: transform 0.3s var(--ease-elastic); }
+.mood-bar:hover .emoji { transform: scale(1.15) rotate(-5deg); }
 .mood-bar .percent {
   font-size: 0.85rem;
   font-weight: 800;
@@ -303,6 +573,65 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* ═══════ FEATURE CARDS ═══════ */
+.feature-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.feature-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.4rem 1.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-out);
+  cursor: default;
+}
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--fc-color, var(--teal));
+}
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.15);
+  border-color: transparent;
+}
+.feature-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: var(--fc-bg, linear-gradient(135deg, rgba(13, 148, 136, 0.1), rgba(139, 92, 246, 0.1)));
+  color: var(--fc-color, var(--teal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: 0.9rem;
+  transition: transform 0.4s var(--ease-elastic);
+}
+.feature-card:hover .feature-icon {
+  transform: scale(1.1) rotate(-8deg);
+}
+.feature-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.4rem;
+  line-height: 1.25;
+}
+.feature-desc {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
 }
 
 /* ═══════ FORM CARD ═══════ */
@@ -451,7 +780,7 @@ body {
 }
 .char-counter .limit { font-family: 'JetBrains Mono', monospace; }
 .char-counter .limit.warn { color: var(--orange); }
-.char-counter .limit.danger { color: var(--rose, #EF4444); }
+.char-counter .limit.danger { color: #EF4444; }
 
 /* Color picker */
 .color-picker {
@@ -565,7 +894,18 @@ body {
   transition: all 0.3s var(--ease-out);
   box-shadow: 0 14px 32px -8px rgba(13, 148, 136, 0.45);
   margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
 }
+.submit-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.7s;
+}
+.submit-btn:hover:not(:disabled)::before { transform: translateX(100%); }
 .submit-btn:hover:not(:disabled) {
   background-position: right center;
   transform: translateY(-2px);
@@ -1046,6 +1386,8 @@ body {
   .hero { padding: 2rem 1.2rem 2.5rem; border-radius: 20px; }
   .hero-title { font-size: 1.5rem; }
   .hero-sub { font-size: 0.85rem; }
+  .quote-card { padding: 1.2rem 1.2rem 1.3rem; }
+  .quote-text { font-size: 0.95rem; }
   .mood-meter { padding: 1rem; border-radius: 16px; }
   .form-card { padding: 1.3rem 1.1rem; }
   .form-header h2 { font-size: 1.2rem; }
@@ -1057,6 +1399,11 @@ body {
   .safety-content h3 { font-size: 1.05rem; }
   .toast-container { top: 0.85rem; right: 0.85rem; left: 0.85rem; max-width: none; }
   .toast { min-width: auto; max-width: none; }
+  .feature-row { grid-template-columns: repeat(2, 1fr); }
+  .feature-card { padding: 1.1rem 0.9rem; }
+  .feature-icon { width: 40px; height: 40px; font-size: 1rem; }
+  .feature-title { font-size: 0.85rem; }
+  .feature-desc { font-size: 0.72rem; }
 }
 </style>
 </head>
@@ -1069,6 +1416,22 @@ body {
   <div class="ambient-orb ao-3"></div>
 </div>
 
+<!-- ═══════ ANNOUNCEMENT BAR ═══════ -->
+<div class="announcement-bar" id="announcementBar">
+  <div class="announce-label">
+    <i class="fas fa-bullhorn"></i>
+    <span>Info</span>
+  </div>
+  <div class="announce-track">
+    <div class="announce-marquee" id="announcementMarquee">
+      <span class="announce-item">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Memuatkan pengumuman...</span>
+      </span>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════ NAVBAR ═══════ -->
 <nav class="navbar">
   <div class="navbar-inner">
@@ -1079,6 +1442,16 @@ body {
         <span>UBK SEMSIRA</span>
       </div>
     </a>
+
+    <!-- Live Clock -->
+    <div class="live-clock" id="liveClock">
+      <div class="clock-icon"><i class="fas fa-clock"></i></div>
+      <div class="clock-text">
+        <span class="clock-time" id="clockTime">--:--:--</span>
+        <span class="clock-date" id="clockDate">Memuatkan...</span>
+      </div>
+    </div>
+
     <div class="nav-actions">
       <a href="teroka.html" class="nav-btn">
         <i class="fas fa-compass"></i>
@@ -1097,6 +1470,9 @@ body {
 
   <!-- ═══ HERO ═══ -->
   <section class="hero">
+    <!-- Floating sparkles -->
+    <div class="sparkles" id="sparkles"></div>
+
     <div class="hero-content">
       <div class="hero-badge">
         <i class="fas fa-shield-alt"></i>
@@ -1109,6 +1485,17 @@ body {
       <p class="hero-sub">
         Luahkan apa yang tersirat di dalam minda secara 100% tanpa nama. Anda tidak bersendirian.
       </p>
+
+      <!-- Quote of the day -->
+      <div class="quote-card">
+        <div class="quote-head">
+          <i class="fas fa-quote-left"></i>
+          <span>Kata-Kata Hari Ini</span>
+        </div>
+        <div class="quote-text" id="quoteText">"Setiap hari adalah peluang baru untuk menjadi lebih baik."</div>
+        <div class="quote-author" id="quoteAuthor">e-MindCare</div>
+        <div class="quote-nav" id="quoteNav"></div>
+      </div>
 
       <!-- Mood Meter -->
       <div class="mood-meter">
@@ -1151,6 +1538,30 @@ body {
       </div>
     </div>
   </section>
+
+  <!-- ═══ FEATURE CARDS ═══ -->
+  <div class="feature-row">
+    <div class="feature-card" style="--fc-color: #0D9488; --fc-bg: linear-gradient(135deg, rgba(13, 148, 136, 0.12), rgba(13, 148, 136, 0.05));">
+      <div class="feature-icon"><i class="fas fa-user-secret"></i></div>
+      <div class="feature-title">100% Anonymous</div>
+      <div class="feature-desc">Identiti anda dilindungi sepenuhnya. Tiada jejak, tiada nama sebenar.</div>
+    </div>
+    <div class="feature-card" style="--fc-color: #8B5CF6; --fc-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(139, 92, 246, 0.05));">
+      <div class="feature-icon"><i class="fas fa-lock"></i></div>
+      <div class="feature-title">Privasi Terjamin</div>
+      <div class="feature-desc">Setiap luahan anda selamat. Hanya untuk mata yang sudi memahami.</div>
+    </div>
+    <div class="feature-card" style="--fc-color: #EC4899; --fc-bg: linear-gradient(135deg, rgba(236, 72, 153, 0.12), rgba(236, 72, 153, 0.05));">
+      <div class="feature-icon"><i class="fas fa-hands-holding-heart"></i></div>
+      <div class="feature-title">Saling Menyokong</div>
+      <div class="feature-desc">Berikan reaksi & sokongan kepada rakan-rakan yang berkongsi.</div>
+    </div>
+    <div class="feature-card" style="--fc-color: #F59E0B; --fc-bg: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.05));">
+      <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+      <div class="feature-title">Live & Real-time</div>
+      <div class="feature-desc">Luahan muncul serta-merta. Kongsi detik perasaan anda sekarang.</div>
+    </div>
+  </div>
 
   <!-- ═══ FORM CARD ═══ -->
   <section class="form-card">
