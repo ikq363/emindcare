@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F766E">
+<title>Dinding Luahan · e-MindCare UBK SEMSIRA</title>
+<meta name="description" content="Dinding luahan tanpa nama untuk warga SEMSIRA. Anda tidak bersendirian.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌈</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root {
+  --teal: #0D9488;
+  --teal-light: #14B8A6;
+  --teal-glow: #2DD4BF;
+  --emerald: #10B981;
+  --indigo: #6366F1;
+  --indigo-light: #818CF8;
+  --violet: #8B5CF6;
+  --cyan: #06B6D4;
+  --cyan-soft: #22D3EE;
+  --pink: #EC4899;
+  --coral: #F43F5E;
+  --orange: #F97316;
+  --amber: #F59E0B;
+  --pearl: #F8FAFC;
+  --ink: #0F172A;
+  --ink-soft: #64748B;
+  --ink-light: #94A3B8;
+  --line: rgba(15, 23, 42, 0.08);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--pearl);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--teal); color: #fff; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
+
+/* ═══════ AMBIENT BACKGROUND ═══════ */
+.ambient {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+}
+.ambient-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(140px); opacity: 0.25;
+  animation: orbDrift 22s ease-in-out infinite;
+}
+.ao-1 {
+  width: 520px; height: 520px;
+  background: radial-gradient(circle, var(--teal-light), transparent 70%);
+  top: -200px; right: -150px;
+}
+.ao-2 {
+  width: 460px; height: 460px;
+  background: radial-gradient(circle, var(--pink), transparent 70%);
+  bottom: -180px; left: -140px;
+  animation-delay: 7s;
+}
+.ao-3 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, var(--violet), transparent 70%);
+  top: 45%; left: 50%;
+  animation-delay: 14s; opacity: 0.16;
+}
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -60px) scale(1.15); }
+}
+
+/* ═══════ NAVBAR ═══════ */
+.navbar {
+  position: sticky; top: 0; z-index: 90;
+  padding: 0.9rem 1.4rem 0;
+}
+.navbar-inner {
+  max-width: 1180px; margin: 0 auto;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.85);
+  border-radius: 60px;
+  padding: 0.55rem 0.55rem 0.55rem 1.1rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 8px 40px rgba(15, 23, 42, 0.06);
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 0.75rem;
+  text-decoration: none; color: inherit;
+  flex-shrink: 0;
+}
+.nav-logo {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--violet));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1.1rem;
+  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.35);
+  flex-shrink: 0;
+}
+.nav-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.nav-brand-text strong {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.nav-brand-text span {
+  font-size: 0.6rem; color: var(--ink-soft);
+  font-weight: 600; letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.nav-actions { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
+.nav-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.3s;
+}
+.nav-btn:hover {
+  background: var(--pearl);
+  color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+.nav-btn.primary {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+  border-color: transparent;
+}
+.nav-btn.primary:hover {
+  box-shadow: 0 10px 24px rgba(13, 148, 136, 0.4);
+}
+@media (max-width: 600px) {
+  .nav-btn span { display: none; }
+  .nav-btn { padding: 0.5rem 0.7rem; }
+}
+
+/* ═══════ MAIN ═══════ */
+.main {
+  position: relative; z-index: 2;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem 1.4rem 4rem;
+}
+
+/* ═══════ HERO ═══════ */
+.hero {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.4), transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.35), transparent 60%),
+    linear-gradient(135deg, #0F172A 0%, #1E1B4B 40%, #0E7490 100%);
+  background-size: 200% 200%;
+  animation: heroGradient 15s ease infinite;
+  border-radius: 32px;
+  padding: 3.5rem 2rem 4rem;
+  color: #fff;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 28px 68px -16px rgba(15, 23, 42, 0.4);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+@keyframes heroGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.hero::before {
+  content: ""; position: absolute;
+  top: -150px; right: -150px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.35), transparent 70%);
+  border-radius: 50%; pointer-events: none;
+}
+.hero::after {
+  content: ""; position: absolute;
+  bottom: -100px; left: 10%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.35), transparent 70%);
+  border-radius: 50%; pointer-events: none;
+}
+.hero-content { position: relative; z-index: 2; max-width: 720px; margin: 0 auto; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  border-radius: 50px;
+  font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--cyan-soft);
+  margin-bottom: 1.3rem;
+}
+.hero-badge i { font-size: 0.75rem; }
+.hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.75rem, 4.5vw, 2.8rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.9rem;
+}
+.hero-title .gradient {
+  background: linear-gradient(120deg, var(--cyan-soft) 0%, var(--teal-glow) 40%, #fff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientMove 4s ease infinite;
+  font-style: italic;
+}
+@keyframes gradientMove {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+.hero-sub {
+  font-size: 0.96rem;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.65;
+  max-width: 560px;
+  margin: 0 auto 1.8rem;
+}
+
+/* Mood meter */
+.mood-meter {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 1.3rem 1.5rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.mood-meter-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--cyan-soft);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.mood-meter-bars {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.mood-bar {
+  flex: 1;
+  min-width: 80px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 0.6rem 0.4rem;
+  text-align: center;
+  transition: all 0.3s;
+}
+.mood-bar:hover { background: rgba(255,255,255,0.18); }
+.mood-bar .emoji { font-size: 1.4rem; line-height: 1; }
+.mood-bar .percent {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 0.3rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+.mood-bar .label {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.65);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════ FORM CARD ═══════ */
+.form-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 2rem;
+  box-shadow: 0 20px 48px -12px rgba(15, 23, 42, 0.12);
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.form-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--pink), var(--amber), var(--teal), var(--cyan), var(--violet));
+  background-size: 200% auto;
+  animation: gradientMove 6s linear infinite;
+}
+.form-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.form-header h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+.form-header p {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.form-step {
+  margin-bottom: 1.3rem;
+}
+.form-step-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+}
+.step-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Mood emoji selector */
+.mood-selector {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+@media (max-width: 520px) {
+  .mood-selector { grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+}
+.mood-option {
+  padding: 0.85rem 0.5rem;
+  background: var(--pearl);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+.mood-option:hover {
+  transform: translateY(-2px);
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+.mood-option .emoji {
+  font-size: 1.7rem;
+  line-height: 1;
+  transition: transform 0.3s var(--ease-elastic);
+}
+.mood-option:hover .emoji { transform: scale(1.15); }
+.mood-option .label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.mood-option.selected {
+  border-color: var(--mood-c, var(--teal));
+  background: linear-gradient(135deg, rgba(255,255,255,0.9), var(--pearl));
+  box-shadow: 0 8px 20px -6px var(--mood-c, rgba(13, 148, 136, 0.3));
+}
+.mood-option.selected .emoji { transform: scale(1.2); }
+.mood-option.selected .label { color: var(--mood-c, var(--teal)); }
+
+/* Textarea */
+.textarea-wrap { position: relative; }
+.textarea {
+  width: 100%;
+  padding: 1rem 1.1rem;
+  background: var(--pearl);
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: var(--ink);
+  resize: vertical;
+  min-height: 120px;
+  outline: none;
+  transition: all 0.3s;
+  line-height: 1.65;
+}
+.textarea::placeholder { color: var(--ink-light); font-weight: 400; }
+.textarea:focus {
+  border-color: var(--teal);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+.char-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--ink-light);
+  font-weight: 600;
+}
+.char-counter .limit { font-family: 'JetBrains Mono', monospace; }
+.char-counter .limit.warn { color: var(--orange); }
+.char-counter .limit.danger { color: var(--rose, #EF4444); }
+
+/* Color picker */
+.color-picker {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+.color-option {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-elastic);
+  position: relative;
+  padding: 0;
+}
+.color-option:hover { transform: scale(1.1); }
+.color-option.selected {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.1);
+}
+.color-option.selected::after {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: #fff;
+  font-size: 0.7rem;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Anonymous name preview */
+.alias-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1.1rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), rgba(34, 211, 238, 0.06));
+  border: 1.5px dashed rgba(139, 92, 246, 0.35);
+  border-radius: 14px;
+}
+.alias-icon {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--violet), var(--pink));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+}
+.alias-info { flex: 1; min-width: 0; }
+.alias-label {
+  font-size: 0.62rem;
+  color: var(--ink-soft);
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.15rem;
+}
+.alias-name {
+  font-family: 'Fraunces', serif;
+  font-size: 0.98rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.alias-refresh {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+.alias-refresh:hover {
+  background: var(--pearl);
+  color: var(--teal);
+  transform: rotate(180deg);
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border-radius: 14px;
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  background-size: 200% auto;
+  color: #fff;
+  border: none;
+  font-family: inherit;
+  font-size: 0.94rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: all 0.3s var(--ease-out);
+  box-shadow: 0 14px 32px -8px rgba(13, 148, 136, 0.45);
+  margin-top: 1rem;
+}
+.submit-btn:hover:not(:disabled) {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 20px 44px -8px rgba(13, 148, 136, 0.6);
+}
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.submit-btn .spinner {
+  width: 15px; height: 15px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══════ WALL SECTION ═══════ */
+.wall-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.wall-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.wall-title i {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal), var(--pink));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.wall-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.wall-count strong { color: var(--teal); }
+
+.wall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.1rem;
+}
+@media (max-width: 400px) { .wall-grid { grid-template-columns: 1fr; } }
+
+.wall-card {
+  position: relative;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.3rem 1.3rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.35s var(--ease-out);
+  animation: cardIn 0.5s var(--ease-out) both;
+  overflow: hidden;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.wall-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 52px -14px rgba(15, 23, 42, 0.15);
+  border-color: transparent;
+}
+.wall-card.pinned {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3);
+}
+
+.wall-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 0.85rem;
+}
+.wall-avatar {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: var(--card-avatar, linear-gradient(135deg, var(--teal), var(--indigo)));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
+}
+.wall-name-block { flex: 1; min-width: 0; }
+.wall-alias {
+  font-family: 'Fraunces', serif;
+  font-size: 0.94rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 0.18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wall-time {
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.wall-time i { color: var(--teal); font-size: 0.62rem; }
+
+.wall-text {
+  font-size: 0.88rem;
+  color: var(--ink);
+  line-height: 1.65;
+  padding: 0.85rem 0.95rem;
+  background: rgba(255,255,255,0.5);
+  border-radius: 12px;
+  margin-bottom: 0.85rem;
+  position: relative;
+  word-break: break-word;
+  backdrop-filter: blur(10px);
+}
+.wall-text::before {
+  content: "\f10d";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: var(--teal);
+  font-size: 0.65rem;
+  margin-right: 0.4rem;
+  opacity: 0.5;
+}
+
+.wall-reactions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.reaction-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+}
+.reaction-btn:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
+}
+.reaction-btn.reacted {
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.15), rgba(99, 102, 241, 0.15));
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.reaction-btn i { font-size: 0.75rem; }
+.reaction-btn .cnt { font-family: 'JetBrains Mono', monospace; }
+
+/* Empty state */
+.wall-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  background: var(--pearl);
+  border: 2px dashed var(--line);
+  border-radius: 20px;
+}
+.wall-empty i {
+  font-size: 3rem;
+  color: var(--ink-light);
+  opacity: 0.4;
+  margin-bottom: 0.85rem;
+  display: block;
+}
+.wall-empty h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+}
+.wall-empty p {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* Skeleton */
+.skeleton-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.3rem;
+  min-height: 200px;
+}
+.skel-line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  margin-bottom: 0.6rem;
+}
+.skel-line.short { width: 40%; }
+.skel-line.medium { width: 70%; }
+.skel-box {
+  height: 42px; width: 42px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════ SAFETY BANNER ═══════ */
+.safety-banner {
+  margin-top: 2.5rem;
+  background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #0E7490 100%);
+  background-size: 200% 200%;
+  animation: heroGradient 12s ease infinite;
+  border-radius: 26px;
+  padding: 2.5rem 2rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.safety-banner::before {
+  content: "";
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.3), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.safety-icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--cyan-soft), var(--teal-light));
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: 0 12px 28px rgba(34, 211, 238, 0.4);
+  position: relative;
+  z-index: 2;
+}
+.safety-content { flex: 1; min-width: 240px; position: relative; z-index: 2; }
+.safety-content h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+.safety-content p {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.6;
+}
+.safety-btn {
+  padding: 0.85rem 1.5rem;
+  border-radius: 50px;
+  background: #fff;
+  color: #0F172A;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+}
+.safety-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 44px rgba(0,0,0,0.3);
+  background: var(--cyan-soft);
+}
+
+/* ═══════ TOAST ═══════ */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  pointer-events: none;
+  max-width: calc(100vw - 3rem);
+}
+.toast {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem 1.15rem;
+  box-shadow: 0 20px 44px -8px rgba(15, 23, 42, 0.22);
+  border-left: 4px solid var(--emerald);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  min-width: 280px;
+  max-width: 400px;
+  font-size: 0.86rem;
+  animation: toastIn 0.45s var(--ease-elastic);
+  pointer-events: auto;
+}
+.toast.error { border-left-color: #EF4444; }
+.toast.info { border-left-color: var(--cyan); }
+.toast.warning { border-left-color: var(--orange); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(120%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.toast.removing { animation: toastOut 0.3s ease forwards; }
+@keyframes toastOut { to { opacity: 0; transform: translateX(120%); } }
+.toast-icon {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+.toast.error .toast-icon { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+.toast.info .toast-icon { background: rgba(6, 182, 212, 0.1); color: var(--cyan); }
+.toast.warning .toast-icon { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.toast-content { flex: 1; min-width: 0; }
+.toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
+.toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
+
+/* ═══════ SAFETY MODAL ═══════ */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.modal.active { display: flex; }
+.modal-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2rem 1.75rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
+  animation: modalPop 0.4s var(--ease-elastic);
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-icon {
+  width: 64px; height: 64px;
+  margin: 0 auto 1.1rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--violet));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  box-shadow: 0 16px 36px rgba(236, 72, 153, 0.4);
+}
+.modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+.modal-desc {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+.modal-actions { display: flex; flex-direction: column; gap: 0.55rem; }
+.modal-actions .btn {
+  width: 100%;
+  padding: 0.85rem 1.3rem;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.87rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+.modal-actions .btn-primary {
+  background: linear-gradient(120deg, var(--teal), var(--indigo));
+  color: #fff;
+}
+.modal-actions .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(13, 148, 136, 0.4);
+}
+.modal-actions .btn-secondary {
+  background: var(--pearl);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.modal-actions .btn-secondary:hover { background: #fff; border-color: var(--ink-light); }
+
+/* ═══════ RESPONSIVE ═══════ */
+@media (max-width: 900px) {
+  .navbar { padding: 0.75rem 1rem 0; }
+  .main { padding: 1.5rem 1rem 3rem; }
+  .hero { padding: 2.5rem 1.5rem 3rem; border-radius: 24px; }
+  .form-card { padding: 1.5rem 1.3rem; border-radius: 22px; }
+  .safety-banner { padding: 2rem 1.5rem; border-radius: 22px; }
+  .wall-title { font-size: 1.25rem; }
+}
+@media (max-width: 520px) {
+  .main { padding: 1rem 0.85rem 2rem; }
+  .hero { padding: 2rem 1.2rem 2.5rem; border-radius: 20px; }
+  .hero-title { font-size: 1.5rem; }
+  .hero-sub { font-size: 0.85rem; }
+  .mood-meter { padding: 1rem; border-radius: 16px; }
+  .form-card { padding: 1.3rem 1.1rem; }
+  .form-header h2 { font-size: 1.2rem; }
+  .mood-option { padding: 0.7rem 0.3rem; border-radius: 12px; }
+  .mood-option .emoji { font-size: 1.4rem; }
+  .mood-option .label { font-size: 0.6rem; }
+  .wall-card { padding: 1.1rem; border-radius: 16px; }
+  .safety-banner { padding: 1.5rem 1.2rem; }
+  .safety-content h3 { font-size: 1.05rem; }
+  .toast-container { top: 0.85rem; right: 0.85rem; left: 0.85rem; max-width: none; }
+  .toast { min-width: auto; max-width: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- AMBIENT BG -->
+<div class="ambient">
+  <div class="ambient-orb ao-1"></div>
+  <div class="ambient-orb ao-2"></div>
+  <div class="ambient-orb ao-3"></div>
+</div>
+
+<!-- ═══════ NAVBAR ═══════ -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo"><i class="fas fa-brain"></i></div>
+      <div class="nav-brand-text">
+        <strong>e-MindCare</strong>
+        <span>UBK SEMSIRA</span>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a href="teroka.html" class="nav-btn">
+        <i class="fas fa-compass"></i>
+        <span>Teroka</span>
+      </a>
+      <a href="index.html" class="nav-btn primary">
+        <i class="fas fa-home"></i>
+        <span>Utama</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════ MAIN ═══════ -->
+<main class="main">
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-shield-alt"></i>
+        <span>100% Tanpa Nama · Selamat & Privasi</span>
+      </div>
+      <h1 class="hero-title">
+        Dinding Luahan &<br>
+        <span class="gradient">Mood Check-In SEMSIRA</span>
+      </h1>
+      <p class="hero-sub">
+        Luahkan apa yang tersirat di dalam minda secara 100% tanpa nama. Anda tidak bersendirian.
+      </p>
+
+      <!-- Mood Meter -->
+      <div class="mood-meter">
+        <div class="mood-meter-title">
+          <i class="fas fa-chart-simple"></i>
+          Mood SEMSIRA Hari Ini
+        </div>
+        <div class="mood-meter-bars" id="moodMeterBars">
+          <div class="mood-bar" data-mood="happy">
+            <div class="emoji">😄</div>
+            <div class="percent" id="pctHappy">—</div>
+            <div class="label">Gembira</div>
+          </div>
+          <div class="mood-bar" data-mood="calm">
+            <div class="emoji">😌</div>
+            <div class="percent" id="pctCalm">—</div>
+            <div class="label">Tenang</div>
+          </div>
+          <div class="mood-bar" data-mood="stress">
+            <div class="emoji">😰</div>
+            <div class="percent" id="pctStress">—</div>
+            <div class="label">Stres</div>
+          </div>
+          <div class="mood-bar" data-mood="sad">
+            <div class="emoji">😢</div>
+            <div class="percent" id="pctSad">—</div>
+            <div class="label">Sedih</div>
+          </div>
+          <div class="mood-bar" data-mood="angry">
+            <div class="emoji">😡</div>
+            <div class="percent" id="pctAngry">—</div>
+            <div class="label">Marah</div>
+          </div>
+          <div class="mood-bar" data-mood="tired">
+            <div class="emoji">🫥</div>
+            <div class="percent" id="pctTired">—</div>
+            <div class="label">Penat</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FORM CARD ═══ -->
+  <section class="form-card">
+    <div class="form-header">
+      <h2>Kongsi Perasaan Anda</h2>
+      <p>Luahan ini kekal 100% tanpa nama. Tiada siapa tahu siapa anda.</p>
+    </div>
+
+    <form id="moodForm">
+      <!-- Step 1: Mood -->
+      <div class="form-step">
+        <div class="form-step-label">
+          <span class="step-num">1</span>
+          Pilih Mood Anda Hari Ini
+        </div>
+        <div class="mood-selector" id="moodSelector">
+          <button type="button" class="mood-option" data-mood="happy" style="--mood-c: #F59E0B;">
+            <span class="emoji">😄</span>
+            <span class="label">Gembira</span>
+          </button>
+          <button type="button" class="mood-option" data-mood="calm" style="--mood-c: #0D9488;">
+            <span class="emoji">😌</span>
+            <span class="label">Tenang</span>
+          </button>
+          <button type="button" class="mood-option" data-mood="stress" style="--mood-c: #F97316;">
+            <span class="emoji">😰</span>
+            <span class="label">Stres</span>
+          </button>
+          <button type="button" class="mood-option" data-mood="sad" style="--mood-c: #6366F1;">
+            <span class="emoji">😢</span>
+            <span class="label">Sedih</span>
+          </button>
+          <button type="button" class="mood-option" data-mood="angry" style="--mood-c: #EF4444;">
+            <span class="emoji">😡</span>
+            <span class="label">Marah</span>
+          </button>
+          <button type="button" class="mood-option" data-mood="tired" style="--mood-c: #64748B;">
+            <span class="emoji">🫥</span>
+            <span class="label">Penat</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Text -->
+      <div class="form-step">
+        <div class="form-step-label">
+          <span class="step-num">2</span>
+          Tulis Luahan Anda
+        </div>
+        <div class="textarea-wrap">
+          <textarea
+            id="moodText"
+            class="textarea"
+            placeholder="Apa yang anda rasa hari ini? Luahkan di sini..."
+            maxlength="300"
+            required></textarea>
+          <div class="char-counter">
+            <span><i class="fas fa-info-circle"></i> Maksimum 300 aksara</span>
+            <span class="limit" id="charLimit">0 / 300</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Color -->
+      <div class="form-step">
+        <div class="form-step-label">
+          <span class="step-num">3</span>
+          Pilih Warna Kad
+        </div>
+        <div class="color-picker" id="colorPicker">
+          <button type="button" class="color-option selected" data-color="#FCE7F3" style="background: #FCE7F3;" title="Pastel Pink"></button>
+          <button type="button" class="color-option" data-color="#CCFBF1" style="background: #CCFBF1;" title="Pastel Teal"></button>
+          <button type="button" class="color-option" data-color="#CFFAFE" style="background: #CFFAFE;" title="Pastel Cyan"></button>
+          <button type="button" class="color-option" data-color="#FEF3C7" style="background: #FEF3C7;" title="Pastel Yellow"></button>
+          <button type="button" class="color-option" data-color="#EDE9FE" style="background: #EDE9FE;" title="Pastel Purple"></button>
+        </div>
+      </div>
+
+      <!-- Anonymous name -->
+      <div class="form-step">
+        <div class="form-step-label">
+          <span class="step-num">4</span>
+          Nama Anonymous Anda
+        </div>
+        <div class="alias-preview">
+          <div class="alias-icon"><i class="fas fa-user-secret"></i></div>
+          <div class="alias-info">
+            <div class="alias-label">Auto-Generated Anonymous</div>
+            <div class="alias-name" id="aliasName">Awan Biru #482</div>
+          </div>
+          <button type="button" class="alias-refresh" id="aliasRefresh" title="Jana nama baharu">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <i class="fas fa-paper-plane"></i>
+        <span>Hantar Luahan Saya</span>
+      </button>
+    </form>
+  </section>
+
+  <!-- ═══ WALL SECTION ═══ -->
+  <section>
+    <div class="wall-header">
+      <h2 class="wall-title">
+        <i class="fas fa-comments"></i>
+        The Mind Wall
+      </h2>
+      <div class="wall-count">
+        <i class="fas fa-heart" style="color: var(--pink);"></i>
+        <strong id="wallCount">0</strong>
+        <span>luahan komuniti</span>
+      </div>
+    </div>
+
+    <div class="wall-grid" id="wallGrid">
+      <div class="skeleton-card">
+        <div class="skel-box"></div>
+        <div class="skel-line medium"></div>
+        <div class="skel-line short"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skel-box"></div>
+        <div class="skel-line medium"></div>
+        <div class="skel-line short"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skel-box"></div>
+        <div class="skel-line medium"></div>
+        <div class="skel-line short"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SAFETY BANNER ═══ -->
+  <section class="safety-banner">
+    <div class="safety-icon">
+      <i class="fas fa-hands-holding-heart"></i>
+    </div>
+    <div class="safety-content">
+      <h3>Perlukan Rakan Pendengar?</h3>
+      <p>Kaunselor SEMSIRA sedia membantu anda secara bersemuka. Semua sesi adalah 100% sulit dan selamat.</p>
+    </div>
+    <a href="tempah-kaunseling.html" class="safety-btn">
+      <i class="fas fa-calendar-check"></i>
+      Tempah Sesi Kaunseling
+    </a>
+  </section>
+
+</main>
+
+<!-- ═══════ SAFETY MODAL ═══════ -->
+<div class="modal" id="safetyModal">
+  <div class="modal-card">
+    <div class="modal-icon">
+      <i class="fas fa-heart"></i>
+    </div>
+    <h3 class="modal-title">Anda Tidak Bersendirian 💗</h3>
+    <p class="modal-desc">
+      Kami perasan luahan anda mungkin mengandungi perasaan berat. Anda sangat berharga, dan kami di sini untuk membantu anda.
+      <br><br>
+      Sila hubungi kaunselor kami untuk sokongan segera.
+    </p>
+    <div class="modal-actions">
+      <a href="tempah-kaunseling.html" class="btn btn-primary">
+        <i class="fas fa-calendar-check"></i>
+        Tempah Sesi Kaunseling
+      </a>
+      <button class="btn btn-secondary" onclick="closeSafetyModal()">
+        Teruskan Hantar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="mood.js"></script>
+
+</body>
+</html>
