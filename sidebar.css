@@ -1,6 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
    e-MindCare · Centralized Sidebar CSS
    Untuk semua dashboard page
+
+   ⭐ MENU BARU DITAMBAH: Mood Check-In
    ═══════════════════════════════════════════════════════════════ */
 
 /* Sidebar backdrop */
@@ -218,6 +220,56 @@
 }
 .sb-item .sb-badge[hidden],
 .sb-item .sb-badge[style*="display:none"] { display: none !important; }
+
+/* ⭐ SPECIAL STYLING — Mood Check-In (highlight) */
+.sb-item.sb-item-mood {
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.08), rgba(236, 72, 153, 0.06));
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+.sb-item.sb-item-mood i:first-child {
+  background: linear-gradient(135deg, #8B5CF6, #EC4899);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+.sb-item.sb-item-mood:hover {
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.18), rgba(236, 72, 153, 0.12));
+  border-color: rgba(139, 92, 246, 0.35);
+  color: #fff;
+}
+.sb-item.sb-item-mood:hover i:first-child {
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.5);
+}
+.sb-item.sb-item-mood.active {
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.28), rgba(236, 72, 153, 0.18));
+  border-color: rgba(139, 92, 246, 0.5);
+  color: #fff;
+}
+.sb-item.sb-item-mood.active::before {
+  background: linear-gradient(180deg, #8B5CF6, #EC4899);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+}
+.sb-item.sb-item-mood .sb-mood-emoji {
+  margin-left: auto;
+  font-size: 0.95rem;
+  opacity: 0.85;
+  transition: transform 0.3s var(--ease-elastic, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.sb-item.sb-item-mood:hover .sb-mood-emoji {
+  transform: scale(1.2) rotate(8deg);
+  opacity: 1;
+}
+.sb-item.sb-item-mood.active .sb-mood-emoji {
+  opacity: 1;
+  animation: moodWiggle 2s ease-in-out infinite;
+}
+@keyframes moodWiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
 
 /* Footer */
 .sb-footer {
