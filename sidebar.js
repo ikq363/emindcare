@@ -2,17 +2,22 @@
    e-MindCare · Centralized Sidebar
    Auto-inject sidebar HTML ke semua page
 
-   ⭐ UNTUK TAMBAH MENU BARU:
-      1. Edit SIDEBAR_MENU array di bawah
-      2. Tambah object baru dalam section yang sesuai
-      3. Semua page auto-update ✅
+   ⭐ MENU BARU DITAMBAH: Mood Check-In → dashboard-mood.html
+
+   ═══════════════════════════════════════════════════════════════
+   UNTUK TAMBAH MENU BARU:
+   1. Edit SIDEBAR_MENU array di bawah
+   2. Tambah object baru dalam section yang sesuai
+   3. Semua page auto-update ✅
    ═══════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════
    KONFIGURASI MENU SIDEBAR
    Setiap section: { label: string, items: [...] }
-   Setiap item: { icon, text, href, badgeId?, key? }
-   - key = identifier unik untuk detect active state
+   Setiap item: { icon, text, href, badgeId?, key?, special? }
+   - key     = identifier unik untuk detect active state
+   - special = extra class untuk styling khas (cth: 'mood')
+   - emoji   = emoji kecil di kanan (optional)
    ═══════════════════════════════════════════════════ */
 const SIDEBAR_MENU = [
   {
@@ -31,6 +36,20 @@ const SIDEBAR_MENU = [
       { key: 'landing',       icon: 'fas fa-paint-brush',  text: 'Sunting Laman',        href: 'dashboard-sunting-laman.html' },
       { key: 'gallery',       icon: 'fas fa-photo-video',  text: 'Galeri UBK',           href: 'dashboard-galeri.html' },
       { key: 'contact',       icon: 'fas fa-address-book', text: 'Hubungi & Lokasi',     href: 'dashboard-contact.html', badgeId: 'sbUnreadBadge' }
+    ]
+  },
+  {
+    // ⭐ SECTION BARU — Mood & Kesejahteraan
+    label: 'Mood & Kesejahteraan',
+    items: [
+      {
+        key: 'mood',
+        icon: 'fas fa-face-smile',
+        text: 'Mood Check-In',
+        href: 'dashboard-mood.html',
+        special: 'mood',
+        emoji: '🌈'
+      }
     ]
   },
   {
@@ -69,18 +88,19 @@ function detectActiveKey() {
 
   // Map filenames → keys
   const fileMap = {
-    'dashboard-kaunselor.html':   'overview',
-    'dashboard-profile.html':     'profile',
+    'dashboard-kaunselor.html':    'overview',
+    'dashboard-profile.html':      'profile',
     'dashboard-sunting-laman.html':'landing',
-    'dashboard-galeri.html':      'gallery',
-    'dashboard-gallery.html':     'gallery',
-    'dashboard-contact.html':     'contact',
-    'dashboard-inventories.html': 'inventories',
-    'dashboard-users.html':       'users',
-    'dashboard-user.html':        'users',
-    'dashboard-appointments.html':'appointments',
-    'dashboard-diaries.html':     'diaries',
-    'dashboard-analytics.html':   'analytics'
+    'dashboard-galeri.html':       'gallery',
+    'dashboard-gallery.html':      'gallery',
+    'dashboard-contact.html':      'contact',
+    'dashboard-mood.html':         'mood',           // ⭐ BARU
+    'dashboard-inventories.html':  'inventories',
+    'dashboard-users.html':        'users',
+    'dashboard-user.html':         'users',
+    'dashboard-appointments.html': 'appointments',
+    'dashboard-diaries.html':      'diaries',
+    'dashboard-analytics.html':    'analytics'
   };
 
   return fileMap[path] || null;
@@ -95,14 +115,20 @@ function buildSidebarHTML() {
   const sectionsHTML = SIDEBAR_MENU.map(section => {
     const itemsHTML = section.items.map(item => {
       const isActive = item.key === activeKey;
+      const specialClass = item.special ? ` sb-item-${item.special}` : '';
       const badgeHTML = item.badgeId
         ? `<span class="sb-badge" id="${item.badgeId}" style="display:none;">0</span>`
         : '';
+      const emojiHTML = item.emoji
+        ? `<span class="sb-mood-emoji">${item.emoji}</span>`
+        : '';
+
       return `
-        <a href="${item.href}" class="sb-item${isActive ? ' active' : ''}" data-key="${item.key}">
+        <a href="${item.href}" class="sb-item${specialClass}${isActive ? ' active' : ''}" data-key="${item.key}">
           <i class="${item.icon}"></i>
           <span>${item.text}</span>
           ${badgeHTML}
+          ${emojiHTML}
         </a>
       `;
     }).join('');
@@ -156,6 +182,7 @@ function injectSidebar() {
     return;
   }
   root.innerHTML = buildSidebarHTML();
+  console.log('[Sidebar] Injected — active:', detectActiveKey() || 'none');
 }
 
 /* Auto-run on DOM ready */
