@@ -11,6 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+<!-- ⭐ SIDEBAR CSS - centralized -->
+<link rel="stylesheet" href="sidebar.css">
+
 <style>
 /* ═══════════════════════════════════════════════════
    ROOT
@@ -50,7 +53,6 @@ body {
   color: var(--ink);
   line-height: 1.6;
   min-height: 100vh;
-  min-height: 100dvh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -60,237 +62,9 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
 
-/* ═══════════════════════════════════════════════════
-   LAYOUT + SIDEBAR
-   ═══════════════════════════════════════════════════ */
-.app { display: flex; min-height: 100vh; min-height: 100dvh; }
+/* ═══════ LAYOUT ═══════ */
+.app { display: flex; min-height: 100vh; }
 
-.sidebar {
-  width: var(--sidebar-w);
-  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
-  color: #cbd5e1;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 60;
-  transition: transform 0.4s var(--ease-out);
-  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
-  overflow-y: auto;
-}
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-
-.sb-brand {
-  padding: 1.5rem 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  flex-shrink: 0;
-}
-.sb-brand-logo {
-  width: 42px; height: 42px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1.15rem;
-  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-.sb-brand-logo::before {
-  content: "";
-  position: absolute;
-  inset: -50%;
-  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
-  animation: shineSweep 4s linear infinite;
-}
-.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
-.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
-@keyframes shineSweep { to { transform: rotate(360deg); } }
-.sb-brand-text strong {
-  display: block;
-  font-family: 'Fraunces', serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.sb-brand-text span {
-  font-size: 0.65rem;
-  color: #94a3b8;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.sb-profile {
-  margin: 1rem 1rem 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  color: inherit;
-}
-.sb-profile:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-}
-.sb-avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  font-weight: 800;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sb-avatar::after {
-  content: "";
-  position: absolute;
-  bottom: -2px; right: -2px;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: var(--emerald);
-  border: 2px solid #1E293B;
-}
-.sb-profile-info { min-width: 0; flex: 1; }
-.sb-profile-info strong {
-  display: block;
-  font-size: 0.85rem;
-  color: #fff;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sb-profile-info span {
-  font-size: 0.68rem;
-  color: var(--teal-glow);
-  font-weight: 600;
-}
-
-.sb-menu {
-  flex: 1;
-  padding: 0.5rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.sb-section-label {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 1rem 0.6rem 0.4rem;
-}
-.sb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 0.84rem;
-  font-weight: 600;
-  transition: all 0.3s var(--ease-out);
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
-  position: relative;
-}
-.sb-item i:first-child {
-  width: 32px; height: 32px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.82rem;
-  flex-shrink: 0;
-  transition: all 0.3s;
-}
-.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.sb-item:hover i:first-child {
-  background: rgba(20, 184, 166, 0.15);
-  color: var(--teal-glow);
-}
-.sb-item.active {
-  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
-  color: #fff;
-}
-.sb-item.active i:first-child {
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
-}
-.sb-item.active::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 20%; bottom: 20%;
-  width: 3px;
-  background: var(--teal-glow);
-  border-radius: 0 4px 4px 0;
-}
-.sb-badge {
-  margin-left: auto;
-  padding: 0.1rem 0.5rem;
-  background: var(--rose);
-  color: #fff;
-  border-radius: 50px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  min-width: 22px;
-  text-align: center;
-}
-
-.sb-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  flex-shrink: 0;
-}
-.sb-footer-btn {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #FCA5A5;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.sb-footer-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-/* ═══════════════════════════════════════════════════
-   MAIN
-   ═══════════════════════════════════════════════════ */
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
@@ -298,7 +72,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: 100dvh;
 }
 
 .topbar {
@@ -373,9 +146,66 @@ body {
   margin: 0 auto;
 }
 
-/* ═══════════════════════════════════════════════════
-   CARDS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ INFO BANNER ═══════ */
+.info-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.06), rgba(34, 211, 238, 0.06));
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 16px;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.info-banner-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px -6px rgba(6, 182, 212, 0.5);
+}
+.info-banner-content { flex: 1; min-width: 200px; }
+.info-banner-content strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 0.15rem;
+}
+.info-banner-content span {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.info-banner-stats {
+  display: flex;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+.stat-mini { text-align: center; }
+.stat-mini-value {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--cyan);
+  line-height: 1;
+}
+.stat-mini-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-top: 0.15rem;
+}
+
+/* ═══════ CARDS ═══════ */
 .card {
   background: #fff;
   border: 1px solid var(--line);
@@ -383,10 +213,7 @@ body {
   padding: 1.6rem;
   margin-bottom: 1.25rem;
   box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
-  transition: box-shadow 0.3s;
 }
-.card:hover { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06); }
-
 .card-header {
   display: flex;
   align-items: flex-start;
@@ -427,71 +254,7 @@ body {
   line-height: 1.5;
 }
 
-/* ═══════════════════════════════════════════════════
-   INFO BANNER
-   ═══════════════════════════════════════════════════ */
-.info-banner {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.06), rgba(34, 211, 238, 0.06));
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  border-radius: 16px;
-  margin-bottom: 1.25rem;
-}
-.info-banner-icon {
-  width: 42px; height: 42px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
-  box-shadow: 0 8px 20px -6px rgba(6, 182, 212, 0.5);
-}
-.info-banner-content { flex: 1; min-width: 0; }
-.info-banner-content strong {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: var(--ink);
-  margin-bottom: 0.15rem;
-}
-.info-banner-content span {
-  font-size: 0.8rem;
-  color: var(--ink-soft);
-  line-height: 1.5;
-}
-.info-banner-stats {
-  display: flex;
-  gap: 1rem;
-  flex-shrink: 0;
-}
-.stat-mini {
-  text-align: center;
-}
-.stat-mini-value {
-  font-family: 'Fraunces', serif;
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: var(--cyan);
-  line-height: 1;
-}
-.stat-mini-label {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--ink-soft);
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  margin-top: 0.15rem;
-}
-
-/* ═══════════════════════════════════════════════════
-   FORM
-   ═══════════════════════════════════════════════════ */
+/* ═══════ FORM ═══════ */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -541,10 +304,7 @@ body {
   -webkit-appearance: none;
   appearance: none;
 }
-.input-field:hover {
-  border-color: rgba(15, 118, 110, 0.2);
-  background: #fff;
-}
+.input-field:hover { border-color: rgba(15, 118, 110, 0.2); background: #fff; }
 .input-field:focus {
   border-color: var(--teal);
   background: #fff;
@@ -578,9 +338,7 @@ select.input-field {
 }
 .input-info i { color: var(--teal); font-size: 0.68rem; }
 
-/* ═══════════════════════════════════════════════════
-   UPLOAD ZONE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ UPLOAD ZONE ═══════ */
 .upload-zone {
   border: 2px dashed rgba(6, 182, 212, 0.3);
   border-radius: 16px;
@@ -648,7 +406,7 @@ select.input-field {
 }
 .format-badge i { color: var(--cyan); font-size: 0.6rem; }
 
-/* Upload queue */
+/* ═══════ UPLOAD QUEUE ═══════ */
 .upload-queue {
   margin-top: 1.25rem;
   display: flex;
@@ -753,9 +511,7 @@ select.input-field {
   color: #fff;
 }
 
-/* ═══════════════════════════════════════════════════
-   BUTTONS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ BUTTONS ═══════ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -819,9 +575,7 @@ select.input-field {
 .btn.loading .btn-loading { display: inline-flex; align-items: center; gap: 0.5rem; }
 .btn .btn-loading { display: none; }
 
-/* ═══════════════════════════════════════════════════
-   SEARCH & FILTER BAR
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TOOLBAR ═══════ */
 .toolbar {
   display: flex;
   gap: 0.65rem;
@@ -878,12 +632,10 @@ select.input-field {
   background-color: #fff;
 }
 
-/* ═══════════════════════════════════════════════════
-   GALLERY GRID (Admin)
-   ═══════════════════════════════════════════════════ */
+/* ═══════ GALLERY GRID ═══════ */
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.1rem;
 }
 .gallery-card {
@@ -924,9 +676,7 @@ select.input-field {
   z-index: 4;
   pointer-events: none;
 }
-.gallery-card:hover .gallery-image-overlay {
-  opacity: 1;
-}
+.gallery-card:hover .gallery-image-overlay { opacity: 1; }
 .gallery-zoom-icon {
   width: 48px; height: 48px;
   border-radius: 50%;
@@ -940,9 +690,7 @@ select.input-field {
   transform: scale(0.8);
   transition: transform 0.3s var(--ease-elastic);
 }
-.gallery-card:hover .gallery-zoom-icon {
-  transform: scale(1);
-}
+.gallery-card:hover .gallery-zoom-icon { transform: scale(1); }
 
 .gallery-badge {
   position: absolute;
@@ -967,7 +715,6 @@ select.input-field {
 .gallery-badge.cat-aktiviti-kelab { background: rgba(236, 72, 153, 0.92); }
 .gallery-badge.cat-lain { background: rgba(100, 116, 139, 0.92); }
 
-/* Count badge */
 .gallery-count-badge {
   position: absolute;
   top: 0.75rem;
@@ -994,8 +741,6 @@ select.input-field {
   border-radius: 50px;
   font-size: 0.65rem;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
   backdrop-filter: blur(8px);
   z-index: 5;
   display: flex;
@@ -1005,7 +750,7 @@ select.input-field {
   color: #fff;
 }
 
-/* ⚡ SLIDESHOW DALAM KAD */
+/* Slideshow in card */
 .gallery-slideshow {
   position: relative;
   width: 100%;
@@ -1019,41 +764,10 @@ select.input-field {
   object-fit: cover;
   opacity: 0;
   transition: opacity 0.8s ease-in-out;
-  will-change: opacity;
 }
 .gallery-slideshow .slide.active {
   opacity: 1;
   z-index: 1;
-}
-
-/* Dots indicator */
-.gallery-slideshow-dots {
-  position: absolute;
-  bottom: 0.6rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.25rem;
-  padding: 0.3rem 0.5rem;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(8px);
-  border-radius: 50px;
-  z-index: 5;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.gallery-card:hover .gallery-slideshow-dots { opacity: 1; }
-.gallery-slideshow-dots .dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
-  transition: all 0.3s;
-}
-.gallery-slideshow-dots .dot.active {
-  background: #fff;
-  width: 14px;
-  border-radius: 3px;
 }
 
 .gallery-body {
@@ -1083,15 +797,6 @@ select.input-field {
   font-weight: 600;
 }
 .gallery-date i { color: var(--cyan); font-size: 0.68rem; }
-.gallery-desc {
-  font-size: 0.78rem;
-  color: var(--ink-soft);
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 
 .gallery-meta {
   display: flex;
@@ -1102,48 +807,43 @@ select.input-field {
   border-top: 1px solid var(--line);
   margin-top: auto;
 }
-.gallery-actions {
-  display: flex;
-  gap: 0.35rem;
-}
+.gallery-actions { display: flex; gap: 0.35rem; }
 
-/* Toggle switch */
-.toggle-switch {
-  position: relative;
+/* Status pill */
+.status-pill {
   display: inline-flex;
   align-items: center;
-  cursor: pointer;
-}
-.toggle-switch input { display: none; }
-.toggle-track {
-  width: 38px;
-  height: 22px;
+  gap: 0.35rem;
+  padding: 0.28rem 0.7rem;
   border-radius: 50px;
-  background: var(--ink-light);
-  position: relative;
-  transition: background 0.3s;
-  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
 }
-.toggle-track::after {
-  content: "";
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 16px; height: 16px;
+.status-pill.active {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--emerald);
+}
+.status-pill.inactive {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--ink-soft);
+}
+.status-pill .dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  transition: transform 0.3s var(--ease-elastic);
+  background: currentColor;
 }
-.toggle-switch input:checked + .toggle-track {
-  background: linear-gradient(90deg, var(--emerald), var(--teal-light));
+.status-pill.active .dot {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  animation: pulse 2s ease-in-out infinite;
 }
-.toggle-switch input:checked + .toggle-track::after {
-  transform: translateX(16px);
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
 }
 
-/* ═══════════════════════════════════════════════════
-   SKELETON LOADER
-   ═══════════════════════════════════════════════════ */
+/* ═══════ SKELETON ═══════ */
 .skeleton-card {
   background: #fff;
   border: 1px solid var(--line);
@@ -1178,9 +878,7 @@ select.input-field {
   100% { background-position: -200% 0; }
 }
 
-/* ═══════════════════════════════════════════════════
-   EMPTY STATE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ EMPTY STATE ═══════ */
 .empty-state {
   padding: 3.5rem 1.5rem;
   text-align: center;
@@ -1203,9 +901,7 @@ select.input-field {
 }
 .empty-state p { font-size: 0.85rem; line-height: 1.6; max-width: 400px; margin: 0 auto; }
 
-/* ═══════════════════════════════════════════════════
-   LIGHTBOX
-   ═══════════════════════════════════════════════════ */
+/* ═══════ LIGHTBOX ═══════ */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -1216,10 +912,7 @@ select.input-field {
   opacity: 0;
   transition: opacity 0.3s;
 }
-.lightbox.active {
-  display: flex;
-  opacity: 1;
-}
+.lightbox.active { display: flex; opacity: 1; }
 .lightbox-content {
   position: relative;
   width: 100%;
@@ -1262,7 +955,6 @@ select.input-field {
   font-size: 1.15rem;
   font-weight: 900;
   margin-bottom: 0.4rem;
-  color: #fff;
 }
 .lightbox-caption p {
   font-size: 0.85rem;
@@ -1343,9 +1035,7 @@ select.input-field {
   z-index: 10;
 }
 
-/* ═══════════════════════════════════════════════════
-   MODAL
-   ═══════════════════════════════════════════════════ */
+/* ═══════ MODAL ═══════ */
 .modal {
   position: fixed;
   inset: 0;
@@ -1420,9 +1110,7 @@ select.input-field {
   object-fit: contain;
 }
 
-/* ═══════════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TOAST ═══════ */
 .toast-container {
   position: fixed;
   top: 1.5rem;
@@ -1471,37 +1159,18 @@ select.input-field {
 .toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
 .toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
 
-/* ═══════════════════════════════════════════════════
-   BACKDROP
-   ═══════════════════════════════════════════════════ */
-.sb-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 55;
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.sb-backdrop.active { display: block; opacity: 1; }
-
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ RESPONSIVE ═══════ */
 @media (max-width: 1024px) {
   :root { --sidebar-w: 240px; }
   .content { padding: 1.25rem; }
+  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 }
 @media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
   .main { margin-left: 0; }
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
   .content { padding: 1rem; }
   .form-grid { grid-template-columns: 1fr; }
-  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
   .lightbox-nav { width: 40px; height: 40px; }
   .lightbox-nav.prev { left: 0.6rem; }
   .lightbox-nav.next { right: 0.6rem; }
@@ -1517,27 +1186,22 @@ select.input-field {
   .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
   .gallery-body { padding: 0.75rem 0.85rem; }
   .gallery-title { font-size: 0.82rem; }
-  .gallery-desc { display: none; }
+  .gallery-date { font-size: 0.68rem; }
+  .info-banner { padding: 0.85rem 1rem; }
+  .info-banner-stats { width: 100%; justify-content: space-around; gap: 0.5rem; }
+  .info-banner-icon { width: 36px; height: 36px; font-size: 0.9rem; }
+  .stat-mini-value { font-size: 1.15rem; }
   .card-header-left { gap: 0.75rem; }
   .card-icon { width: 40px; height: 40px; font-size: 0.95rem; }
   .card-title { font-size: 1rem; }
   .upload-zone { padding: 1.75rem 1.2rem; }
   .upload-icon { width: 56px; height: 56px; font-size: 1.4rem; }
   .upload-zone h4 { font-size: 0.92rem; }
-  .info-banner { padding: 0.85rem 1rem; flex-wrap: wrap; }
-  .info-banner-stats { width: 100%; justify-content: space-around; }
-  .info-banner-icon { width: 36px; height: 36px; font-size: 0.9rem; }
   .lightbox-content { padding: 1rem; }
   .lightbox-image-wrap { max-height: calc(100vh - 220px); }
   .lightbox-image-wrap img { max-height: calc(100vh - 220px); }
-  .lightbox-caption h3 { font-size: 1rem; }
-  .lightbox-caption p { font-size: 0.78rem; }
   .toast-container { top: 0.85rem; right: 0.85rem; left: 0.85rem; max-width: none; }
   .toast { min-width: auto; max-width: none; }
-  .gallery-slideshow-dots { opacity: 1; padding: 0.25rem 0.5rem; }
-  .gallery-slideshow-dots .dot { width: 5px; height: 5px; }
-  .gallery-slideshow-dots .dot.active { width: 12px; }
-  .gallery-count-badge { font-size: 0.62rem; padding: 0.28rem 0.6rem; top: 0.6rem; right: 0.6rem; }
 }
 </style>
 </head>
@@ -1545,95 +1209,8 @@ select.input-field {
 
 <div class="app">
 
-  <!-- ═══════ SIDEBAR ═══════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
-      <div class="sb-brand-text">
-        <strong id="sbBrandName">e-MindCare</strong>
-        <span>Dashboard Kaunselor</span>
-      </div>
-    </div>
-
-    <a href="dashboard-profile.html" class="sb-profile">
-      <div class="sb-avatar" id="sbAvatar">K</div>
-      <div class="sb-profile-info">
-        <strong id="sbProfileName">Kaunselor</strong>
-        <span>Kaunselor UBK</span>
-      </div>
-    </a>
-
-    <nav class="sb-menu">
-      <div class="sb-section-label">Utama</div>
-      <a href="dashboard-kaunselor.html" class="sb-item">
-        <i class="fas fa-chart-pie"></i>
-        <span>Overview</span>
-      </a>
-      <a href="dashboard-profile.html" class="sb-item">
-        <i class="fas fa-user-circle"></i>
-        <span>Profil Kaunselor</span>
-      </a>
-
-      <div class="sb-section-label">Kandungan Laman</div>
-      <a href="dashboard-announcements.html" class="sb-item">
-        <i class="fas fa-bullhorn"></i>
-        <span>Pengumuman</span>
-      </a>
-      <a href="dashboard-banners.html" class="sb-item">
-        <i class="fas fa-images"></i>
-        <span>Banner Iklan</span>
-      </a>
-      <a href="dashboard-collaborations.html" class="sb-item">
-        <i class="fas fa-handshake"></i>
-        <span>Kolaborasi</span>
-      </a>
-      <a href="dashboard-sunting-laman.html" class="sb-item">
-        <i class="fas fa-paint-brush"></i>
-        <span>Sunting Laman</span>
-      </a>
-      <a href="dashboard-galeri.html" class="sb-item active">
-        <i class="fas fa-photo-video"></i>
-        <span>Galeri UBK</span>
-      </a>
-      <a href="dashboard-contact.html" class="sb-item">
-        <i class="fas fa-address-book"></i>
-        <span>Hubungi & Lokasi</span>
-      </a>
-
-      <div class="sb-section-label">Pengurusan</div>
-      <a href="dashboard-inventories.html" class="sb-item">
-        <i class="fas fa-clipboard-list"></i>
-        <span>Ujian Inventori</span>
-      </a>
-      <a href="dashboard-users.html" class="sb-item">
-        <i class="fas fa-users"></i>
-        <span>Urus Pengguna</span>
-      </a>
-      <a href="dashboard-appointments.html" class="sb-item">
-        <i class="fas fa-calendar-check"></i>
-        <span>Tempahan Kaunseling</span>
-        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
-      </a>
-      <a href="dashboard-diaries.html" class="sb-item">
-        <i class="fas fa-book"></i>
-        <span>Diari & Catatan</span>
-      </a>
-
-      <div class="sb-section-label">Analitik</div>
-      <a href="dashboard-analytics.html" class="sb-item">
-        <i class="fas fa-chart-line"></i>
-        <span>Data & Laporan</span>
-      </a>
-    </nav>
-
-    <div class="sb-footer">
-      <button class="sb-footer-btn" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Log Keluar</span>
-      </button>
-    </div>
-  </aside>
-  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
+  <!-- ⭐ SIDEBAR — auto-inject dari sidebar.js -->
+  <div id="sidebar-root"></div>
 
   <!-- ═══════ MAIN ═══════ -->
   <div class="main">
@@ -1658,7 +1235,7 @@ select.input-field {
 
     <main class="content">
 
-      <!-- ═══════ INFO BANNER ═══════ -->
+      <!-- ═══ INFO BANNER ═══ -->
       <div class="info-banner">
         <div class="info-banner-icon"><i class="fas fa-photo-video"></i></div>
         <div class="info-banner-content">
@@ -1681,7 +1258,7 @@ select.input-field {
         </div>
       </div>
 
-      <!-- ═══════ UPLOAD GALERI ═══════ -->
+      <!-- ═══ UPLOAD GALERI ═══ -->
       <div class="card">
         <div class="card-header">
           <div class="card-header-left">
@@ -1776,7 +1353,7 @@ select.input-field {
         </form>
       </div>
 
-      <!-- ═══════ SENARAI GALERI ═══════ -->
+      <!-- ═══ SENARAI GALERI ═══ -->
       <div class="card">
         <div class="card-header">
           <div class="card-header-left">
@@ -1813,7 +1390,6 @@ select.input-field {
 
         <!-- Gallery Grid -->
         <div class="gallery-grid" id="galleryGrid">
-          <!-- Skeleton loading -->
           <div class="skeleton-card">
             <div class="skeleton-image"></div>
             <div class="skeleton-body">
@@ -1845,7 +1421,7 @@ select.input-field {
   </div>
 </div>
 
-<!-- ═══════ LIGHTBOX ═══════ -->
+<!-- ═══ LIGHTBOX ═══ -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
   <button class="lightbox-close" onclick="closeLightbox(event)" title="Tutup">
     <i class="fas fa-times"></i>
@@ -1869,7 +1445,7 @@ select.input-field {
   <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
 </div>
 
-<!-- ═══════ EDIT MODAL ═══════ -->
+<!-- ═══ EDIT MODAL ═══ -->
 <div class="modal" id="editModal">
   <div class="modal-card wide">
     <div class="modal-icon info"><i class="fas fa-pen"></i></div>
@@ -1916,7 +1492,7 @@ select.input-field {
 
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
-      <button class="btn btn-primary" id="editSaveBtn">
+      <button class="btn btn-primary" id="editSaveBtn" onclick="saveEditAlbum()">
         <span class="btn-text"><i class="fas fa-save"></i> Simpan</span>
         <span class="btn-loading"><span class="spinner"></span> Menyimpan...</span>
       </button>
@@ -1924,10 +1500,10 @@ select.input-field {
   </div>
 </div>
 
-<!-- ═══════ CONFIRM MODAL ═══════ -->
+<!-- ═══ CONFIRM MODAL ═══ -->
 <div class="modal" id="confirmModal">
   <div class="modal-card">
-    <div class="modal-icon danger" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
+    <div class="modal-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
     <h3 class="modal-title" id="confirmTitle">Padam Album?</h3>
     <p class="modal-desc" id="confirmDesc">Tindakan ini tidak boleh diundur.</p>
     <div class="modal-actions">
@@ -1937,10 +1513,868 @@ select.input-field {
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ═══ TOAST ═══ -->
 <div class="toast-container" id="toastContainer"></div>
 
-<script type="module" src="dashboard-galeri.js"></script>
+<!-- ⭐ SIDEBAR JS — auto-inject -->
+<script type="module" src="sidebar.js"></script>
+
+<!-- ⭐ PAGE JS -->
+<script type="module">
+  import './config.js';
+
+  /* ═══════════════════════════════════════════════════════════
+     CONSTANTS
+     ═══════════════════════════════════════════════════════════ */
+  const SESSION_KEY = 'emindcare_session';
+  const COLLECTION = 'gallery';
+
+  const CATEGORY_CLASS = {
+    'Program UBK': 'cat-program-ubk',
+    'Lawatan Kerjaya': 'cat-lawatan-kerjaya',
+    'Bengkel Minda Sihat': 'cat-bengkel-minda',
+    'Aktiviti Kelab': 'cat-aktiviti-kelab',
+    'Lain-lain': 'cat-lain'
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     STATE
+     ═══════════════════════════════════════════════════════════ */
+  let currentUser = null;
+  let allAlbums = [];
+  let filteredAlbums = [];
+  let uploadQueue = [];  // { id, file, url, status, progress, publicId }
+  let editingAlbumId = null;
+  let pendingConfirmAction = null;
+
+  // Lightbox
+  let lightboxImages = [];
+  let lightboxIndex = 0;
+  let lightboxAlbum = null;
+
+  // Slideshow timers
+  let slideshowTimers = [];
+
+  /* ═══════════════════════════════════════════════════════════
+     INIT
+     ═══════════════════════════════════════════════════════════ */
+  window.addEventListener('load', async () => {
+    await waitForEMindCare();
+    if (!authGuard()) return;
+    await waitForSidebar();
+
+    loadProfile();
+    applyBranding();
+    bindEvents();
+    await loadAlbums();
+  });
+
+  function waitForEMindCare() {
+    return new Promise((resolve, reject) => {
+      if (window.EMindCare) return resolve();
+      let tries = 0;
+      const timer = setInterval(() => {
+        tries++;
+        if (window.EMindCare) { clearInterval(timer); resolve(); }
+        else if (tries > 100) { clearInterval(timer); reject(new Error('SDK timeout')); }
+      }, 50);
+    });
+  }
+
+  function waitForSidebar() {
+    return new Promise(resolve => {
+      if (document.getElementById('sbProfileName')) return resolve();
+      const obs = new MutationObserver(() => {
+        if (document.getElementById('sbProfileName')) {
+          obs.disconnect();
+          resolve();
+        }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => { obs.disconnect(); resolve(); }, 3000);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     AUTH GUARD
+     ═══════════════════════════════════════════════════════════ */
+  function authGuard() {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) { window.location.href = 'login.html'; return false; }
+    try {
+      const session = JSON.parse(raw);
+      if (session.role !== 'kaunselor') {
+        const redirects = { guru: 'dashboard-guru.html', murid: 'dashboard-murid.html' };
+        window.location.href = redirects[session.role] || 'login.html';
+        return false;
+      }
+      currentUser = session;
+      return true;
+    } catch (e) {
+      localStorage.removeItem(SESSION_KEY);
+      window.location.href = 'login.html';
+      return false;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LOAD PROFILE
+     ═══════════════════════════════════════════════════════════ */
+  function loadProfile() {
+    const nameEl = document.getElementById('sbProfileName');
+    const avatarEl = document.getElementById('sbAvatar');
+    if (nameEl) nameEl.textContent = currentUser.fullName || 'Kaunselor';
+    if (avatarEl) {
+      if (currentUser.avatarUrl) {
+        avatarEl.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
+      } else {
+        avatarEl.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
+      }
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     APPLY BRANDING
+     ═══════════════════════════════════════════════════════════ */
+  async function applyBranding() {
+    try {
+      const cfg = await window.EMindCare.getSiteConfig();
+      if (!cfg?.branding) return;
+      const b = cfg.branding;
+      const brandNameEl = document.getElementById('sbBrandName');
+      const logoEl = document.getElementById('sbLogo');
+      if (b.name && brandNameEl) brandNameEl.textContent = b.name;
+      if (logoEl) {
+        if (b.logoUrl) logoEl.innerHTML = `<img src="${b.logoUrl}" alt="">`;
+        else if (b.logoIcon) logoEl.innerHTML = `<i class="${b.logoIcon}"></i>`;
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     BIND EVENTS
+     ═══════════════════════════════════════════════════════════ */
+  function bindEvents() {
+    // Form submit
+    const form = document.getElementById('galleryForm');
+    if (form) form.addEventListener('submit', handleSaveAlbum);
+
+    // File input (multiple)
+    const fileInput = document.getElementById('galleryFileInput');
+    if (fileInput) fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length) handleFilesUpload(files);
+    });
+
+    // Drag & drop
+    const zone = document.getElementById('galleryUploadZone');
+    if (zone) {
+      ['dragenter', 'dragover'].forEach(ev => {
+        zone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          zone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach(ev => {
+        zone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          zone.classList.remove('dragover');
+        });
+      });
+      zone.addEventListener('drop', (e) => {
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        if (files.length) handleFilesUpload(files);
+      });
+    }
+
+    // Search & filter
+    const search = document.getElementById('gallerySearch');
+    if (search) search.addEventListener('input', filterAndRender);
+
+    const catFilter = document.getElementById('galleryFilterCat');
+    if (catFilter) catFilter.addEventListener('change', filterAndRender);
+
+    const statusFilter = document.getElementById('galleryFilterStatus');
+    if (statusFilter) statusFilter.addEventListener('change', filterAndRender);
+
+    // Confirm modal
+    const confirmBtn = document.getElementById('confirmBtn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        if (typeof pendingConfirmAction === 'function') {
+          const action = pendingConfirmAction;
+          closeConfirmModal();
+          await action();
+        }
+      });
+    }
+
+    const modal = document.getElementById('confirmModal');
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeConfirmModal();
+      });
+    }
+
+    // Edit modal
+    const editModal = document.getElementById('editModal');
+    if (editModal) {
+      editModal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeEditModal();
+      });
+    }
+
+    // ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeEditModal();
+        closeConfirmModal();
+      }
+      if (document.getElementById('lightbox')?.classList.contains('active')) {
+        if (e.key === 'ArrowLeft') lightboxNav(e, -1);
+        if (e.key === 'ArrowRight') lightboxNav(e, 1);
+      }
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     FILE UPLOAD HANDLING (MULTIPLE)
+     ═══════════════════════════════════════════════════════════ */
+  async function handleFilesUpload(files) {
+    for (const file of files) {
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('Fail Terlalu Besar', `${file.name} melebihi 10MB`, 'warning', 3500);
+        continue;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        showToast('Format Tidak Sah', `${file.name} bukan gambar`, 'warning', 3500);
+        continue;
+      }
+
+      const item = {
+        id: 'up_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        file,
+        url: URL.createObjectURL(file),
+        status: 'pending',
+        progress: 0,
+        publicId: null,
+        cloudUrl: null
+      };
+
+      uploadQueue.push(item);
+      renderUploadQueue();
+    }
+
+    // Start upload one by one
+    await processUploadQueue();
+  }
+
+  async function processUploadQueue() {
+    const pending = uploadQueue.filter(u => u.status === 'pending');
+    if (!pending.length) return;
+
+    for (const item of pending) {
+      try {
+        item.status = 'uploading';
+        renderUploadQueue();
+
+        const result = await uploadToCloudinary(item.file, (pct) => {
+          item.progress = pct;
+          updateUploadItem(item);
+        });
+
+        item.publicId = result.public_id;
+        item.cloudUrl = result.secure_url;
+        item.status = 'complete';
+        item.progress = 100;
+        renderUploadQueue();
+
+      } catch (err) {
+        console.error('Upload error:', err);
+        item.status = 'error';
+        item.error = err.message;
+        renderUploadQueue();
+      }
+    }
+
+    updateSaveButtonState();
+  }
+
+  function uploadToCloudinary(file, onProgress) {
+    const { CLOUDINARY_CONFIG } = window.EMindCare;
+    const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+    formData.append('folder', CLOUDINARY_CONFIG.folder + '/gallery');
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && onProgress) {
+          onProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try { resolve(JSON.parse(xhr.responseText)); }
+          catch { reject(new Error('Respons tidak sah')); }
+        } else {
+          try {
+            const errData = JSON.parse(xhr.responseText);
+            reject(new Error(errData.error?.message || 'Upload gagal'));
+          } catch {
+            reject(new Error('Upload gagal: ' + xhr.status));
+          }
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Rangkaian gagal'));
+      xhr.send(formData);
+    });
+  }
+
+  function renderUploadQueue() {
+    const queue = document.getElementById('uploadQueue');
+    if (!queue) return;
+
+    if (!uploadQueue.length) {
+      queue.innerHTML = '';
+      updateSaveButtonState();
+      return;
+    }
+
+    queue.innerHTML = uploadQueue.map(item => {
+      const statusText = item.status === 'complete' ? '✓' :
+                         item.status === 'error' ? '✕' :
+                         item.status === 'uploading' ? `${item.progress}%` : 'Menunggu';
+
+      return `
+        <div class="upload-item ${item.status}" data-id="${item.id}">
+          <div class="upload-thumb">
+            <img src="${item.url}" alt="${escapeHtml(item.file.name)}">
+          </div>
+          <div class="upload-info">
+            <div class="upload-name">${escapeHtml(item.file.name)}</div>
+            <div class="upload-bar">
+              <div class="upload-bar-fill" style="width:${item.progress}%;"></div>
+            </div>
+          </div>
+          <span class="upload-status">${statusText}</span>
+          <button class="upload-remove" type="button" onclick="removeUploadItem('${item.id}')" title="Buang">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    updateSaveButtonState();
+  }
+
+  function updateUploadItem(item) {
+    const el = document.querySelector(`.upload-item[data-id="${item.id}"]`);
+    if (!el) return;
+    const bar = el.querySelector('.upload-bar-fill');
+    const status = el.querySelector('.upload-status');
+    if (bar) bar.style.width = item.progress + '%';
+    if (status) status.textContent = item.progress + '%';
+  }
+
+  window.removeUploadItem = function(id) {
+    uploadQueue = uploadQueue.filter(u => u.id !== id);
+    renderUploadQueue();
+  };
+
+  function updateSaveButtonState() {
+    const btn = document.getElementById('gallerySaveBtn');
+    if (!btn) return;
+    const completed = uploadQueue.filter(u => u.status === 'complete');
+    btn.disabled = completed.length === 0;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     SAVE ALBUM
+     ═══════════════════════════════════════════════════════════ */
+  async function handleSaveAlbum(e) {
+    e.preventDefault();
+
+    const title = document.getElementById('galleryTitle').value.trim();
+    const category = document.getElementById('galleryCategory').value;
+    const date = document.getElementById('galleryDate').value;
+    const description = document.getElementById('galleryDesc').value.trim();
+
+    if (!title) return showToast('Ralat', 'Sila masukkan tajuk program.', 'error');
+    if (!category) return showToast('Ralat', 'Sila pilih kategori.', 'error');
+
+    const completedImages = uploadQueue.filter(u => u.status === 'complete');
+    if (!completedImages.length) {
+      return showToast('Ralat', 'Sila upload sekurang-kurangnya 1 gambar.', 'warning');
+    }
+
+    const btn = document.getElementById('gallerySaveBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const { db, fs } = window.EMindCare;
+
+      const images = completedImages.map(u => ({
+        url: u.cloudUrl,
+        publicId: u.publicId,
+        filename: u.file.name
+      }));
+
+      const data = {
+        title,
+        description: description || null,
+        category,
+        date: date || null,
+        images,
+        coverImage: images[0].url,
+        status: 'published',
+        order: allAlbums.length + 1,
+        createdAt: fs.serverTimestamp(),
+        createdBy: currentUser?.fullName || 'kaunselor'
+      };
+
+      const ref = await fs.addDoc(fs.collection(db, COLLECTION), data);
+      allAlbums.push({ id: ref.id, ...data });
+
+      resetGalleryForm();
+      filterAndRender();
+      updateStats();
+      showToast('Berjaya', `Album "${title}" berjaya disimpan.`, 'success');
+
+    } catch (err) {
+      console.error('Save album error:', err);
+      showToast('Ralat', 'Gagal menyimpan: ' + err.message, 'error');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+
+  window.resetGalleryForm = function() {
+    uploadQueue.forEach(u => { if (u.url) URL.revokeObjectURL(u.url); });
+    uploadQueue = [];
+
+    document.getElementById('galleryForm').reset();
+    document.getElementById('galleryTitle').value = '';
+    document.getElementById('galleryCategory').value = '';
+    document.getElementById('galleryDate').value = '';
+    document.getElementById('galleryDesc').value = '';
+    document.getElementById('galleryFileInput').value = '';
+    document.getElementById('gallerySaveBtn').classList.remove('loading');
+    document.getElementById('gallerySaveBtn').disabled = true;
+
+    renderUploadQueue();
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     LOAD ALBUMS
+     ═══════════════════════════════════════════════════════════ */
+  async function loadAlbums() {
+    try {
+      const { db, fs } = window.EMindCare;
+      const snap = await fs.getDocs(fs.collection(db, COLLECTION));
+      allAlbums = [];
+      snap.forEach(d => allAlbums.push({ id: d.id, ...d.data() }));
+
+      allAlbums.sort((a, b) => {
+        const at = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        const bt = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+        return bt - at;
+      });
+
+      filterAndRender();
+      updateStats();
+
+    } catch (err) {
+      console.error('Load albums error:', err);
+      document.getElementById('galleryGrid').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle" style="color:var(--rose);"></i>
+          <strong>Ralat Memuatkan</strong>
+          <p>${escapeHtml(err.message)}</p>
+        </div>`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     FILTER & RENDER
+     ═══════════════════════════════════════════════════════════ */
+  function filterAndRender() {
+    const search = (document.getElementById('gallerySearch')?.value || '').toLowerCase().trim();
+    const cat = document.getElementById('galleryFilterCat')?.value || '';
+    const status = document.getElementById('galleryFilterStatus')?.value || '';
+
+    filteredAlbums = allAlbums.filter(a => {
+      if (cat && a.category !== cat) return false;
+      if (status === 'published' && a.status !== 'published') return false;
+      if (status === 'hidden' && a.status !== 'hidden') return false;
+
+      if (search) {
+        const hay = [a.title, a.description, a.category].filter(Boolean).join(' ').toLowerCase();
+        if (!hay.includes(search)) return false;
+      }
+
+      return true;
+    });
+
+    renderGallery();
+  }
+
+  function renderGallery() {
+    const grid = document.getElementById('galleryGrid');
+
+    if (!filteredAlbums.length) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-images"></i>
+          <strong>${allAlbums.length ? 'Tiada Album Dijumpai' : 'Belum Ada Album'}</strong>
+          <p>${allAlbums.length
+            ? 'Cuba tukar filter atau kata kunci carian.'
+            : 'Tambah album galeri pertama menggunakan borang di atas.'}</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = filteredAlbums.map((album, idx) => {
+      const catClass = CATEGORY_CLASS[album.category] || 'cat-lain';
+      const images = album.images || [];
+      const imgCount = images.length;
+      const dateStr = album.date ? formatDateShort(album.date) : '';
+      const isHidden = album.status === 'hidden';
+
+      return `
+        <div class="gallery-card ${isHidden ? 'hidden-status' : ''}">
+          <div class="gallery-image" onclick="openLightbox('${album.id}')">
+            <div class="gallery-slideshow" data-album="${album.id}">
+              ${images.map((img, i) => `
+                <img src="${img.url}" alt="${escapeHtml(album.title)} - ${i + 1}"
+                     class="slide ${i === 0 ? 'active' : ''}"
+                     data-idx="${i}"
+                     loading="${i === 0 ? 'eager' : 'lazy'}">
+              `).join('')}
+            </div>
+            <span class="gallery-badge ${catClass}">${escapeHtml(album.category || 'Lain-lain')}</span>
+            ${isHidden
+              ? `<span class="gallery-hidden-badge"><i class="fas fa-eye-slash"></i> Sembunyi</span>`
+              : (imgCount > 1 ? `<span class="gallery-count-badge"><i class="fas fa-images"></i> ${imgCount}</span>` : '')
+            }
+            <div class="gallery-image-overlay">
+              <div class="gallery-zoom-icon"><i class="fas fa-search-plus"></i></div>
+            </div>
+          </div>
+          <div class="gallery-body">
+            ${dateStr ? `<span class="gallery-date"><i class="fas fa-calendar"></i> ${dateStr}</span>` : ''}
+            <div class="gallery-title">${escapeHtml(album.title || 'Tanpa Tajuk')}</div>
+            <div class="gallery-meta">
+              <span class="status-pill ${isHidden ? 'inactive' : 'active'}">
+                <span class="dot"></span>
+                ${isHidden ? 'Sembunyi' : 'Papar'}
+              </span>
+              <div class="gallery-actions">
+                <button class="btn btn-secondary btn-sm btn-icon" onclick="event.stopPropagation(); toggleAlbumStatus('${album.id}')" title="${isHidden ? 'Papar' : 'Sembunyi'}">
+                  <i class="fas fa-${isHidden ? 'eye' : 'eye-slash'}"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm btn-icon" onclick="event.stopPropagation(); openEditAlbum('${album.id}')" title="Edit">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation(); deleteAlbum('${album.id}')" title="Padam">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    startSlideshows();
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     SLIDESHOW
+     ═══════════════════════════════════════════════════════════ */
+  function startSlideshows() {
+    slideshowTimers.forEach(t => clearInterval(t));
+    slideshowTimers = [];
+
+    document.querySelectorAll('.gallery-slideshow').forEach(slideshow => {
+      const slides = slideshow.querySelectorAll('.slide');
+      if (slides.length <= 1) return;
+
+      let current = 0;
+      let paused = false;
+
+      slideshow.closest('.gallery-card')?.addEventListener('mouseenter', () => { paused = true; });
+      slideshow.closest('.gallery-card')?.addEventListener('mouseleave', () => { paused = false; });
+
+      const timer = setInterval(() => {
+        if (paused) return;
+        current = (current + 1) % slides.length;
+        slides.forEach((s, i) => s.classList.toggle('active', i === current));
+      }, 3000);
+
+      slideshowTimers.push(timer);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOGGLE ALBUM STATUS
+     ═══════════════════════════════════════════════════════════ */
+  window.toggleAlbumStatus = async function(id) {
+    const album = allAlbums.find(a => a.id === id);
+    if (!album) return;
+
+    const newStatus = album.status === 'published' ? 'hidden' : 'published';
+
+    try {
+      const { db, fs } = window.EMindCare;
+      await fs.updateDoc(fs.doc(db, COLLECTION, id), {
+        status: newStatus,
+        updatedAt: fs.serverTimestamp()
+      });
+      album.status = newStatus;
+      filterAndRender();
+      updateStats();
+      showToast('Berjaya', newStatus === 'published' ? 'Album dipaparkan.' : 'Album disembunyikan.', 'success', 2500);
+    } catch (err) {
+      showToast('Ralat', 'Gagal kemaskini: ' + err.message, 'error');
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     EDIT ALBUM
+     ═══════════════════════════════════════════════════════════ */
+  window.openEditAlbum = function(id) {
+    const album = allAlbums.find(a => a.id === id);
+    if (!album) return;
+
+    editingAlbumId = id;
+
+    document.getElementById('editTitle').value = album.title || '';
+    document.getElementById('editCategory').value = album.category || 'Program UBK';
+    document.getElementById('editDate').value = album.date || '';
+    document.getElementById('editDesc').value = album.description || '';
+
+    const previewImg = document.getElementById('editPreviewImg');
+    if (album.coverImage || (album.images && album.images[0])) {
+      previewImg.src = album.coverImage || album.images[0].url;
+    }
+
+    document.getElementById('editModal').classList.add('active');
+  };
+
+  window.closeEditModal = function() {
+    document.getElementById('editModal').classList.remove('active');
+    editingAlbumId = null;
+  };
+
+  window.saveEditAlbum = async function() {
+    if (!editingAlbumId) return;
+
+    const title = document.getElementById('editTitle').value.trim();
+    const category = document.getElementById('editCategory').value;
+    const date = document.getElementById('editDate').value;
+    const desc = document.getElementById('editDesc').value.trim();
+
+    if (!title) return showToast('Ralat', 'Sila masukkan tajuk.', 'error');
+
+    const btn = document.getElementById('editSaveBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const { db, fs } = window.EMindCare;
+      await fs.updateDoc(fs.doc(db, COLLECTION, editingAlbumId), {
+        title,
+        category,
+        date: date || null,
+        description: desc || null,
+        updatedAt: fs.serverTimestamp()
+      });
+
+      const album = allAlbums.find(a => a.id === editingAlbumId);
+      if (album) {
+        album.title = title;
+        album.category = category;
+        album.date = date;
+        album.description = desc;
+      }
+
+      closeEditModal();
+      filterAndRender();
+      showToast('Berjaya', 'Album dikemaskini.', 'success');
+    } catch (err) {
+      showToast('Ralat', 'Gagal simpan: ' + err.message, 'error');
+    } finally {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     DELETE ALBUM
+     ═══════════════════════════════════════════════════════════ */
+  window.deleteAlbum = function(id) {
+    const album = allAlbums.find(a => a.id === id);
+    if (!album) return;
+
+    document.getElementById('confirmTitle').textContent = 'Padam Album?';
+    document.getElementById('confirmDesc').textContent =
+      `Album "${truncate(album.title, 50)}" dengan ${album.images?.length || 0} gambar akan dipadamkan secara kekal.`;
+
+    pendingConfirmAction = async () => {
+      try {
+        const { db, fs } = window.EMindCare;
+        await fs.deleteDoc(fs.doc(db, COLLECTION, id));
+        allAlbums = allAlbums.filter(a => a.id !== id);
+        filterAndRender();
+        updateStats();
+        showToast('Berjaya', 'Album dipadam.', 'success');
+      } catch (err) {
+        showToast('Ralat', 'Gagal padam: ' + err.message, 'error');
+      }
+    };
+
+    document.getElementById('confirmModal').classList.add('active');
+  };
+
+  window.closeConfirmModal = function() {
+    document.getElementById('confirmModal').classList.remove('active');
+    pendingConfirmAction = null;
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     LIGHTBOX
+     ═══════════════════════════════════════════════════════════ */
+  window.openLightbox = function(albumId) {
+    const album = filteredAlbums.find(a => a.id === albumId) || allAlbums.find(a => a.id === albumId);
+    if (!album || !album.images?.length) return;
+
+    lightboxAlbum = album;
+    lightboxImages = album.images;
+    lightboxIndex = 0;
+
+    updateLightbox();
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Pause slideshows
+    slideshowTimers.forEach(t => clearInterval(t));
+  };
+
+  window.closeLightbox = function(e) {
+    if (e && e.target !== e.currentTarget && !e.target.closest('.lightbox-close')) {
+      if (e.target.closest('.lightbox-content') || e.target.closest('.lightbox-nav')) return;
+    }
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+    startSlideshows();
+  };
+
+  window.lightboxNav = function(e, dir) {
+    if (e) e.stopPropagation();
+    if (lightboxImages.length <= 1) return;
+    lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+    updateLightbox();
+  };
+
+  function updateLightbox() {
+    if (!lightboxAlbum || !lightboxImages.length) return;
+
+    document.getElementById('lightboxImage').src = lightboxImages[lightboxIndex].url;
+    document.getElementById('lightboxTitle').textContent = lightboxAlbum.title || '';
+    document.getElementById('lightboxDesc').textContent = lightboxAlbum.description || '';
+
+    const dateEl = document.getElementById('lightboxDate');
+    if (lightboxAlbum.date) {
+      dateEl.innerHTML = `<i class="fas fa-calendar"></i> ${formatDateShort(lightboxAlbum.date)}`;
+      dateEl.style.display = 'inline-flex';
+    } else {
+      dateEl.style.display = 'none';
+    }
+
+    document.getElementById('lightboxCounter').textContent =
+      `${lightboxIndex + 1} / ${lightboxImages.length}`;
+
+    const showNav = lightboxImages.length > 1;
+    document.querySelectorAll('.lightbox-nav').forEach(btn => {
+      btn.style.display = showNav ? 'flex' : 'none';
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     UPDATE STATS
+     ═══════════════════════════════════════════════════════════ */
+  function updateStats() {
+    const total = allAlbums.length;
+    const published = allAlbums.filter(a => a.status === 'published').length;
+    const hidden = allAlbums.filter(a => a.status === 'hidden').length;
+
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statPublished').textContent = published;
+    document.getElementById('statHidden').textContent = hidden;
+
+    const countText = document.getElementById('galleryCountText');
+    if (countText) countText.textContent = `${total} album (${published} dipaparkan)`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     HELPERS
+     ═══════════════════════════════════════════════════════════ */
+  function escapeHtml(str) {
+    if (str == null) return '';
+    const d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+  function truncate(str, len) {
+    if (!str) return '';
+    return str.length > len ? str.substring(0, len) + '...' : str;
+  }
+
+  function formatDateShort(dateStr) {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    } catch { return dateStr; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOAST
+     ═══════════════════════════════════════════════════════════ */
+  function showToast(title, message, type = 'success', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-icon"><i class="fas ${icons[type] || 'fa-info'}"></i></div>
+      <div class="toast-content"><strong>${title}</strong><span>${message}</span></div>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('removing');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+
+  console.log(
+    "%c 🖼️ Dashboard Gallery ",
+    "background:linear-gradient(135deg,#06B6D4,#4F46E5,#8B5CF6);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
+  );
+</script>
 
 </body>
 </html>
