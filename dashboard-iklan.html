@@ -11,6 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+<!-- ⭐ SIDEBAR CSS - centralized -->
+<link rel="stylesheet" href="sidebar.css">
+
 <style>
 /* ═══════════════════════════════════════════════════
    ROOT
@@ -50,7 +53,6 @@ body {
   color: var(--ink);
   line-height: 1.6;
   min-height: 100vh;
-  min-height: 100dvh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -60,237 +62,9 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
 
-/* ═══════════════════════════════════════════════════
-   LAYOUT + SIDEBAR
-   ═══════════════════════════════════════════════════ */
-.app { display: flex; min-height: 100vh; min-height: 100dvh; }
+/* ═══════ LAYOUT ═══════ */
+.app { display: flex; min-height: 100vh; }
 
-.sidebar {
-  width: var(--sidebar-w);
-  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
-  color: #cbd5e1;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 60;
-  transition: transform 0.4s var(--ease-out);
-  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
-  overflow-y: auto;
-}
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-
-.sb-brand {
-  padding: 1.5rem 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  flex-shrink: 0;
-}
-.sb-brand-logo {
-  width: 42px; height: 42px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1.15rem;
-  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-.sb-brand-logo::before {
-  content: "";
-  position: absolute;
-  inset: -50%;
-  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
-  animation: shineSweep 4s linear infinite;
-}
-.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
-.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
-@keyframes shineSweep { to { transform: rotate(360deg); } }
-.sb-brand-text strong {
-  display: block;
-  font-family: 'Fraunces', serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.sb-brand-text span {
-  font-size: 0.65rem;
-  color: #94a3b8;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.sb-profile {
-  margin: 1rem 1rem 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  color: inherit;
-}
-.sb-profile:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-}
-.sb-avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  font-weight: 800;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sb-avatar::after {
-  content: "";
-  position: absolute;
-  bottom: -2px; right: -2px;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: var(--emerald);
-  border: 2px solid #1E293B;
-}
-.sb-profile-info { min-width: 0; flex: 1; }
-.sb-profile-info strong {
-  display: block;
-  font-size: 0.85rem;
-  color: #fff;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sb-profile-info span {
-  font-size: 0.68rem;
-  color: var(--teal-glow);
-  font-weight: 600;
-}
-
-.sb-menu {
-  flex: 1;
-  padding: 0.5rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.sb-section-label {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 1rem 0.6rem 0.4rem;
-}
-.sb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 0.84rem;
-  font-weight: 600;
-  transition: all 0.3s var(--ease-out);
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
-  position: relative;
-}
-.sb-item i:first-child {
-  width: 32px; height: 32px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.82rem;
-  flex-shrink: 0;
-  transition: all 0.3s;
-}
-.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.sb-item:hover i:first-child {
-  background: rgba(20, 184, 166, 0.15);
-  color: var(--teal-glow);
-}
-.sb-item.active {
-  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
-  color: #fff;
-}
-.sb-item.active i:first-child {
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
-}
-.sb-item.active::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 20%; bottom: 20%;
-  width: 3px;
-  background: var(--teal-glow);
-  border-radius: 0 4px 4px 0;
-}
-.sb-badge {
-  margin-left: auto;
-  padding: 0.1rem 0.5rem;
-  background: var(--rose);
-  color: #fff;
-  border-radius: 50px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  min-width: 22px;
-  text-align: center;
-}
-
-.sb-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  flex-shrink: 0;
-}
-.sb-footer-btn {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #FCA5A5;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.sb-footer-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-/* ═══════════════════════════════════════════════════
-   MAIN
-   ═══════════════════════════════════════════════════ */
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
@@ -298,7 +72,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: 100dvh;
 }
 
 .topbar {
@@ -373,9 +146,7 @@ body {
   margin: 0 auto;
 }
 
-/* ═══════════════════════════════════════════════════
-   TAB NAVIGATION
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TAB NAVIGATION ═══════ */
 .tab-nav {
   display: flex;
   gap: 0.35rem;
@@ -433,9 +204,7 @@ body {
   color: var(--ink-soft);
 }
 
-/* ═══════════════════════════════════════════════════
-   TAB PANELS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TAB PANELS ═══════ */
 .tab-panel {
   display: none;
   animation: panelIn 0.45s var(--ease-out);
@@ -446,9 +215,7 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ═══════════════════════════════════════════════════
-   CARDS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ CARDS ═══════ */
 .card {
   background: #fff;
   border: 1px solid var(--line);
@@ -456,10 +223,7 @@ body {
   padding: 1.6rem;
   margin-bottom: 1.25rem;
   box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
-  transition: box-shadow 0.3s;
 }
-.card:hover { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06); }
-
 .card-header {
   display: flex;
   align-items: flex-start;
@@ -500,9 +264,7 @@ body {
   line-height: 1.5;
 }
 
-/* ═══════════════════════════════════════════════════
-   FORM
-   ═══════════════════════════════════════════════════ */
+/* ═══════ FORM ═══════ */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -549,11 +311,10 @@ body {
   color: var(--ink);
   transition: all 0.3s var(--ease-out);
   outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
-.input-field:hover {
-  border-color: rgba(15, 118, 110, 0.2);
-  background: #fff;
-}
+.input-field:hover { border-color: rgba(15, 118, 110, 0.2); background: #fff; }
 .input-field:focus {
   border-color: var(--teal);
   background: #fff;
@@ -580,9 +341,24 @@ textarea.input-field {
 }
 .input-info i { color: var(--teal); font-size: 0.68rem; }
 
-/* ═══════════════════════════════════════════════════
-   TOGGLE SWITCH
-   ═══════════════════════════════════════════════════ */
+/* Char counter */
+.char-counter {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink-light);
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255,255,255,0.9);
+  padding: 0.15rem 0.5rem;
+  border-radius: 50px;
+  pointer-events: none;
+}
+.char-counter.warn { color: var(--orange); }
+.char-counter.danger { color: var(--rose); }
+
+/* ═══════ TOGGLE SWITCH ═══════ */
 .toggle-switch {
   position: relative;
   display: inline-flex;
@@ -621,9 +397,7 @@ textarea.input-field {
   color: var(--ink-soft);
 }
 
-/* ═══════════════════════════════════════════════════
-   BUTTONS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ BUTTONS ═══════ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -687,9 +461,7 @@ textarea.input-field {
 .btn.loading .btn-loading { display: inline-flex; align-items: center; gap: 0.5rem; }
 .btn .btn-loading { display: none; }
 
-/* ═══════════════════════════════════════════════════
-   RUNNING TEXT PREVIEW
-   ═══════════════════════════════════════════════════ */
+/* ═══════ PREVIEW BOX (Marquee) ═══════ */
 .preview-label {
   display: flex;
   align-items: center;
@@ -715,7 +487,6 @@ textarea.input-field {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.4); opacity: 0.7; }
 }
-
 .preview-box {
   background: linear-gradient(90deg, #0F172A 0%, #4C1D95 50%, #0E7490 100%);
   color: #fff;
@@ -793,13 +564,11 @@ textarea.input-field {
 }
 .preview-divider { color: var(--cyan-soft); opacity: 0.4; font-size: 0.7rem; }
 
-/* ═══════════════════════════════════════════════════
-   UPLOAD ZONE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ UPLOAD ZONE ═══════ */
 .upload-zone {
   border: 2px dashed rgba(15, 118, 110, 0.25);
   border-radius: 16px;
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.5rem;
   text-align: center;
   background: rgba(20, 184, 166, 0.02);
   cursor: pointer;
@@ -820,52 +589,62 @@ textarea.input-field {
   cursor: pointer;
 }
 .upload-icon {
-  width: 58px; height: 58px;
+  width: 64px; height: 64px;
   margin: 0 auto 1rem;
-  border-radius: 18px;
+  border-radius: 20px;
   background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
   color: #fff;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   box-shadow: 0 12px 28px -6px rgba(15, 118, 110, 0.4);
   transition: transform 0.4s var(--ease-elastic);
 }
-.upload-zone:hover .upload-icon { transform: translateY(-4px) scale(1.05); }
+.upload-zone:hover .upload-icon { transform: translateY(-4px) scale(1.08); }
 .upload-zone h4 {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 800;
   color: var(--ink);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.3rem;
 }
 .upload-zone p {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--ink-soft);
+  line-height: 1.5;
 }
 
+/* Upload preview */
 .upload-preview {
   position: relative;
   margin-top: 1rem;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
-  background: var(--pearl);
-  max-height: 260px;
+  background: #0F172A;
+  max-height: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--line);
 }
+.upload-preview.logo-mode {
+  background: #fff;
+  padding: 2rem;
+  min-height: 200px;
+}
 .upload-preview img,
 .upload-preview video {
   max-width: 100%;
-  max-height: 260px;
+  max-height: 320px;
   object-fit: contain;
   display: block;
 }
+.upload-preview.logo-mode img {
+  max-height: 260px;
+}
 .upload-preview .remove-btn {
   position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  width: 34px; height: 34px;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 36px; height: 36px;
   border-radius: 50%;
   background: rgba(239, 68, 68, 0.9);
   color: #fff;
@@ -874,42 +653,17 @@ textarea.input-field {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   transition: all 0.3s;
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+  backdrop-filter: blur(8px);
 }
 .upload-preview .remove-btn:hover {
   background: var(--rose);
   transform: scale(1.1);
 }
-.upload-preview .media-badge {
-  position: absolute;
-  top: 0.6rem;
-  left: 0.6rem;
-  padding: 0.25rem 0.65rem;
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(8px);
-  color: #fff;
-  border-radius: 50px;
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-.upload-preview .media-size {
-  position: absolute;
-  bottom: 0.6rem;
-  right: 0.6rem;
-  padding: 0.2rem 0.6rem;
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(8px);
-  color: #fff;
-  border-radius: 50px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-}
 
+/* Upload progress */
 .upload-progress {
   display: none;
   margin-top: 1rem;
@@ -955,9 +709,7 @@ textarea.input-field {
   box-shadow: 0 0 12px rgba(20, 184, 166, 0.5);
 }
 
-/* ═══════════════════════════════════════════════════
-   LIST ITEMS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ LIST STACK (Pengumuman) ═══════ */
 .list-stack {
   display: flex;
   flex-direction: column;
@@ -1036,38 +788,7 @@ textarea.input-field {
   flex-shrink: 0;
 }
 
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 50px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-}
-.status-pill.active {
-  background: rgba(16, 185, 129, 0.12);
-  color: var(--emerald);
-}
-.status-pill.inactive {
-  background: rgba(100, 116, 139, 0.12);
-  color: var(--ink-soft);
-}
-.status-pill .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.status-pill.active .dot {
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-/* ═══════════════════════════════════════════════════
-   MEDIA GRID
-   ═══════════════════════════════════════════════════ */
+/* ═══════ MEDIA GRID (Banner & Collab) ═══════ */
 .media-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -1139,18 +860,9 @@ textarea.input-field {
   align-items: center;
   gap: 0.3rem;
 }
-.media-badge.image {
-  background: rgba(20, 184, 166, 0.9);
-  color: #fff;
-}
-.media-badge.video {
-  background: rgba(239, 68, 68, 0.9);
-  color: #fff;
-}
-.media-badge.logo {
-  background: rgba(99, 102, 241, 0.9);
-  color: #fff;
-}
+.media-badge.image { background: rgba(20, 184, 166, 0.92); color: #fff; }
+.media-badge.video { background: rgba(239, 68, 68, 0.92); color: #fff; }
+.media-badge.logo { background: rgba(99, 102, 241, 0.92); color: #fff; }
 
 .media-card-body {
   padding: 1rem 1.1rem;
@@ -1170,15 +882,21 @@ textarea.input-field {
   overflow: hidden;
   word-break: break-word;
 }
-.media-card-sub {
-  font-size: 0.76rem;
-  color: var(--ink-soft);
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.media-card-link {
+  font-size: 0.72rem;
+  color: var(--indigo);
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+.media-card-link:hover { color: var(--teal); }
+.media-card-link i { font-size: 0.65rem; flex-shrink: 0; }
+
 .media-card-meta {
   display: flex;
   align-items: center;
@@ -1188,14 +906,39 @@ textarea.input-field {
   border-top: 1px solid var(--line);
   margin-top: auto;
 }
-.media-card-actions {
-  display: flex;
+.media-card-actions { display: flex; gap: 0.35rem; }
+
+/* Status pill */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
   gap: 0.35rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 50px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.status-pill.active {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--emerald);
+}
+.status-pill.inactive {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--ink-soft);
+}
+.status-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-pill.active .dot {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  animation: pulse 2s ease-in-out infinite;
 }
 
-/* ═══════════════════════════════════════════════════
-   EMPTY STATE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ EMPTY STATE ═══════ */
 .empty-state {
   padding: 3rem 1.5rem;
   text-align: center;
@@ -1218,9 +961,7 @@ textarea.input-field {
 }
 .empty-state p { font-size: 0.84rem; line-height: 1.6; }
 
-/* ═══════════════════════════════════════════════════
-   MODAL
-   ═══════════════════════════════════════════════════ */
+/* ═══════ MODAL ═══════ */
 .modal {
   position: fixed;
   inset: 0;
@@ -1275,9 +1016,7 @@ textarea.input-field {
 .modal-actions { display: flex; gap: 0.6rem; }
 .modal-actions .btn { flex: 1; }
 
-/* ═══════════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TOAST ═══════ */
 .toast-container {
   position: fixed;
   top: 1.5rem;
@@ -1326,37 +1065,18 @@ textarea.input-field {
 .toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
 .toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
 
-/* ═══════════════════════════════════════════════════
-   BACKDROP
-   ═══════════════════════════════════════════════════ */
-.sb-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 55;
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.sb-backdrop.active { display: block; opacity: 1; }
-
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ RESPONSIVE ═══════ */
 @media (max-width: 1024px) {
   :root { --sidebar-w: 240px; }
   .content { padding: 1.25rem; }
+  .media-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }
 @media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
   .main { margin-left: 0; }
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
   .content { padding: 1rem; }
   .form-grid { grid-template-columns: 1fr; }
-  .media-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }
 @media (max-width: 520px) {
   .topbar { padding: 0.65rem 0.85rem; }
@@ -1389,101 +1109,10 @@ textarea.input-field {
 
 <div class="app">
 
-  <!-- ═══════════════════════════════════════════════════
-       SIDEBAR — dengan 3 menu berasingan
-       ═══════════════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
-      <div class="sb-brand-text">
-        <strong id="sbBrandName">e-MindCare</strong>
-        <span>Dashboard Kaunselor</span>
-      </div>
-    </div>
+  <!-- ⭐ SIDEBAR — auto-inject dari sidebar.js -->
+  <div id="sidebar-root"></div>
 
-    <a href="dashboard-profile.html" class="sb-profile">
-      <div class="sb-avatar" id="sbAvatar">K</div>
-      <div class="sb-profile-info">
-        <strong id="sbProfileName">Kaunselor</strong>
-        <span>Kaunselor UBK</span>
-      </div>
-    </a>
-
-    <nav class="sb-menu">
-      <div class="sb-section-label">Utama</div>
-      <a href="dashboard-kaunselor.html" class="sb-item">
-        <i class="fas fa-chart-pie"></i>
-        <span>Overview</span>
-      </a>
-      <a href="dashboard-profile.html" class="sb-item">
-        <i class="fas fa-user-circle"></i>
-        <span>Profil Kaunselor</span>
-      </a>
-
-      <div class="sb-section-label">Kandungan Laman</div>
-      <a href="dashboard-iklan.html?tab=announcements" class="sb-item" data-tab-link="announcements">
-        <i class="fas fa-bullhorn"></i>
-        <span>Pengumuman</span>
-      </a>
-      <a href="dashboard-iklan.html?tab=banners" class="sb-item" data-tab-link="banners">
-        <i class="fas fa-images"></i>
-        <span>Banner Iklan</span>
-      </a>
-      <a href="dashboard-iklan.html?tab=collabs" class="sb-item" data-tab-link="collabs">
-        <i class="fas fa-handshake"></i>
-        <span>Kolaborasi</span>
-      </a>
-      <a href="dashboard-sunting-laman.html" class="sb-item">
-        <i class="fas fa-paint-brush"></i>
-        <span>Sunting Laman</span>
-      </a>
-      <a href="dashboard-gallery.html" class="sb-item">
-        <i class="fas fa-photo-video"></i>
-        <span>Galeri UBK</span>
-      </a>
-      <a href="dashboard-contact.html" class="sb-item">
-        <i class="fas fa-address-book"></i>
-        <span>Hubungi & Lokasi</span>
-      </a>
-
-      <div class="sb-section-label">Pengurusan</div>
-      <a href="dashboard-inventories.html" class="sb-item">
-        <i class="fas fa-clipboard-list"></i>
-        <span>Ujian Inventori</span>
-      </a>
-      <a href="dashboard-users.html" class="sb-item">
-        <i class="fas fa-users"></i>
-        <span>Urus Pengguna</span>
-      </a>
-      <a href="dashboard-appointments.html" class="sb-item">
-        <i class="fas fa-calendar-check"></i>
-        <span>Tempahan Kaunseling</span>
-        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
-      </a>
-      <a href="dashboard-diaries.html" class="sb-item">
-        <i class="fas fa-book"></i>
-        <span>Diari & Catatan</span>
-      </a>
-
-      <div class="sb-section-label">Analitik</div>
-      <a href="dashboard-analytics.html" class="sb-item">
-        <i class="fas fa-chart-line"></i>
-        <span>Data & Laporan</span>
-      </a>
-    </nav>
-
-    <div class="sb-footer">
-      <button class="sb-footer-btn" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Log Keluar</span>
-      </button>
-    </div>
-  </aside>
-  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
-
-  <!-- ═══════════════════════════════════════════════════
-       MAIN
-       ═══════════════════════════════════════════════════ -->
+  <!-- ═══════ MAIN ═══════ -->
   <div class="main">
 
     <header class="topbar">
@@ -1569,13 +1198,14 @@ textarea.input-field {
 
           <form id="announcementForm">
             <div class="form-grid">
-              <div class="form-group full">
+              <div class="form-group full" style="position:relative;">
                 <label class="form-label" for="annText">
                   Teks Pengumuman <span class="req">*</span>
                 </label>
                 <div class="input-wrap">
                   <i class="fas fa-comment input-icon"></i>
                   <input type="text" id="annText" class="input-field" placeholder="Cth: Selamat datang ke portal e-MindCare UBK SEMSIRA" maxlength="180" required>
+                  <span class="char-counter" id="annTextCounter">0 / 180</span>
                 </div>
                 <div class="input-info">
                   <i class="fas fa-info-circle"></i>
@@ -1620,7 +1250,7 @@ textarea.input-field {
             </div>
 
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;">
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-primary" id="annSaveBtn">
                 <span class="btn-text">
                   <i class="fas fa-save"></i>
                   <span>Tambah Pengumuman</span>
@@ -1798,7 +1428,7 @@ textarea.input-field {
               <p>Format PNG dengan latar lutsinar digalakkan</p>
             </div>
 
-            <div class="upload-preview" id="collabPreview" style="display:none;"></div>
+            <div class="upload-preview logo-mode" id="collabPreview" style="display:none;"></div>
 
             <div class="upload-progress" id="collabProgress">
               <div class="upload-progress-header">
@@ -1877,7 +1507,7 @@ textarea.input-field {
   </div>
 </div>
 
-<!-- CONFIRM MODAL -->
+<!-- ═══ CONFIRM MODAL ═══ -->
 <div class="modal" id="confirmModal">
   <div class="modal-card">
     <div class="modal-icon danger" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
@@ -1890,10 +1520,1002 @@ textarea.input-field {
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ═══ TOAST ═══ -->
 <div class="toast-container" id="toastContainer"></div>
 
-<script type="module" src="dashboard-iklan.js"></script>
+<!-- ⭐ SIDEBAR JS — auto-inject -->
+<script type="module" src="sidebar.js"></script>
+
+<!-- ⭐ PAGE JS -->
+<script type="module">
+  import './config.js';
+
+  /* ═══════════════════════════════════════════════════════════
+     CONSTANTS
+     ═══════════════════════════════════════════════════════════ */
+  const SESSION_KEY = 'emindcare_session';
+  const ANN_COLLECTION = 'announcements';
+  const BAN_COLLECTION = 'banners';
+  const COL_COLLECTION = 'collaborations';
+
+  const PAGE_TITLES = {
+    announcements: ['Pengumuman', 'Urus mesej running text di laman utama'],
+    banners: ['Banner Iklan', 'Upload & urus banner slideshow laman utama'],
+    collabs: ['Kolaborasi', 'Urus logo rakan strategik & kerjasama UBK']
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     STATE
+     ═══════════════════════════════════════════════════════════ */
+  let currentUser = null;
+  let allAnn = [];
+  let allBanners = [];
+  let allCollabs = [];
+
+  let pendingBannerUpload = null;
+  let pendingCollabUpload = null;
+  let pendingConfirmAction = null;
+
+  /* ═══════════════════════════════════════════════════════════
+     INIT
+     ═══════════════════════════════════════════════════════════ */
+  window.addEventListener('load', async () => {
+    await waitForEMindCare();
+    if (!authGuard()) return;
+    await waitForSidebar();
+
+    loadProfile();
+    applyBranding();
+    bindEvents();
+    handleUrlTab();
+
+    await Promise.all([
+      loadAnnouncements(),
+      loadBanners(),
+      loadCollabs()
+    ]);
+  });
+
+  function waitForEMindCare() {
+    return new Promise((resolve, reject) => {
+      if (window.EMindCare) return resolve();
+      let tries = 0;
+      const timer = setInterval(() => {
+        tries++;
+        if (window.EMindCare) { clearInterval(timer); resolve(); }
+        else if (tries > 100) { clearInterval(timer); reject(new Error('SDK timeout')); }
+      }, 50);
+    });
+  }
+
+  function waitForSidebar() {
+    return new Promise(resolve => {
+      if (document.getElementById('sbProfileName')) return resolve();
+      const obs = new MutationObserver(() => {
+        if (document.getElementById('sbProfileName')) {
+          obs.disconnect();
+          resolve();
+        }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => { obs.disconnect(); resolve(); }, 3000);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     URL TAB HANDLING
+     ═══════════════════════════════════════════════════════════ */
+  function handleUrlTab() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab && PAGE_TITLES[tab]) {
+      switchTab(tab);
+    }
+  }
+
+  window.switchTab = function(tabName) {
+    if (!PAGE_TITLES[tabName]) return;
+
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    if (tabBtn) tabBtn.classList.add('active');
+
+    // Update panels
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.querySelector(`.tab-panel[data-panel="${tabName}"]`);
+    if (panel) panel.classList.add('active');
+
+    // Update title
+    const [title, sub] = PAGE_TITLES[tabName];
+    document.getElementById('pageTitle').textContent = title;
+    document.getElementById('pageSubtitle').textContent = sub;
+
+    // Update URL
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabName);
+    window.history.replaceState({}, '', url);
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     AUTH GUARD
+     ═══════════════════════════════════════════════════════════ */
+  function authGuard() {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) { window.location.href = 'login.html'; return false; }
+    try {
+      const session = JSON.parse(raw);
+      if (session.role !== 'kaunselor') {
+        const redirects = { guru: 'dashboard-guru.html', murid: 'dashboard-murid.html' };
+        window.location.href = redirects[session.role] || 'login.html';
+        return false;
+      }
+      currentUser = session;
+      return true;
+    } catch (e) {
+      localStorage.removeItem(SESSION_KEY);
+      window.location.href = 'login.html';
+      return false;
+    }
+  }
+
+  function loadProfile() {
+    const nameEl = document.getElementById('sbProfileName');
+    const avatarEl = document.getElementById('sbAvatar');
+    if (nameEl) nameEl.textContent = currentUser.fullName || 'Kaunselor';
+    if (avatarEl) {
+      if (currentUser.avatarUrl) {
+        avatarEl.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
+      } else {
+        avatarEl.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
+      }
+    }
+  }
+
+  async function applyBranding() {
+    try {
+      const cfg = await window.EMindCare.getSiteConfig();
+      if (!cfg?.branding) return;
+      const b = cfg.branding;
+      const brandNameEl = document.getElementById('sbBrandName');
+      const logoEl = document.getElementById('sbLogo');
+      if (b.name && brandNameEl) brandNameEl.textContent = b.name;
+      if (logoEl) {
+        if (b.logoUrl) logoEl.innerHTML = `<img src="${b.logoUrl}" alt="">`;
+        else if (b.logoIcon) logoEl.innerHTML = `<i class="${b.logoIcon}"></i>`;
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     BIND EVENTS
+     ═══════════════════════════════════════════════════════════ */
+  function bindEvents() {
+    // Tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // === Announcement form ===
+    const annForm = document.getElementById('announcementForm');
+    if (annForm) annForm.addEventListener('submit', handleAddAnnouncement);
+
+    const annText = document.getElementById('annText');
+    if (annText) {
+      annText.addEventListener('input', () => {
+        const counter = document.getElementById('annTextCounter');
+        const len = annText.value.length;
+        counter.textContent = `${len} / 180`;
+        counter.classList.remove('warn', 'danger');
+        if (len > 150) counter.classList.add('warn');
+        if (len > 170) counter.classList.add('danger');
+      });
+    }
+
+    // === Banner ===
+    const bannerForm = document.getElementById('bannerForm');
+    if (bannerForm) bannerForm.addEventListener('submit', handleSaveBanner);
+
+    const bannerFile = document.getElementById('bannerFileInput');
+    if (bannerFile) bannerFile.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleBannerFile(file);
+    });
+
+    const bannerZone = document.getElementById('bannerUploadZone');
+    if (bannerZone) setupDragZone(bannerZone, handleBannerFile);
+
+    // === Collab ===
+    const collabForm = document.getElementById('collabForm');
+    if (collabForm) collabForm.addEventListener('submit', handleSaveCollab);
+
+    const collabFile = document.getElementById('collabFileInput');
+    if (collabFile) collabFile.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleCollabFile(file);
+    });
+
+    const collabZone = document.getElementById('collabUploadZone');
+    if (collabZone) setupDragZone(collabZone, handleCollabFile);
+
+    // === Confirm modal ===
+    const confirmBtn = document.getElementById('confirmBtn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        if (typeof pendingConfirmAction === 'function') {
+          const action = pendingConfirmAction;
+          closeConfirmModal();
+          await action();
+        }
+      });
+    }
+
+    const modal = document.getElementById('confirmModal');
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeConfirmModal();
+      });
+    }
+  }
+
+  function setupDragZone(zone, onFile) {
+    ['dragenter', 'dragover'].forEach(ev => {
+      zone.addEventListener(ev, (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+      zone.addEventListener(ev, (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+      });
+    });
+    zone.addEventListener('drop', (e) => {
+      const file = e.dataTransfer.files[0];
+      if (file) onFile(file);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     ANNOUNCEMENTS
+     ═══════════════════════════════════════════════════════════ */
+  async function loadAnnouncements() {
+    try {
+      const { db, fs } = window.EMindCare;
+      const snap = await fs.getDocs(fs.collection(db, ANN_COLLECTION));
+      allAnn = [];
+      snap.forEach(d => allAnn.push({ id: d.id, ...d.data() }));
+
+      allAnn.sort((a, b) => {
+        const at = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        const bt = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+        return bt - at;
+      });
+
+      renderAnnouncementList();
+      updateLivePreview();
+      updateCounts();
+    } catch (err) {
+      console.error('Load announcements error:', err);
+    }
+  }
+
+  async function handleAddAnnouncement(e) {
+    e.preventDefault();
+
+    const text = document.getElementById('annText').value.trim();
+    const icon = document.getElementById('annIcon').value.trim() || 'fa-bullhorn';
+    const badge = document.getElementById('annBadge').value.trim();
+    const active = document.getElementById('annActive').checked;
+
+    if (!text) return showToast('Ralat', 'Sila masukkan teks pengumuman.', 'error');
+
+    const btn = document.getElementById('annSaveBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const { db, fs } = window.EMindCare;
+      const data = {
+        text,
+        icon: icon.startsWith('fa-') ? icon : `fa-${icon}`,
+        badge: badge || null,
+        active,
+        createdAt: fs.serverTimestamp(),
+        createdBy: currentUser?.fullName || 'kaunselor'
+      };
+
+      const ref = await fs.addDoc(fs.collection(db, ANN_COLLECTION), data);
+      allAnn.unshift({ id: ref.id, ...data });
+
+      document.getElementById('announcementForm').reset();
+      document.getElementById('annIcon').value = 'fa-bullhorn';
+      document.getElementById('annActive').checked = true;
+      document.getElementById('annTextCounter').textContent = '0 / 180';
+
+      renderAnnouncementList();
+      updateLivePreview();
+      updateCounts();
+      showToast('Berjaya', 'Pengumuman ditambah.', 'success');
+    } catch (err) {
+      showToast('Ralat', 'Gagal simpan: ' + err.message, 'error');
+    } finally {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+
+  function renderAnnouncementList() {
+    const list = document.getElementById('announcementList');
+    if (!allAnn.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-bullhorn"></i>
+          <strong>Belum Ada Pengumuman</strong>
+          <p>Tambah pengumuman pertama anda menggunakan borang di atas.</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = allAnn.map(a => `
+      <div class="list-item ${!a.active ? 'inactive' : ''}">
+        <div class="list-item-icon">
+          <i class="fas ${a.icon || 'fa-bullhorn'}"></i>
+        </div>
+        <div class="list-item-content">
+          <div class="list-item-title">${escapeHtml(a.text || '')}</div>
+          <div class="list-item-meta">
+            ${a.badge ? `<span class="badge-inline">${escapeHtml(a.badge)}</span>` : ''}
+            <span><i class="fas fa-clock"></i> ${a.createdAt?.toDate ? timeAgo(a.createdAt.toDate()) : 'Baru sahaja'}</span>
+          </div>
+        </div>
+        <div class="list-item-actions">
+          <span class="status-pill ${a.active ? 'active' : 'inactive'}">
+            <span class="dot"></span>
+            ${a.active ? 'Aktif' : 'Tidak Aktif'}
+          </span>
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="toggleAnnouncement('${a.id}', ${!a.active})" title="${a.active ? 'Nyahaktifkan' : 'Aktifkan'}">
+            <i class="fas fa-${a.active ? 'toggle-on' : 'toggle-off'}"></i>
+          </button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAnnouncement('${a.id}')" title="Padam">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.toggleAnnouncement = async function(id, active) {
+    try {
+      const { db, fs } = window.EMindCare;
+      await fs.updateDoc(fs.doc(db, ANN_COLLECTION, id), { active, updatedAt: fs.serverTimestamp() });
+      const item = allAnn.find(x => x.id === id);
+      if (item) item.active = active;
+      renderAnnouncementList();
+      updateLivePreview();
+      updateCounts();
+      showToast('Berjaya', active ? 'Pengumuman diaktifkan.' : 'Pengumuman dinyahaktifkan.', 'success', 2500);
+    } catch (err) {
+      showToast('Ralat', 'Gagal kemaskini: ' + err.message, 'error');
+    }
+  };
+
+  window.deleteAnnouncement = function(id) {
+    const item = allAnn.find(x => x.id === id);
+    if (!item) return;
+
+    document.getElementById('confirmTitle').textContent = 'Padam Pengumuman?';
+    document.getElementById('confirmDesc').textContent = `Pengumuman "${truncate(item.text, 60)}" akan dipadamkan.`;
+
+    pendingConfirmAction = async () => {
+      try {
+        const { db, fs } = window.EMindCare;
+        await fs.deleteDoc(fs.doc(db, ANN_COLLECTION, id));
+        allAnn = allAnn.filter(x => x.id !== id);
+        renderAnnouncementList();
+        updateLivePreview();
+        updateCounts();
+        showToast('Berjaya', 'Pengumuman dipadam.', 'success');
+      } catch (err) {
+        showToast('Ralat', 'Gagal padam: ' + err.message, 'error');
+      }
+    };
+
+    document.getElementById('confirmModal').classList.add('active');
+  };
+
+  function updateLivePreview() {
+    const marquee = document.getElementById('previewMarquee');
+    const activeItems = allAnn.filter(a => a.active);
+
+    if (!activeItems.length) {
+      marquee.innerHTML = `<span class="preview-item"><i class="fas fa-circle-info"></i><span style="opacity:0.7;">Belum ada pengumuman aktif. Tambah di bawah.</span></span>`;
+      return;
+    }
+
+    const itemsHTML = activeItems.map(a => {
+      const badge = a.badge ? `<span class="badge">${escapeHtml(a.badge)}</span>` : '';
+      return `<span class="preview-item"><i class="fas ${a.icon || 'fa-bullhorn'}"></i>${badge}<span>${escapeHtml(a.text || '')}</span></span>`;
+    });
+
+    const sep = '<span class="preview-divider">✦</span>';
+    const content = itemsHTML.join(sep);
+    marquee.innerHTML = `${content}${sep}${content}${sep}`;
+    marquee.style.animationDuration = Math.max(30, marquee.scrollWidth / 50) + 's';
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     BANNERS
+     ═══════════════════════════════════════════════════════════ */
+  async function loadBanners() {
+    try {
+      const { db, fs } = window.EMindCare;
+      const snap = await fs.getDocs(fs.collection(db, BAN_COLLECTION));
+      allBanners = [];
+      snap.forEach(d => allBanners.push({ id: d.id, ...d.data() }));
+
+      allBanners.sort((a, b) => {
+        const ao = a.order ?? 999;
+        const bo = b.order ?? 999;
+        if (ao !== bo) return ao - bo;
+        const at = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        const bt = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+        return bt - at;
+      });
+
+      renderBannerGrid();
+      updateCounts();
+    } catch (err) {
+      console.error('Load banners error:', err);
+    }
+  }
+
+  async function handleBannerFile(file) {
+    if (file.size > 25 * 1024 * 1024) {
+      return showToast('Fail Terlalu Besar', 'Maksimum 25MB.', 'error');
+    }
+    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+      return showToast('Format Tidak Sah', 'Sila pilih gambar atau video.', 'error');
+    }
+
+    const preview = document.getElementById('bannerPreview');
+    const progress = document.getElementById('bannerProgress');
+    const fill = document.getElementById('bannerProgressFill');
+    const pct = document.getElementById('bannerProgressPct');
+    const label = document.getElementById('bannerProgressLabel');
+
+    preview.style.display = 'flex';
+    preview.innerHTML = file.type.startsWith('video/')
+      ? `<video src="${URL.createObjectURL(file)}" muted></video><button class="remove-btn" type="button" onclick="clearBannerUpload()"><i class="fas fa-times"></i></button>`
+      : `<img src="${URL.createObjectURL(file)}" alt="Preview"><button class="remove-btn" type="button" onclick="clearBannerUpload()"><i class="fas fa-times"></i></button>`;
+
+    progress.classList.add('active');
+    fill.style.width = '0%';
+    pct.textContent = '0%';
+    label.textContent = `Memuat naik ${file.name}...`;
+
+    try {
+      const result = await uploadToCloudinary(file, 'auto', 'banners', (p) => {
+        fill.style.width = p + '%';
+        pct.textContent = p + '%';
+      });
+
+      pendingBannerUpload = {
+        mediaUrl: result.secure_url,
+        mediaType: file.type.startsWith('video/') ? 'video' : 'image',
+        publicId: result.public_id,
+        format: result.format,
+        bytes: result.bytes,
+        width: result.width,
+        height: result.height
+      };
+
+      label.textContent = '✓ Selesai';
+      pct.textContent = '100%';
+      fill.style.width = '100%';
+      document.getElementById('bannerSaveBtn').disabled = false;
+
+      setTimeout(() => progress.classList.remove('active'), 2000);
+      showToast('Upload Berjaya', 'Klik "Tambah Banner" untuk teruskan.', 'success');
+    } catch (err) {
+      progress.classList.remove('active');
+      preview.style.display = 'none';
+      preview.innerHTML = '';
+      showToast('Upload Gagal', err.message, 'error');
+    }
+  }
+
+  window.clearBannerUpload = function() {
+    pendingBannerUpload = null;
+    document.getElementById('bannerFileInput').value = '';
+    document.getElementById('bannerSaveBtn').disabled = true;
+    document.getElementById('bannerProgress').classList.remove('active');
+    const preview = document.getElementById('bannerPreview');
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+  };
+
+  async function handleSaveBanner(e) {
+    e.preventDefault();
+
+    if (!pendingBannerUpload) {
+      return showToast('Ralat', 'Sila upload fail banner dahulu.', 'warning');
+    }
+
+    const btn = document.getElementById('bannerSaveBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const { db, fs } = window.EMindCare;
+
+      const data = {
+        text: document.getElementById('bannerTitle').value.trim() || null,
+        subtitle: document.getElementById('bannerSubtitle').value.trim() || null,
+        badge: document.getElementById('bannerBadge').value.trim() || null,
+        linkUrl: document.getElementById('bannerLink').value.trim() || null,
+        mediaUrl: pendingBannerUpload.mediaUrl,
+        mediaType: pendingBannerUpload.mediaType,
+        publicId: pendingBannerUpload.publicId,
+        format: pendingBannerUpload.format,
+        bytes: pendingBannerUpload.bytes,
+        width: pendingBannerUpload.width,
+        height: pendingBannerUpload.height,
+        active: true,
+        order: allBanners.length + 1,
+        createdAt: fs.serverTimestamp(),
+        createdBy: currentUser?.fullName || 'kaunselor'
+      };
+
+      const ref = await fs.addDoc(fs.collection(db, BAN_COLLECTION), data);
+      allBanners.push({ id: ref.id, ...data });
+
+      resetBannerForm();
+      renderBannerGrid();
+      updateCounts();
+      showToast('Berjaya', 'Banner disimpan.', 'success');
+    } catch (err) {
+      showToast('Ralat', 'Gagal simpan: ' + err.message, 'error');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+
+  window.resetBannerForm = function() {
+    pendingBannerUpload = null;
+    document.getElementById('bannerForm').reset();
+    document.getElementById('bannerFileInput').value = '';
+    document.getElementById('bannerSaveBtn').disabled = true;
+    document.getElementById('bannerSaveBtn').classList.remove('loading');
+    document.getElementById('bannerProgress').classList.remove('active');
+    const preview = document.getElementById('bannerPreview');
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+  };
+
+  function renderBannerGrid() {
+    const grid = document.getElementById('bannerGrid');
+    if (!allBanners.length) {
+      grid.innerHTML = `<div class="empty-state"><i class="fas fa-images"></i><strong>Belum Ada Banner</strong><p>Upload banner pertama anda.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = allBanners.map(b => {
+      const mediaHTML = b.mediaType === 'video'
+        ? `<video src="${b.mediaUrl}" muted preload="metadata"></video>`
+        : `<img src="${b.mediaUrl}" alt="${escapeHtml(b.text || 'Banner')}" loading="lazy">`;
+
+      return `
+        <div class="media-card ${!b.active ? 'inactive' : ''}">
+          <div class="media-card-media">
+            ${mediaHTML}
+            <span class="media-badge ${b.mediaType}">
+              <i class="fas fa-${b.mediaType === 'video' ? 'video' : 'image'}"></i>
+              ${b.mediaType === 'video' ? 'Video' : 'Imej'}
+            </span>
+          </div>
+          <div class="media-card-body">
+            <div class="media-card-title">${escapeHtml(b.text || 'Tanpa Tajuk')}</div>
+            <div class="media-card-meta">
+              <span class="status-pill ${b.active ? 'active' : 'inactive'}"><span class="dot"></span>${b.active ? 'Aktif' : 'Tidak Aktif'}</span>
+              <div class="media-card-actions">
+                <button class="btn btn-secondary btn-sm btn-icon" onclick="toggleBanner('${b.id}', ${!b.active})" title="${b.active ? 'Nyahaktifkan' : 'Aktifkan'}">
+                  <i class="fas fa-${b.active ? 'toggle-on' : 'toggle-off'}"></i>
+                </button>
+                <button class="btn btn-danger btn-sm btn-icon" onclick="deleteBanner('${b.id}')" title="Padam">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.toggleBanner = async function(id, active) {
+    try {
+      const { db, fs } = window.EMindCare;
+      await fs.updateDoc(fs.doc(db, BAN_COLLECTION, id), { active, updatedAt: fs.serverTimestamp() });
+      const item = allBanners.find(x => x.id === id);
+      if (item) item.active = active;
+      renderBannerGrid();
+      updateCounts();
+      showToast('Berjaya', active ? 'Banner diaktifkan.' : 'Banner dinyahaktifkan.', 'success', 2500);
+    } catch (err) {
+      showToast('Ralat', 'Gagal kemaskini: ' + err.message, 'error');
+    }
+  };
+
+  window.deleteBanner = function(id) {
+    const item = allBanners.find(x => x.id === id);
+    if (!item) return;
+
+    document.getElementById('confirmTitle').textContent = 'Padam Banner?';
+    document.getElementById('confirmDesc').textContent = `Banner "${truncate(item.text || 'Tanpa Tajuk', 50)}" akan dipadamkan.`;
+
+    pendingConfirmAction = async () => {
+      try {
+        const { db, fs } = window.EMindCare;
+        await fs.deleteDoc(fs.doc(db, BAN_COLLECTION, id));
+        allBanners = allBanners.filter(x => x.id !== id);
+        renderBannerGrid();
+        updateCounts();
+        showToast('Berjaya', 'Banner dipadam.', 'success');
+      } catch (err) {
+        showToast('Ralat', 'Gagal padam: ' + err.message, 'error');
+      }
+    };
+
+    document.getElementById('confirmModal').classList.add('active');
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     COLLABORATIONS
+     ═══════════════════════════════════════════════════════════ */
+  async function loadCollabs() {
+    try {
+      const { db, fs } = window.EMindCare;
+      const snap = await fs.getDocs(fs.collection(db, COL_COLLECTION));
+      allCollabs = [];
+      snap.forEach(d => allCollabs.push({ id: d.id, ...d.data() }));
+
+      allCollabs.sort((a, b) => {
+        const ao = a.order ?? 999;
+        const bo = b.order ?? 999;
+        if (ao !== bo) return ao - bo;
+        return 0;
+      });
+
+      renderCollabGrid();
+      updateCounts();
+    } catch (err) {
+      console.error('Load collabs error:', err);
+    }
+  }
+
+  async function handleCollabFile(file) {
+    if (file.size > 10 * 1024 * 1024) {
+      return showToast('Fail Terlalu Besar', 'Maksimum 10MB.', 'error');
+    }
+    if (!file.type.startsWith('image/')) {
+      return showToast('Format Tidak Sah', 'Sila pilih gambar sahaja.', 'error');
+    }
+
+    const preview = document.getElementById('collabPreview');
+    const progress = document.getElementById('collabProgress');
+    const fill = document.getElementById('collabProgressFill');
+    const pct = document.getElementById('collabProgressPct');
+    const label = document.getElementById('collabProgressLabel');
+
+    preview.style.display = 'flex';
+    preview.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Preview"><button class="remove-btn" type="button" onclick="clearCollabUpload()"><i class="fas fa-times"></i></button>`;
+
+    progress.classList.add('active');
+    fill.style.width = '0%';
+    pct.textContent = '0%';
+    label.textContent = `Memuat naik ${file.name}...`;
+
+    try {
+      const result = await uploadToCloudinary(file, 'image', 'collaborations', (p) => {
+        fill.style.width = p + '%';
+        pct.textContent = p + '%';
+      });
+
+      pendingCollabUpload = {
+        logoUrl: result.secure_url,
+        publicId: result.public_id,
+        format: result.format,
+        bytes: result.bytes
+      };
+
+      label.textContent = '✓ Selesai';
+      pct.textContent = '100%';
+      fill.style.width = '100%';
+      document.getElementById('collabSaveBtn').disabled = false;
+
+      setTimeout(() => progress.classList.remove('active'), 2000);
+      showToast('Upload Berjaya', 'Klik "Tambah Logo" untuk teruskan.', 'success');
+    } catch (err) {
+      progress.classList.remove('active');
+      preview.style.display = 'none';
+      preview.innerHTML = '';
+      showToast('Upload Gagal', err.message, 'error');
+    }
+  }
+
+  window.clearCollabUpload = function() {
+    pendingCollabUpload = null;
+    document.getElementById('collabFileInput').value = '';
+    document.getElementById('collabSaveBtn').disabled = true;
+    document.getElementById('collabProgress').classList.remove('active');
+    const preview = document.getElementById('collabPreview');
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+  };
+
+  async function handleSaveCollab(e) {
+    e.preventDefault();
+
+    if (!pendingCollabUpload) {
+      return showToast('Ralat', 'Sila upload logo dahulu.', 'warning');
+    }
+
+    const name = document.getElementById('collabName').value.trim();
+    const link = document.getElementById('collabLink').value.trim();
+
+    if (!name) return showToast('Ralat', 'Sila masukkan nama rakan.', 'error');
+
+    const btn = document.getElementById('collabSaveBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const { db, fs } = window.EMindCare;
+
+      const data = {
+        name,
+        logoUrl: pendingCollabUpload.logoUrl,
+        publicId: pendingCollabUpload.publicId,
+        format: pendingCollabUpload.format,
+        bytes: pendingCollabUpload.bytes,
+        linkUrl: link || null,
+        order: allCollabs.length + 1,
+        active: true,
+        createdAt: fs.serverTimestamp(),
+        createdBy: currentUser?.fullName || 'kaunselor'
+      };
+
+      const ref = await fs.addDoc(fs.collection(db, COL_COLLECTION), data);
+      allCollabs.push({ id: ref.id, ...data });
+
+      resetCollabForm();
+      renderCollabGrid();
+      updateCounts();
+      showToast('Berjaya', 'Logo kolaborasi disimpan.', 'success');
+    } catch (err) {
+      showToast('Ralat', 'Gagal simpan: ' + err.message, 'error');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+
+  window.resetCollabForm = function() {
+    pendingCollabUpload = null;
+    document.getElementById('collabForm').reset();
+    document.getElementById('collabFileInput').value = '';
+    document.getElementById('collabSaveBtn').disabled = true;
+    document.getElementById('collabSaveBtn').classList.remove('loading');
+    document.getElementById('collabProgress').classList.remove('active');
+    const preview = document.getElementById('collabPreview');
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+  };
+
+  function renderCollabGrid() {
+    const grid = document.getElementById('collabGrid');
+    if (!allCollabs.length) {
+      grid.innerHTML = `<div class="empty-state"><i class="fas fa-handshake"></i><strong>Belum Ada Logo Kolaborasi</strong><p>Upload logo rakan kolaborasi.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = allCollabs.map(c => `
+      <div class="media-card ${!c.active ? 'inactive' : ''}">
+        <div class="media-card-media logo-mode">
+          <img src="${c.logoUrl}" alt="${escapeHtml(c.name || 'Logo')}" loading="lazy">
+          <span class="media-badge logo"><i class="fas fa-handshake"></i> Rakan</span>
+        </div>
+        <div class="media-card-body">
+          <div class="media-card-title">${escapeHtml(c.name || 'Tanpa Nama')}</div>
+          ${c.linkUrl ? `<a href="${escapeHtml(c.linkUrl)}" target="_blank" rel="noopener" class="media-card-link"><i class="fas fa-external-link-alt"></i>${escapeHtml(shortUrl(c.linkUrl))}</a>` : ''}
+          <div class="media-card-meta">
+            <span class="status-pill ${c.active ? 'active' : 'inactive'}"><span class="dot"></span>${c.active ? 'Aktif' : 'Tidak Aktif'}</span>
+            <div class="media-card-actions">
+              <button class="btn btn-secondary btn-sm btn-icon" onclick="toggleCollab('${c.id}', ${!c.active})" title="${c.active ? 'Nyahaktifkan' : 'Aktifkan'}">
+                <i class="fas fa-${c.active ? 'toggle-on' : 'toggle-off'}"></i>
+              </button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteCollab('${c.id}')" title="Padam">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.toggleCollab = async function(id, active) {
+    try {
+      const { db, fs } = window.EMindCare;
+      await fs.updateDoc(fs.doc(db, COL_COLLECTION, id), { active, updatedAt: fs.serverTimestamp() });
+      const item = allCollabs.find(x => x.id === id);
+      if (item) item.active = active;
+      renderCollabGrid();
+      updateCounts();
+      showToast('Berjaya', active ? 'Logo diaktifkan.' : 'Logo dinyahaktifkan.', 'success', 2500);
+    } catch (err) {
+      showToast('Ralat', 'Gagal kemaskini: ' + err.message, 'error');
+    }
+  };
+
+  window.deleteCollab = function(id) {
+    const item = allCollabs.find(x => x.id === id);
+    if (!item) return;
+
+    document.getElementById('confirmTitle').textContent = 'Padam Logo?';
+    document.getElementById('confirmDesc').textContent = `Logo "${truncate(item.name || 'Tanpa Nama', 50)}" akan dipadamkan.`;
+
+    pendingConfirmAction = async () => {
+      try {
+        const { db, fs } = window.EMindCare;
+        await fs.deleteDoc(fs.doc(db, COL_COLLECTION, id));
+        allCollabs = allCollabs.filter(x => x.id !== id);
+        renderCollabGrid();
+        updateCounts();
+        showToast('Berjaya', 'Logo dipadam.', 'success');
+      } catch (err) {
+        showToast('Ralat', 'Gagal padam: ' + err.message, 'error');
+      }
+    };
+
+    document.getElementById('confirmModal').classList.add('active');
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     UPDATE COUNTS
+     ═══════════════════════════════════════════════════════════ */
+  function updateCounts() {
+    document.getElementById('tabCountAnn').textContent = allAnn.filter(a => a.active).length;
+    document.getElementById('tabCountBan').textContent = allBanners.filter(b => b.active).length;
+    document.getElementById('tabCountCol').textContent = allCollabs.filter(c => c.active).length;
+
+    const annCount = document.getElementById('annCountText');
+    if (annCount) annCount.textContent = `${allAnn.length} pengumuman (${allAnn.filter(a => a.active).length} aktif)`;
+
+    const banCount = document.getElementById('bannerCountText');
+    if (banCount) banCount.textContent = `${allBanners.length} banner (${allBanners.filter(b => b.active).length} aktif)`;
+
+    const colCount = document.getElementById('collabCountText');
+    if (colCount) colCount.textContent = `${allCollabs.length} logo (${allCollabs.filter(c => c.active).length} aktif)`;
+  }
+
+  window.closeConfirmModal = function() {
+    document.getElementById('confirmModal').classList.remove('active');
+    pendingConfirmAction = null;
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     UPLOAD HELPER
+     ═══════════════════════════════════════════════════════════ */
+  function uploadToCloudinary(file, resourceType, subfolder, onProgress) {
+    const { CLOUDINARY_CONFIG } = window.EMindCare;
+
+    let type = resourceType;
+    if (type === 'auto') {
+      if (file.type.startsWith('video/')) type = 'video';
+      else if (file.type.startsWith('image/')) type = 'image';
+      else type = 'raw';
+    }
+
+    const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/${type}/upload`;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+    formData.append('folder', `${CLOUDINARY_CONFIG.folder}/${subfolder}`);
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && onProgress) {
+          onProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try { resolve(JSON.parse(xhr.responseText)); }
+          catch { reject(new Error('Respons tidak sah')); }
+        } else {
+          try {
+            const errData = JSON.parse(xhr.responseText);
+            reject(new Error(errData.error?.message || 'Upload gagal'));
+          } catch {
+            reject(new Error('Upload gagal: ' + xhr.status));
+          }
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Rangkaian gagal'));
+      xhr.send(formData);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     HELPERS
+     ═══════════════════════════════════════════════════════════ */
+  function escapeHtml(str) {
+    if (str == null) return '';
+    const d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+  function truncate(str, len) {
+    if (!str) return '';
+    return str.length > len ? str.substring(0, len) + '...' : str;
+  }
+
+  function shortUrl(url) {
+    if (!url) return '';
+    try {
+      const u = new URL(url);
+      let display = u.hostname.replace(/^www\./, '') + u.pathname;
+      if (display.length > 32) display = display.substring(0, 32) + '...';
+      return display;
+    } catch { return truncate(url, 32); }
+  }
+
+  function timeAgo(date) {
+    if (!date) return 'Baru sahaja';
+    const diff = Date.now() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 1) return 'Baru sahaja';
+    if (mins < 60) return `${mins} min lalu`;
+    if (hours < 24) return `${hours} jam lalu`;
+    if (days < 7) return `${days} hari lalu`;
+    return date.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short' });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOAST
+     ═══════════════════════════════════════════════════════════ */
+  function showToast(title, message, type = 'success', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-icon"><i class="fas ${icons[type] || 'fa-info'}"></i></div>
+      <div class="toast-content"><strong>${title}</strong><span>${message}</span></div>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('removing');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+
+  console.log(
+    "%c 📢 Dashboard Iklan ",
+    "background:linear-gradient(135deg,#0F766E,#4F46E5,#F59E0B);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
+  );
+</script>
 
 </body>
 </html>
