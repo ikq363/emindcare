@@ -11,6 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+<!-- ⭐ SIDEBAR CSS - centralized -->
+<link rel="stylesheet" href="sidebar.css">
+
 <style>
 /* ═══════════════════════════════════════════════════
    ROOT
@@ -50,7 +53,6 @@ body {
   color: var(--ink);
   line-height: 1.6;
   min-height: 100vh;
-  min-height: 100dvh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -60,237 +62,9 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
 
-/* ═══════════════════════════════════════════════════
-   LAYOUT + SIDEBAR
-   ═══════════════════════════════════════════════════ */
-.app { display: flex; min-height: 100vh; min-height: 100dvh; }
+/* ═══════ LAYOUT ═══════ */
+.app { display: flex; min-height: 100vh; }
 
-.sidebar {
-  width: var(--sidebar-w);
-  background: linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #312E81 100%);
-  color: #cbd5e1;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 60;
-  transition: transform 0.4s var(--ease-out);
-  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.15);
-  overflow-y: auto;
-}
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-
-.sb-brand {
-  padding: 1.5rem 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  flex-shrink: 0;
-}
-.sb-brand-logo {
-  width: 42px; height: 42px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1.15rem;
-  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.3);
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-.sb-brand-logo::before {
-  content: "";
-  position: absolute;
-  inset: -50%;
-  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.35), transparent);
-  animation: shineSweep 4s linear infinite;
-}
-.sb-brand-logo i, .sb-brand-logo img { position: relative; z-index: 1; }
-.sb-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
-@keyframes shineSweep { to { transform: rotate(360deg); } }
-.sb-brand-text strong {
-  display: block;
-  font-family: 'Fraunces', serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.sb-brand-text span {
-  font-size: 0.65rem;
-  color: #94a3b8;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.sb-profile {
-  margin: 1rem 1rem 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  color: inherit;
-}
-.sb-profile:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-}
-.sb-avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  font-weight: 800;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-.sb-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sb-avatar::after {
-  content: "";
-  position: absolute;
-  bottom: -2px; right: -2px;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: var(--emerald);
-  border: 2px solid #1E293B;
-}
-.sb-profile-info { min-width: 0; flex: 1; }
-.sb-profile-info strong {
-  display: block;
-  font-size: 0.85rem;
-  color: #fff;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sb-profile-info span {
-  font-size: 0.68rem;
-  color: var(--teal-glow);
-  font-weight: 600;
-}
-
-.sb-menu {
-  flex: 1;
-  padding: 0.5rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.sb-section-label {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 1rem 0.6rem 0.4rem;
-}
-.sb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 0.84rem;
-  font-weight: 600;
-  transition: all 0.3s var(--ease-out);
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
-  position: relative;
-}
-.sb-item i:first-child {
-  width: 32px; height: 32px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.82rem;
-  flex-shrink: 0;
-  transition: all 0.3s;
-}
-.sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.sb-item:hover i:first-child {
-  background: rgba(20, 184, 166, 0.15);
-  color: var(--teal-glow);
-}
-.sb-item.active {
-  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(99, 102, 241, 0.12));
-  color: #fff;
-}
-.sb-item.active i:first-child {
-  background: linear-gradient(135deg, var(--teal-light), var(--indigo-light));
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
-}
-.sb-item.active::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 20%; bottom: 20%;
-  width: 3px;
-  background: var(--teal-glow);
-  border-radius: 0 4px 4px 0;
-}
-.sb-badge {
-  margin-left: auto;
-  padding: 0.1rem 0.5rem;
-  background: var(--rose);
-  color: #fff;
-  border-radius: 50px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  min-width: 22px;
-  text-align: center;
-}
-
-.sb-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  flex-shrink: 0;
-}
-.sb-footer-btn {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #FCA5A5;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.sb-footer-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-/* ═══════════════════════════════════════════════════
-   MAIN
-   ═══════════════════════════════════════════════════ */
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
@@ -298,7 +72,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: 100dvh;
 }
 
 .topbar {
@@ -368,68 +141,12 @@ body {
 .content {
   flex: 1;
   padding: 1.5rem;
-  max-width: 1300px;
+  max-width: 1280px;
   width: 100%;
   margin: 0 auto;
 }
 
-/* ═══════════════════════════════════════════════════
-   CARDS
-   ═══════════════════════════════════════════════════ */
-.card {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 1.6rem;
-  margin-bottom: 1.25rem;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
-  transition: box-shadow 0.3s;
-}
-.card:hover { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06); }
-
-.card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.4rem;
-  padding-bottom: 1.2rem;
-  border-bottom: 1px solid var(--line);
-  flex-wrap: wrap;
-}
-.card-header-left {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.95rem;
-}
-.card-icon {
-  width: 46px; height: 46px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--card-c1, var(--teal)), var(--card-c2, var(--indigo)));
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem;
-  box-shadow: 0 8px 20px -6px var(--card-c1, rgba(15, 118, 110, 0.4));
-  flex-shrink: 0;
-}
-.card-title {
-  font-family: 'Fraunces', serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: var(--ink);
-  letter-spacing: -0.015em;
-  margin-bottom: 0.15rem;
-  line-height: 1.2;
-}
-.card-subtitle {
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-  line-height: 1.5;
-}
-
-/* ═══════════════════════════════════════════════════
-   INFO BANNER
-   ═══════════════════════════════════════════════════ */
+/* ═══════ INFO BANNER ═══════ */
 .info-banner {
   display: flex;
   align-items: center;
@@ -474,9 +191,56 @@ body {
   flex-shrink: 0;
 }
 
-/* ═══════════════════════════════════════════════════
-   FORM
-   ═══════════════════════════════════════════════════ */
+/* ═══════ CARDS ═══════ */
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.6rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
+}
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.card-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.95rem;
+}
+.card-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--card-c1, var(--teal)), var(--card-c2, var(--indigo)));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 20px -6px var(--card-c1, rgba(15, 118, 110, 0.4));
+  flex-shrink: 0;
+}
+.card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  margin-bottom: 0.15rem;
+  line-height: 1.2;
+}
+.card-subtitle {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ═══════ FORM ═══════ */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -524,10 +288,7 @@ body {
   transition: all 0.3s var(--ease-out);
   outline: none;
 }
-.input-field:hover {
-  border-color: rgba(15, 118, 110, 0.2);
-  background: #fff;
-}
+.input-field:hover { border-color: rgba(15, 118, 110, 0.2); background: #fff; }
 .input-field:focus {
   border-color: var(--teal);
   background: #fff;
@@ -546,11 +307,9 @@ body {
 }
 .input-info i { color: var(--teal); font-size: 0.68rem; }
 
-/* ═══════════════════════════════════════════════════
-   UPLOAD ZONE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ UPLOAD ZONE ═══════ */
 .upload-zone {
-  border: 2px dashed rgba(99, 102, 241, 0.25);
+  border: 2px dashed rgba(99, 102, 241, 0.3);
   border-radius: 16px;
   padding: 2.5rem 1.5rem;
   text-align: center;
@@ -616,7 +375,7 @@ body {
 }
 .format-badge i { color: var(--indigo); font-size: 0.6rem; }
 
-/* Upload preview (logo mode — putih background) */
+/* Upload preview */
 .upload-preview {
   position: relative;
   margin-top: 1rem;
@@ -736,9 +495,7 @@ body {
   box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
 }
 
-/* ═══════════════════════════════════════════════════
-   BUTTONS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ BUTTONS ═══════ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -802,9 +559,7 @@ body {
 .btn.loading .btn-loading { display: inline-flex; align-items: center; gap: 0.5rem; }
 .btn .btn-loading { display: none; }
 
-/* ═══════════════════════════════════════════════════
-   MEDIA GRID (Logo Cards)
-   ═══════════════════════════════════════════════════ */
+/* ═══════ LOGO GRID ═══════ */
 .media-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -824,6 +579,9 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15);
   border-color: transparent;
+}
+.media-card.inactive {
+  opacity: 0.55;
 }
 
 /* Logo display — putih background, lebih besar */
@@ -863,8 +621,29 @@ body {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  background: rgba(99, 102, 241, 0.9);
+  background: rgba(99, 102, 241, 0.92);
   color: #fff;
+}
+
+/* Order badge */
+.media-order-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  z-index: 2;
 }
 
 .media-card-body {
@@ -910,23 +689,46 @@ body {
   border-top: 1px solid var(--line);
   margin-top: auto;
 }
-.media-card-meta-info {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.7rem;
-  color: var(--ink-soft);
-  font-weight: 600;
-}
-.media-card-meta-info i { color: var(--teal); font-size: 0.65rem; }
 .media-card-actions {
   display: flex;
   gap: 0.35rem;
 }
 
-/* ═══════════════════════════════════════════════════
-   EMPTY STATE
-   ═══════════════════════════════════════════════════ */
+/* Status pill */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 50px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.status-pill.active {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--emerald);
+}
+.status-pill.inactive {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--ink-soft);
+}
+.status-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-pill.active .dot {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+/* ═══════ EMPTY STATE ═══════ */
 .empty-state {
   padding: 3.5rem 1.5rem;
   text-align: center;
@@ -949,9 +751,7 @@ body {
 }
 .empty-state p { font-size: 0.85rem; line-height: 1.6; max-width: 400px; margin: 0 auto; }
 
-/* ═══════════════════════════════════════════════════
-   MODAL
-   ═══════════════════════════════════════════════════ */
+/* ═══════ MODAL ═══════ */
 .modal {
   position: fixed;
   inset: 0;
@@ -988,6 +788,7 @@ body {
 }
 .modal-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
 .modal-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+.modal-icon.info { background: rgba(99, 102, 241, 0.1); color: var(--indigo); }
 .modal-title {
   font-family: 'Fraunces', serif;
   font-size: 1.25rem;
@@ -1003,12 +804,10 @@ body {
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
-.modal-actions { display: flex; gap: 0.6rem; }
+.modal-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
 .modal-actions .btn { flex: 1; }
 
-/* ═══════════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TOAST ═══════ */
 .toast-container {
   position: fixed;
   top: 1.5rem;
@@ -1057,37 +856,18 @@ body {
 .toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
 .toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
 
-/* ═══════════════════════════════════════════════════
-   BACKDROP
-   ═══════════════════════════════════════════════════ */
-.sb-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 55;
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.sb-backdrop.active { display: block; opacity: 1; }
-
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ RESPONSIVE ═══════ */
 @media (max-width: 1024px) {
   :root { --sidebar-w: 240px; }
   .content { padding: 1.25rem; }
+  .media-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }
 @media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
   .main { margin-left: 0; }
   .tb-toggle { display: flex; }
   .topbar { padding: 0.75rem 1rem; }
   .content { padding: 1rem; }
   .form-grid { grid-template-columns: 1fr; }
-  .media-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }
 @media (max-width: 520px) {
   .topbar { padding: 0.65rem 0.85rem; }
@@ -1111,6 +891,7 @@ body {
   .upload-icon { width: 56px; height: 56px; font-size: 1.4rem; }
   .upload-zone h4 { font-size: 0.92rem; }
   .upload-preview { padding: 1.25rem; min-height: 160px; }
+  .upload-preview img { max-height: 160px; }
   .toast-container { top: 0.85rem; right: 0.85rem; left: 0.85rem; max-width: none; }
   .toast { min-width: auto; max-width: none; }
 }
@@ -1120,95 +901,8 @@ body {
 
 <div class="app">
 
-  <!-- ═══════ SIDEBAR ═══════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-      <div class="sb-brand-logo" id="sbLogo"><i class="fas fa-brain"></i></div>
-      <div class="sb-brand-text">
-        <strong id="sbBrandName">e-MindCare</strong>
-        <span>Dashboard Kaunselor</span>
-      </div>
-    </div>
-
-    <a href="dashboard-profile.html" class="sb-profile">
-      <div class="sb-avatar" id="sbAvatar">K</div>
-      <div class="sb-profile-info">
-        <strong id="sbProfileName">Kaunselor</strong>
-        <span>Kaunselor UBK</span>
-      </div>
-    </a>
-
-    <nav class="sb-menu">
-      <div class="sb-section-label">Utama</div>
-      <a href="dashboard-kaunselor.html" class="sb-item">
-        <i class="fas fa-chart-pie"></i>
-        <span>Overview</span>
-      </a>
-      <a href="dashboard-profile.html" class="sb-item">
-        <i class="fas fa-user-circle"></i>
-        <span>Profil Kaunselor</span>
-      </a>
-
-      <div class="sb-section-label">Kandungan Laman</div>
-      <a href="dashboard-announcements.html" class="sb-item">
-        <i class="fas fa-bullhorn"></i>
-        <span>Pengumuman</span>
-      </a>
-      <a href="dashboard-banners.html" class="sb-item">
-        <i class="fas fa-images"></i>
-        <span>Banner Iklan</span>
-      </a>
-      <a href="dashboard-collaborations.html" class="sb-item active">
-        <i class="fas fa-handshake"></i>
-        <span>Kolaborasi</span>
-      </a>
-      <a href="dashboard-sunting-laman.html" class="sb-item">
-        <i class="fas fa-paint-brush"></i>
-        <span>Sunting Laman</span>
-      </a>
-      <a href="dashboard-gallery.html" class="sb-item">
-        <i class="fas fa-photo-video"></i>
-        <span>Galeri UBK</span>
-      </a>
-      <a href="dashboard-contact.html" class="sb-item">
-        <i class="fas fa-address-book"></i>
-        <span>Hubungi & Lokasi</span>
-      </a>
-
-      <div class="sb-section-label">Pengurusan</div>
-      <a href="dashboard-inventories.html" class="sb-item">
-        <i class="fas fa-clipboard-list"></i>
-        <span>Ujian Inventori</span>
-      </a>
-      <a href="dashboard-users.html" class="sb-item">
-        <i class="fas fa-users"></i>
-        <span>Urus Pengguna</span>
-      </a>
-      <a href="dashboard-appointments.html" class="sb-item">
-        <i class="fas fa-calendar-check"></i>
-        <span>Tempahan Kaunseling</span>
-        <span class="sb-badge" id="pendingBadge" style="display:none;">0</span>
-      </a>
-      <a href="dashboard-diaries.html" class="sb-item">
-        <i class="fas fa-book"></i>
-        <span>Diari & Catatan</span>
-      </a>
-
-      <div class="sb-section-label">Analitik</div>
-      <a href="dashboard-analytics.html" class="sb-item">
-        <i class="fas fa-chart-line"></i>
-        <span>Data & Laporan</span>
-      </a>
-    </nav>
-
-    <div class="sb-footer">
-      <button class="sb-footer-btn" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Log Keluar</span>
-      </button>
-    </div>
-  </aside>
-  <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSidebar()"></div>
+  <!-- ⭐ SIDEBAR — auto-inject dari sidebar.js -->
+  <div id="sidebar-root"></div>
 
   <!-- ═══════ MAIN ═══════ -->
   <div class="main">
@@ -1233,7 +927,7 @@ body {
 
     <main class="content">
 
-      <!-- ═══════ INFO BANNER ═══════ -->
+      <!-- ═══ INFO BANNER ═══ -->
       <div class="info-banner">
         <div class="info-banner-icon"><i class="fas fa-handshake"></i></div>
         <div class="info-banner-content">
@@ -1243,7 +937,7 @@ body {
         <div class="info-banner-count" id="collabTotal">0</div>
       </div>
 
-      <!-- ═══════ UPLOAD LOGO ═══════ -->
+      <!-- ═══ UPLOAD LOGO ═══ -->
       <div class="card">
         <div class="card-header">
           <div class="card-header-left">
@@ -1333,7 +1027,7 @@ body {
         </form>
       </div>
 
-      <!-- ═══════ SENARAI LOGO ═══════ -->
+      <!-- ═══ SENARAI LOGO ═══ -->
       <div class="card">
         <div class="card-header">
           <div class="card-header-left">
@@ -1359,7 +1053,7 @@ body {
   </div>
 </div>
 
-<!-- CONFIRM MODAL -->
+<!-- ═══ CONFIRM MODAL ═══ -->
 <div class="modal" id="confirmModal">
   <div class="modal-card">
     <div class="modal-icon danger" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
@@ -1372,10 +1066,570 @@ body {
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ═══ TOAST ═══ -->
 <div class="toast-container" id="toastContainer"></div>
 
-<script type="module" src="dashboard-collaborations.js"></script>
+<!-- ⭐ SIDEBAR JS — auto-inject -->
+<script type="module" src="sidebar.js"></script>
+
+<!-- ⭐ PAGE JS -->
+<script type="module">
+  import './config.js';
+
+  /* ═══════════════════════════════════════════════════════════
+     CONSTANTS
+     ═══════════════════════════════════════════════════════════ */
+  const SESSION_KEY = 'emindcare_session';
+  const COLLECTION = 'collaborations';
+
+  /* ═══════════════════════════════════════════════════════════
+     STATE
+     ═══════════════════════════════════════════════════════════ */
+  let currentUser = null;
+  let allCollabs = [];
+  let pendingUpload = null;  // { logoUrl, publicId }
+  let pendingConfirmAction = null;
+
+  /* ═══════════════════════════════════════════════════════════
+     INIT
+     ═══════════════════════════════════════════════════════════ */
+  window.addEventListener('load', async () => {
+    await waitForEMindCare();
+    if (!authGuard()) return;
+    await waitForSidebar();
+
+    loadProfile();
+    applyBranding();
+    bindEvents();
+    await loadCollabs();
+  });
+
+  function waitForEMindCare() {
+    return new Promise((resolve, reject) => {
+      if (window.EMindCare) return resolve();
+      let tries = 0;
+      const timer = setInterval(() => {
+        tries++;
+        if (window.EMindCare) { clearInterval(timer); resolve(); }
+        else if (tries > 100) { clearInterval(timer); reject(new Error('SDK timeout')); }
+      }, 50);
+    });
+  }
+
+  function waitForSidebar() {
+    return new Promise(resolve => {
+      if (document.getElementById('sbProfileName')) return resolve();
+      const obs = new MutationObserver(() => {
+        if (document.getElementById('sbProfileName')) {
+          obs.disconnect();
+          resolve();
+        }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => { obs.disconnect(); resolve(); }, 3000);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     AUTH GUARD
+     ═══════════════════════════════════════════════════════════ */
+  function authGuard() {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) { window.location.href = 'login.html'; return false; }
+    try {
+      const session = JSON.parse(raw);
+      if (session.role !== 'kaunselor') {
+        const redirects = { guru: 'dashboard-guru.html', murid: 'dashboard-murid.html' };
+        window.location.href = redirects[session.role] || 'login.html';
+        return false;
+      }
+      currentUser = session;
+      return true;
+    } catch (e) {
+      localStorage.removeItem(SESSION_KEY);
+      window.location.href = 'login.html';
+      return false;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LOAD PROFILE
+     ═══════════════════════════════════════════════════════════ */
+  function loadProfile() {
+    const nameEl = document.getElementById('sbProfileName');
+    const avatarEl = document.getElementById('sbAvatar');
+    if (nameEl) nameEl.textContent = currentUser.fullName || 'Kaunselor';
+    if (avatarEl) {
+      if (currentUser.avatarUrl) {
+        avatarEl.innerHTML = `<img src="${currentUser.avatarUrl}" alt="">`;
+      } else {
+        avatarEl.textContent = (currentUser.fullName || 'K').charAt(0).toUpperCase();
+      }
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     APPLY BRANDING
+     ═══════════════════════════════════════════════════════════ */
+  async function applyBranding() {
+    try {
+      const cfg = await window.EMindCare.getSiteConfig();
+      if (!cfg?.branding) return;
+      const b = cfg.branding;
+      const brandNameEl = document.getElementById('sbBrandName');
+      const logoEl = document.getElementById('sbLogo');
+      if (b.name && brandNameEl) brandNameEl.textContent = b.name;
+      if (logoEl) {
+        if (b.logoUrl) logoEl.innerHTML = `<img src="${b.logoUrl}" alt="">`;
+        else if (b.logoIcon) logoEl.innerHTML = `<i class="${b.logoIcon}"></i>`;
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     BIND EVENTS
+     ═══════════════════════════════════════════════════════════ */
+  function bindEvents() {
+    const form = document.getElementById('collabForm');
+    if (form) form.addEventListener('submit', handleSaveCollab);
+
+    const fileInput = document.getElementById('collabFileInput');
+    if (fileInput) fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFileUpload(file);
+    });
+
+    // Drag & drop
+    const zone = document.getElementById('collabUploadZone');
+    if (zone) {
+      ['dragenter', 'dragover'].forEach(ev => {
+        zone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          zone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach(ev => {
+        zone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          zone.classList.remove('dragover');
+        });
+      });
+      zone.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files[0];
+        if (file) handleFileUpload(file);
+      });
+    }
+
+    const confirmBtn = document.getElementById('confirmBtn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        if (typeof pendingConfirmAction === 'function') {
+          const action = pendingConfirmAction;
+          closeConfirmModal();
+          await action();
+        }
+      });
+    }
+
+    const modal = document.getElementById('confirmModal');
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeConfirmModal();
+      });
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     FILE UPLOAD TO CLOUDINARY
+     ═══════════════════════════════════════════════════════════ */
+  async function handleFileUpload(file) {
+    if (file.size > 10 * 1024 * 1024) {
+      return showToast('Fail Terlalu Besar', 'Maksimum 10MB dibenarkan.', 'error');
+    }
+
+    if (!file.type.startsWith('image/')) {
+      return showToast('Format Tidak Dibenarkan', 'Sila pilih fail gambar sahaja.', 'error');
+    }
+
+    // Show preview + progress
+    const preview = document.getElementById('collabPreview');
+    const progress = document.getElementById('collabProgress');
+    const fillEl = document.getElementById('collabProgressFill');
+    const pctEl = document.getElementById('collabProgressPct');
+    const labelEl = document.getElementById('collabProgressLabel');
+
+    preview.style.display = 'flex';
+    preview.innerHTML = `
+      <img src="${URL.createObjectURL(file)}" alt="Preview">
+      <div class="media-badge"><i class="fas fa-image"></i> Logo</div>
+      <button class="remove-btn" type="button" onclick="clearUpload()" title="Buang">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+
+    progress.classList.add('active');
+    fillEl.style.width = '0%';
+    pctEl.textContent = '0%';
+    labelEl.textContent = `Memuat naik ${file.name}...`;
+
+    try {
+      const result = await uploadToCloudinaryWithProgress(file, (pct) => {
+        fillEl.style.width = pct + '%';
+        pctEl.textContent = pct + '%';
+      });
+
+      pendingUpload = {
+        logoUrl: result.secure_url,
+        publicId: result.public_id,
+        format: result.format,
+        bytes: result.bytes
+      };
+
+      labelEl.textContent = '✓ Selesai dimuat naik';
+      pctEl.textContent = '100%';
+      fillEl.style.width = '100%';
+      document.getElementById('collabSaveBtn').disabled = false;
+
+      setTimeout(() => progress.classList.remove('active'), 2000);
+      showToast('Upload Berjaya', 'Logo sedia untuk disimpan.', 'success');
+
+    } catch (err) {
+      progress.classList.remove('active');
+      preview.style.display = 'none';
+      preview.innerHTML = '';
+      showToast('Upload Gagal', err.message, 'error');
+    }
+  }
+
+  function uploadToCloudinaryWithProgress(file, onProgress) {
+    const { CLOUDINARY_CONFIG } = window.EMindCare;
+    const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+    formData.append('folder', CLOUDINARY_CONFIG.folder + '/collaborations');
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && onProgress) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          onProgress(pct);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try { resolve(JSON.parse(xhr.responseText)); }
+          catch (e) { reject(new Error('Respons Cloudinary tidak sah')); }
+        } else {
+          try {
+            const errData = JSON.parse(xhr.responseText);
+            reject(new Error(errData.error?.message || 'Upload gagal: ' + xhr.status));
+          } catch {
+            reject(new Error('Upload gagal: ' + xhr.status));
+          }
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Rangkaian gagal'));
+      xhr.send(formData);
+    });
+  }
+
+  window.clearUpload = function() {
+    pendingUpload = null;
+    document.getElementById('collabFileInput').value = '';
+    document.getElementById('collabSaveBtn').disabled = true;
+    document.getElementById('collabProgress').classList.remove('active');
+    const preview = document.getElementById('collabPreview');
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     SAVE COLLAB
+     ═══════════════════════════════════════════════════════════ */
+  async function handleSaveCollab(e) {
+    e.preventDefault();
+
+    if (!pendingUpload) {
+      return showToast('Ralat', 'Sila upload logo dahulu.', 'warning');
+    }
+
+    const name = document.getElementById('collabName').value.trim();
+    const link = document.getElementById('collabLink').value.trim();
+
+    if (!name) {
+      return showToast('Ralat', 'Sila masukkan nama rakan kolaborasi.', 'error');
+    }
+
+    const btn = document.getElementById('collabSaveBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const { db, fs } = window.EMindCare;
+
+      const data = {
+        name,
+        logoUrl: pendingUpload.logoUrl,
+        publicId: pendingUpload.publicId,
+        format: pendingUpload.format,
+        bytes: pendingUpload.bytes,
+        linkUrl: link || null,
+        order: allCollabs.length + 1,
+        active: true,
+        createdAt: fs.serverTimestamp(),
+        createdBy: currentUser?.fullName || 'kaunselor'
+      };
+
+      const ref = await fs.addDoc(fs.collection(db, COLLECTION), data);
+      allCollabs.push({ id: ref.id, ...data });
+
+      resetCollabForm();
+      renderCollabGrid();
+      updateCounts();
+      showToast('Berjaya', 'Logo kolaborasi disimpan.', 'success');
+
+    } catch (err) {
+      console.error('Save collab error:', err);
+      showToast('Ralat', 'Gagal menyimpan: ' + err.message, 'error');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+
+  window.resetCollabForm = function() {
+    pendingUpload = null;
+    document.getElementById('collabForm').reset();
+    document.getElementById('collabName').value = '';
+    document.getElementById('collabLink').value = '';
+    document.getElementById('collabFileInput').value = '';
+    document.getElementById('collabSaveBtn').disabled = true;
+    document.getElementById('collabSaveBtn').classList.remove('loading');
+    document.getElementById('collabProgress').classList.remove('active');
+    const preview = document.getElementById('collabPreview');
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     LOAD COLLABS
+     ═══════════════════════════════════════════════════════════ */
+  async function loadCollabs() {
+    try {
+      const { db, fs } = window.EMindCare;
+      const snap = await fs.getDocs(fs.collection(db, COLLECTION));
+      allCollabs = [];
+      snap.forEach(d => allCollabs.push({ id: d.id, ...d.data() }));
+
+      allCollabs.sort((a, b) => {
+        const ao = a.order ?? 999;
+        const bo = b.order ?? 999;
+        if (ao !== bo) return ao - bo;
+        const at = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        const bt = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+        return bt - at;
+      });
+
+      renderCollabGrid();
+      updateCounts();
+
+    } catch (err) {
+      console.error('Load collabs error:', err);
+      document.getElementById('collabGrid').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle" style="color:var(--rose);"></i>
+          <strong>Ralat Memuatkan</strong>
+          <p>${err.message}</p>
+        </div>`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     RENDER COLLAB GRID
+     ═══════════════════════════════════════════════════════════ */
+  function renderCollabGrid() {
+    const grid = document.getElementById('collabGrid');
+    if (!allCollabs.length) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-handshake"></i>
+          <strong>Belum Ada Logo Kolaborasi</strong>
+          <p>Upload logo rakan kolaborasi pertama anda menggunakan borang di atas.</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = allCollabs.map(c => {
+      const linkHTML = c.linkUrl
+        ? `<a href="${escapeHtml(c.linkUrl)}" target="_blank" rel="noopener" class="media-card-link">
+             <i class="fas fa-external-link-alt"></i>
+             ${escapeHtml(shortUrl(c.linkUrl))}
+           </a>`
+        : `<span class="media-card-link" style="color:var(--ink-light);">
+             <i class="fas fa-minus"></i>
+             Tiada pautan
+           </span>`;
+
+      return `
+        <div class="media-card ${!c.active ? 'inactive' : ''}">
+          <div class="media-card-logo">
+            <img src="${c.logoUrl}" alt="${escapeHtml(c.name || 'Logo')}" loading="lazy">
+            <span class="media-badge"><i class="fas fa-handshake"></i> Rakan</span>
+            <span class="media-order-badge">${c.order || '—'}</span>
+          </div>
+          <div class="media-card-body">
+            <div class="media-card-title">${escapeHtml(c.name || 'Tanpa Nama')}</div>
+            ${linkHTML}
+            <div class="media-card-meta">
+              <span class="status-pill ${c.active ? 'active' : 'inactive'}">
+                <span class="dot"></span>
+                ${c.active ? 'Aktif' : 'Tidak Aktif'}
+              </span>
+              <div class="media-card-actions">
+                <button class="btn btn-secondary btn-sm btn-icon"
+                        onclick="toggleCollab('${c.id}', ${!c.active})"
+                        title="${c.active ? 'Nyahaktifkan' : 'Aktifkan'}">
+                  <i class="fas fa-${c.active ? 'toggle-on' : 'toggle-off'}"></i>
+                </button>
+                <button class="btn btn-danger btn-sm btn-icon"
+                        onclick="deleteCollab('${c.id}')"
+                        title="Padam">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOGGLE COLLAB
+     ═══════════════════════════════════════════════════════════ */
+  window.toggleCollab = async function(id, active) {
+    try {
+      const { db, fs } = window.EMindCare;
+      await fs.updateDoc(fs.doc(db, COLLECTION, id), {
+        active,
+        updatedAt: fs.serverTimestamp()
+      });
+
+      const item = allCollabs.find(c => c.id === id);
+      if (item) item.active = active;
+
+      renderCollabGrid();
+      updateCounts();
+      showToast('Berjaya', active ? 'Logo diaktifkan.' : 'Logo dinyahaktifkan.', 'success', 2500);
+
+    } catch (err) {
+      showToast('Ralat', 'Gagal kemaskini: ' + err.message, 'error');
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     DELETE COLLAB
+     ═══════════════════════════════════════════════════════════ */
+  window.deleteCollab = function(id) {
+    const item = allCollabs.find(c => c.id === id);
+    if (!item) return;
+
+    document.getElementById('confirmTitle').textContent = 'Padam Logo?';
+    document.getElementById('confirmDesc').textContent =
+      `Logo "${truncate(item.name || 'Tanpa Nama', 60)}" akan dipadamkan secara kekal dari sistem.`;
+
+    pendingConfirmAction = async () => {
+      try {
+        const { db, fs } = window.EMindCare;
+        await fs.deleteDoc(fs.doc(db, COLLECTION, id));
+        allCollabs = allCollabs.filter(c => c.id !== id);
+        renderCollabGrid();
+        updateCounts();
+        showToast('Berjaya', 'Logo telah dipadam.', 'success');
+      } catch (err) {
+        showToast('Ralat', 'Gagal memadam: ' + err.message, 'error');
+      }
+    };
+
+    document.getElementById('confirmModal').classList.add('active');
+  };
+
+  window.closeConfirmModal = function() {
+    document.getElementById('confirmModal').classList.remove('active');
+    pendingConfirmAction = null;
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     UPDATE COUNTS
+     ═══════════════════════════════════════════════════════════ */
+  function updateCounts() {
+    const total = allCollabs.length;
+    const active = allCollabs.filter(c => c.active).length;
+
+    const countText = document.getElementById('collabCountText');
+    if (countText) countText.textContent = `${total} logo (${active} aktif)`;
+
+    const totalEl = document.getElementById('collabTotal');
+    if (totalEl) totalEl.textContent = active;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     HELPERS
+     ═══════════════════════════════════════════════════════════ */
+  function escapeHtml(str) {
+    if (str == null) return '';
+    const d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+  function truncate(str, len) {
+    if (!str) return '';
+    return str.length > len ? str.substring(0, len) + '...' : str;
+  }
+
+  function shortUrl(url) {
+    if (!url) return '';
+    try {
+      const u = new URL(url);
+      let display = u.hostname.replace(/^www\./, '') + u.pathname;
+      if (display.length > 32) display = display.substring(0, 32) + '...';
+      return display;
+    } catch {
+      return truncate(url, 32);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOAST
+     ═══════════════════════════════════════════════════════════ */
+  function showToast(title, message, type = 'success', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const icons = { success: 'fa-check', error: 'fa-times', info: 'fa-info', warning: 'fa-exclamation' };
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-icon"><i class="fas ${icons[type] || 'fa-info'}"></i></div>
+      <div class="toast-content"><strong>${title}</strong><span>${message}</span></div>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('removing');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+
+  console.log(
+    "%c 🤝 Dashboard Collaborations ",
+    "background:linear-gradient(135deg,#0F766E,#4F46E5,#8B5CF6);color:#fff;font-weight:900;padding:6px 14px;border-radius:6px;font-size:13px;"
+  );
+</script>
 
 </body>
 </html>
