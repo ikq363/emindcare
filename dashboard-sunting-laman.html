@@ -63,14 +63,9 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border-radius: 10px; }
 
-/* ═══════════════════════════════════════════════════
-   LAYOUT
-   ═══════════════════════════════════════════════════ */
+/* ═══════ LAYOUT ═══════ */
 .app { display: flex; min-height: 100vh; min-height: 100dvh; }
 
-/* ═══════════════════════════════════════════════════
-   MAIN
-   ═══════════════════════════════════════════════════ */
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
@@ -142,12 +137,9 @@ body {
   background: var(--pearl);
   color: var(--teal);
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 
-/* ═══════════════════════════════════════════════════
-   CONTENT WRAPPER — grid dengan side nav
-   ═══════════════════════════════════════════════════ */
+/* ═══════ CONTENT WRAPPER ═══════ */
 .content {
   flex: 1;
   padding: 1.5rem;
@@ -161,9 +153,7 @@ body {
 }
 .content-main { min-width: 0; }
 
-/* ═══════════════════════════════════════════════════
-   SIDE NAV (Section Jumper)
-   ═══════════════════════════════════════════════════ */
+/* ═══════ SIDE NAV ═══════ */
 .side-nav {
   position: sticky;
   top: 5.5rem;
@@ -227,9 +217,7 @@ body {
 }
 .side-nav-item.active i { opacity: 1; }
 
-/* ═══════════════════════════════════════════════════
-   SECTION
-   ═══════════════════════════════════════════════════ */
+/* ═══════ FORM SECTION ═══════ */
 .form-section {
   background: #fff;
   border: 1px solid var(--line);
@@ -292,9 +280,7 @@ body {
   line-height: 1.5;
 }
 
-/* ═══════════════════════════════════════════════════
-   FORM
-   ═══════════════════════════════════════════════════ */
+/* ═══════ FORM ═══════ */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -355,7 +341,6 @@ body {
 }
 .input-wrap:focus-within .input-icon { color: var(--teal); }
 .input-field::placeholder { color: var(--ink-light); font-weight: 500; font-size: 0.8rem; }
-.input-field.no-icon { padding-left: 1rem; }
 textarea.input-field {
   padding-left: 1rem;
   min-height: 90px;
@@ -375,7 +360,6 @@ textarea.input-field.tall { min-height: 120px; }
 }
 .input-info i { color: var(--teal); font-size: 0.68rem; }
 
-/* Character counter */
 .char-counter {
   position: absolute;
   bottom: 0.65rem;
@@ -392,9 +376,7 @@ textarea.input-field.tall { min-height: 120px; }
 .char-counter.warn { color: var(--orange); }
 .char-counter.limit { color: var(--rose); }
 
-/* ═══════════════════════════════════════════════════
-   IMAGE UPLOAD CARD
-   ═══════════════════════════════════════════════════ */
+/* ═══════ IMAGE UPLOAD CARD ═══════ */
 .image-upload-card {
   display: flex;
   gap: 1.25rem;
@@ -444,22 +426,6 @@ textarea.input-field.tall { min-height: 120px; }
   font-size: 1.8rem;
   opacity: 0.5;
 }
-.image-preview-box .preview-badge {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--emerald);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6rem;
-  border: 2px solid #fff;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
 .image-upload-info { flex: 1; min-width: 200px; }
 .image-upload-title {
   font-size: 0.92rem;
@@ -479,9 +445,7 @@ textarea.input-field.tall { min-height: 120px; }
   flex-wrap: wrap;
 }
 
-/* ═══════════════════════════════════════════════════
-   UPLOAD PROGRESS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ UPLOAD PROGRESS ═══════ */
 .upload-progress {
   display: none;
   margin-top: 1rem;
@@ -527,9 +491,7 @@ textarea.input-field.tall { min-height: 120px; }
   box-shadow: 0 0 12px rgba(20, 184, 166, 0.5);
 }
 
-/* ═══════════════════════════════════════════════════
-   BUTTONS
-   ═══════════════════════════════════════════════════ */
+/* ═══════ BUTTONS ═══════ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -583,12 +545,6 @@ textarea.input-field.tall { min-height: 120px; }
   color: var(--teal);
   background: rgba(15, 118, 110, 0.05);
 }
-.btn-danger {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--rose);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-.btn-danger:hover { background: var(--rose); color: #fff; }
 .btn-sm { padding: 0.55rem 1rem; font-size: 0.78rem; border-radius: 10px; }
 
 .btn .spinner {
@@ -603,9 +559,7 @@ textarea.input-field.tall { min-height: 120px; }
 .btn.loading .btn-loading { display: inline-flex; align-items: center; gap: 0.5rem; }
 .btn .btn-loading { display: none; }
 
-/* ═══════════════════════════════════════════════════
-   ACTION BAR (STICKY)
-   ═══════════════════════════════════════════════════ */
+/* ═══════ ACTION BAR ═══════ */
 .action-bar {
   position: sticky;
   bottom: 1.25rem;
@@ -654,9 +608,7 @@ textarea.input-field.tall { min-height: 120px; }
   flex-wrap: wrap;
 }
 
-/* ═══════════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════════ */
+/* ═══════ TOAST ═══════ */
 .toast-container {
   position: fixed;
   top: 1.5rem;
@@ -705,66 +657,7 @@ textarea.input-field.tall { min-height: 120px; }
 .toast-content strong { display: block; color: var(--ink); font-size: 0.85rem; margin-bottom: 0.15rem; font-weight: 700; }
 .toast-content span { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; display: block; }
 
-/* ═══════════════════════════════════════════════════
-   MODAL
-   ═══════════════════════════════════════════════════ */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9997;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(8px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.modal.active { display: flex; opacity: 1; }
-.modal-card {
-  background: #fff;
-  border-radius: 22px;
-  padding: 1.75rem 1.6rem;
-  max-width: 440px;
-  width: 100%;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
-  animation: modalPop 0.4s var(--ease-elastic);
-}
-@keyframes modalPop {
-  from { opacity: 0; transform: scale(0.9) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-.modal-icon {
-  width: 60px; height: 60px;
-  margin: 0 auto 1rem;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.5rem;
-}
-.modal-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--rose); }
-.modal-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
-.modal-title {
-  font-family: 'Fraunces', serif;
-  font-size: 1.25rem;
-  font-weight: 900;
-  text-align: center;
-  color: var(--ink);
-  margin-bottom: 0.4rem;
-}
-.modal-desc {
-  font-size: 0.86rem;
-  color: var(--ink-soft);
-  text-align: center;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
-.modal-actions { display: flex; gap: 0.6rem; }
-.modal-actions .btn { flex: 1; }
-
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════ */
+/* ═══════ RESPONSIVE ═══════ */
 @media (max-width: 1200px) {
   .content { grid-template-columns: 1fr; }
   .side-nav { position: static; top: auto; }
@@ -839,9 +732,7 @@ textarea.input-field.tall { min-height: 120px; }
 
         <form id="landingForm" autocomplete="off">
 
-          <!-- ═══════════════════════════════════════════════
-               BAHAGIAN 1: IDENTITI VISUAL
-               ═══════════════════════════════════════════════ -->
+          <!-- ═══════ BAHAGIAN 1: IDENTITI VISUAL ═══════ -->
           <div class="form-section" id="section-1" style="--sec-c1:#0F766E; --sec-c2:#14B8A6;">
             <div class="section-header">
               <div class="section-icon"><i class="fas fa-fingerprint"></i></div>
@@ -924,9 +815,7 @@ textarea.input-field.tall { min-height: 120px; }
             </div>
           </div>
 
-          <!-- ═══════════════════════════════════════════════
-               BAHAGIAN 2: HERO SECTION
-               ═══════════════════════════════════════════════ -->
+          <!-- ═══════ BAHAGIAN 2: HERO SECTION ═══════ -->
           <div class="form-section" id="section-2" style="--sec-c1:#4F46E5; --sec-c2:#6366F1;">
             <div class="section-header">
               <div class="section-icon"><i class="fas fa-rocket"></i></div>
@@ -946,15 +835,11 @@ textarea.input-field.tall { min-height: 120px; }
                   <i class="fas fa-text-height input-icon"></i>
                   <input type="text" id="heroTitle" class="input-field" placeholder="Selamat Datang Ke e-Mindcare" maxlength="120" required>
                 </div>
-                <div class="input-info">
-                  <i class="fas fa-lightbulb"></i>
-                  <span>Teks ini akan jadi tajuk besar di bahagian atas laman</span>
-                </div>
               </div>
 
               <div class="form-group full" style="position:relative;">
                 <label class="form-label" for="heroSubtitle">Slogan / Sub-tajuk Hero</label>
-                <textarea id="heroSubtitle" class="input-field" placeholder="Empowering Minds Through Interactive Navigation, Digital Counseling, and Resilience Excellence" maxlength="250" rows="3"></textarea>
+                <textarea id="heroSubtitle" class="input-field" placeholder="Empowering Minds Through Interactive Navigation..." maxlength="250" rows="3"></textarea>
                 <div class="char-counter" id="heroSubCounter">0 / 250</div>
               </div>
 
@@ -976,9 +861,7 @@ textarea.input-field.tall { min-height: 120px; }
             </div>
           </div>
 
-          <!-- ═══════════════════════════════════════════════
-               BAHAGIAN 3: VISI & MISI
-               ═══════════════════════════════════════════════ -->
+          <!-- ═══════ BAHAGIAN 3: VISI & MISI ═══════ -->
           <div class="form-section" id="section-3" style="--sec-c1:#8B5CF6; --sec-c2:#A78BFA;">
             <div class="section-header">
               <div class="section-icon"><i class="fas fa-bullseye"></i></div>
@@ -1004,9 +887,7 @@ textarea.input-field.tall { min-height: 120px; }
             </div>
           </div>
 
-          <!-- ═══════════════════════════════════════════════
-               BAHAGIAN 4: MAKLUMAT PEJABAT & FOOTER
-               ═══════════════════════════════════════════════ -->
+          <!-- ═══════ BAHAGIAN 4: MAKLUMAT PEJABAT & FOOTER ═══════ -->
           <div class="form-section" id="section-4" style="--sec-c1:#F59E0B; --sec-c2:#FBBF24;">
             <div class="section-header">
               <div class="section-icon"><i class="fas fa-address-book"></i></div>
@@ -1158,27 +1039,14 @@ textarea.input-field.tall { min-height: 120px; }
   </div>
 </div>
 
-<!-- CONFIRM MODAL -->
-<div class="modal" id="confirmModal">
-  <div class="modal-card">
-    <div class="modal-icon warning" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
-    <h3 class="modal-title" id="confirmTitle">Anda Pasti?</h3>
-    <p class="modal-desc" id="confirmDesc">Tindakan ini tidak boleh diundur.</p>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeConfirmModal()">Batal</button>
-      <button class="btn btn-danger" id="confirmBtn">Ya, Teruskan</button>
-    </div>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ⭐ SIDEBAR JS — auto-inject sidebar HTML -->
+<!-- ⭐ SIDEBAR JS -->
 <script type="module" src="sidebar.js"></script>
 
-<!-- ⭐ PAGE JS -->
-<script type="module" src="dashboard-landing.js"></script>
+<!-- ⭐ PAGE JS — nama fail baharu -->
+<script type="module" src="dashboard-sunting-laman.js"></script>
 
 </body>
 </html>
